@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corrective Actions — Claude Design Prompt</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface-alt: #21253a;
+      --border: #2e3347;
+      --accent: #6c8ef5;
+      --accent-soft: #1e2a4a;
+      --text: #e2e5f0;
+      --text-muted: #7c85a2;
+      --green: #4ade80;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --orange: #fb923c;
+      --grey: #94a3b8;
+      --tag-bg: #2a2f45;
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 48px 24px 80px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 48px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 640px;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Context card */
+    .context-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .context-card p { margin-bottom: 10px; }
+    .context-card p:last-child { margin-bottom: 0; }
+
+    /* Feature cards */
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+
+    .feature-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .feature-number {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .feature-title-block h3 { margin-bottom: 4px; }
+    .feature-title-block .what-it-does {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .new-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #1a3a2a;
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* Requirements list */
+    .req-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 16px 0 10px;
+    }
+
+    ul.req {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    ul.req li {
+      display: flex;
+      gap: 10px;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    ul.req li::before {
+      content: '→';
+      color: var(--accent);
+      font-size: 13px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Combined action checklist */
+    .checklist {
+      background: var(--surface-alt);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin: 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .check-box {
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Data model */
+    .model-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .model-grid { grid-template-columns: 1fr; }
+    }
+
+    .model-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+
+    .model-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .field-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-list li {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .field-list li code {
+      color: var(--text);
+      background: var(--surface-alt);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    /* Status chips */
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .chip.yellow { background: #2e2410; color: var(--yellow); }
+    .chip.yellow .chip-dot { background: var(--yellow); }
+    .chip.red { background: #2e1010; color: var(--red); }
+    .chip.red .chip-dot { background: var(--red); }
+    .chip.orange { background: #2e1a0a; color: var(--orange); }
+    .chip.orange .chip-dot { background: var(--orange); }
+    .chip.green { background: #0e2a18; color: var(--green); }
+    .chip.green .chip-dot { background: var(--green); }
+    .chip.grey { background: #1e2530; color: var(--grey); }
+    .chip.grey .chip-dot { background: var(--grey); }
+
+    /* Entry points */
+    .entry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .entry-grid { grid-template-columns: 1fr; }
+    }
+
+    .entry-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .entry-card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .entry-card p {
+      font-size: 13px;
+      margin-bottom: 0;
+    }
+
+    /* UX principles */
+    .principles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .principles-grid { grid-template-columns: 1fr; }
+    }
+
+    .principle-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+
+    .principle-card .icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .principle-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .principle-card p {
+      font-size: 13px;
+      margin-bottom: 0;
+    }
+
+    /* Not in scope */
+    .not-in-scope {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+
+    .not-in-scope ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .not-in-scope ul li {
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .not-in-scope ul li::before {
+      content: '✕';
+      color: var(--red);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    /* Deliverable */
+    .deliverable {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-top: 40px;
+    }
+
+    .deliverable h3 {
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .deliverable p {
+      color: var(--text);
+      margin-bottom: 0;
+      font-size: 15px;
+    }
+
+    /* Warning note */
+    .warning-note {
+      background: #2a1e0a;
+      border: 1px solid #4a3010;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--orange);
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-label">Claude Design Prompt</div>
+    <h1>Corrective Actions<br>Runtime Operations Prototype</h1>
+    <p class="subtitle">Design a powerful, safe operator console for intervening on running process instances in real time — inside a BPMN process orchestration platform (FlowX).</p>
+  </div>
+
+  <!-- Context -->
+  <div class="section">
+    <h2>Context &amp; Mental Model</h2>
+    <div class="context-card">
+      <p>In FlowX, a <strong>Process Instance</strong> is a running execution of a BPMN process definition. Each instance carries one or more <strong>Tokens</strong> — markers that travel through the process graph node by node. A token's position tells you exactly where execution is stuck or progressing.</p>
+      <p>Process instances can be launched standalone or as part of a <strong>UI Flow Session</strong> — a higher-level orchestration that groups multiple process instances into a single end-user journey (e.g. an onboarding flow that spawns a KYC process, a document upload process, and an approval process together).</p>
+      <p>An application can have multiple <strong>builds</strong> — versioned snapshots of the process definitions and configuration deployed at a specific point in time. A running instance always belongs to a specific build. When a new build is deployed (e.g. after a hotfix), existing running instances remain on their original build unless explicitly migrated.</p>
+      <p><strong>Operators need to intervene when:</strong> a token is stuck at a broken node; running instances need to continue on a newer build after a hotfix; or a variable value needs correction without restarting the instance from scratch.</p>
+    </div>
+  </div>
+
+  <!-- Data model -->
+  <div class="section">
+    <h2>Data Model</h2>
+    <div class="model-grid">
+
+      <div class="model-card">
+        <h4>Process Instance</h4>
+        <ul class="field-list">
+          <li><code>uuid</code> — unique identifier</li>
+          <li><code>processDefinitionName</code> — process name</li>
+          <li><code>state</code> — see statuses below</li>
+          <li><code>buildAppVersionId</code> — current build</li>
+          <li><code>initiatorUsername</code> — who started it</li>
+          <li><code>timestamp</code> — when it started</li>
+          <li><code>tokens[]</code> — list of tokens</li>
+        </ul>
+        <div class="status-row">
+          <span class="chip yellow"><span class="chip-dot"></span>STARTED</span>
+          <span class="chip grey"><span class="chip-dot"></span>ON_HOLD</span>
+          <span class="chip green"><span class="chip-dot"></span>FINISHED</span>
+          <span class="chip red"><span class="chip-dot"></span>FAILED</span>
+          <span class="chip orange"><span class="chip-dot"></span>EXPIRED</span>
+          <span class="chip orange"><span class="chip-dot"></span>ABORTED</span>
+          <span class="chip orange"><span class="chip-dot"></span>TERMINATED</span>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <h4>Token</h4>
+        <ul class="field-list">
+          <li><code>uuid</code> — unique identifier</li>
+          <li><code>state</code> — ACTIVE, ON_HOLD, INACTIVE, EXPIRED, ABORTED, DISMISSED, TERMINATED</li>
+          <li><code>currentNode</code> — node where token sits</li>
+          <li><code>nodeType</code> — USER_TASK, SERVICE_TASK, EXCLUSIVE_GATEWAY, PARALLEL_GATEWAY, etc.</li>
+        </ul>
+      </div>
+
+      <div class="model-card">
+        <h4>Build</h4>
+        <ul class="field-list">
+          <li><code>id</code> — unique identifier</li>
+          <li><code>versionLabel</code> — e.g. v2.1.4</li>
+          <li><code>deployedAt</code> — deployment timestamp</li>
+          <li><code>status</code> — ACTIVE, INACTIVE</li>
+        </ul>
+      </div>
+
+      <div class="model-card">
+        <h4>UI Flow Session</h4>
+        <ul class="field-list">
+          <li><code>id</code> — unique identifier</li>
+          <li><code>uiFlowName</code> — name of the UI flow</li>
+          <li><code>status</code> — mirrors process states</li>
+          <li><code>dateStarted</code> — when it started</li>
+          <li><code>processInstances[]</code> — grouped instances</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section">
+    <h2>Features to Design</h2>
+
+    <!-- Feature 1 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-number">1</div>
+        <div class="feature-title-block">
+          <h3>Move Token <span class="new-badge">New</span></h3>
+          <div class="what-it-does">Moves a token from its current node to any other node in the same process definition. Used when a token is stuck at a broken node and needs to be rerouted to unblock execution.</div>
+        </div>
+      </div>
+      <div class="req-label">Design Requirements</div>
+      <ul class="req">
+        <li>Works on <strong>individual instances</strong> (from instance detail view or from list)</li>
+        <li>Works in <strong>bulk</strong> — operator selects multiple instances of the same process definition and moves all their tokens to the same target node in one action</li>
+        <li>Target node is selected from a visual representation of the BPMN process — show a simplified node list or mini-graph with node names and types</li>
+        <li>Available on instances in <strong>any non-terminal state</strong> (STARTED, ON_HOLD, CREATED, FAILED, EXPIRED)</li>
+        <li>Can be combined with Change Variables and/or Migrate Instance in a single atomic operation (see Feature 4)</li>
+        <li>Confirmation step: "You are about to move [N] token(s) from node [X] to node [Y] across [M] instance(s). This action cannot be undone."</li>
+      </ul>
+    </div>
+
+    <!-- Feature 2 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-number">2</div>
+        <div class="feature-title-block">
+          <h3>Migrate Running Instance to Another Build <span class="new-badge">New</span></h3>
+          <div class="what-it-does">Moves a running process instance from the build it is currently executing on to a different (typically newer) build of the same application. The instance continues execution from where it left off, but now runs against the updated process definition. Used after deploying a hotfix so instances on the old build continue on the new one without being restarted or lost.</div>
+        </div>
+      </div>
+      <div class="req-label">Design Requirements</div>
+      <ul class="req">
+        <li>Works on <strong>individual instances</strong> and in <strong>bulk</strong> (select multiple → migrate all to target build)</li>
+        <li>Operator selects the <strong>target build</strong> from a dropdown showing available builds (version label + deployed date + status)</li>
+        <li>The current build each instance is on must be clearly visible before and after selection</li>
+        <li>Bulk migration: all selected instances must belong to the same process definition; warn clearly if mixed selection is attempted</li>
+        <li>Applies to instances in <strong>any state</strong> — including FAILED, EXPIRED (not just active ones)</li>
+        <li>Can be combined with Move Token and/or Change Variables in a single atomic operation (see Feature 4)</li>
+        <li>Confirmation step: current build → target build, number of instances affected, warning if target build has structural changes that may affect token positions</li>
+      </ul>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-number">3</div>
+        <div class="feature-title-block">
+          <h3>Change Variables</h3>
+          <div class="what-it-does">Updates the process variables (key-value pairs) on a running instance. Used to fix bad input data, override a stuck condition variable, or inject missing values without restarting the instance.</div>
+        </div>
+      </div>
+      <div class="req-label">Design Requirements</div>
+      <ul class="req">
+        <li>Works on instances in <strong>any status</strong> — including FAILED, TERMINATED, EXPIRED (not just STARTED/ON_HOLD)</li>
+        <li><strong>Single instance:</strong> JSON editor with diff view showing current values vs. proposed changes side by side</li>
+        <li><strong>Bulk:</strong> apply the same <em>variable patch</em> (partial set of key-value pairs — only the keys being changed) across multiple selected instances simultaneously</li>
+        <li>Bulk editor must make it visually explicit this is a <strong>partial patch, not a full replace</strong></li>
+        <li>Can be combined with Move Token and/or Migrate Instance in a single atomic operation (see Feature 4)</li>
+      </ul>
+    </div>
+
+    <!-- Feature 4 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-number">4</div>
+        <div class="feature-title-block">
+          <h3>Combined Corrective Action <span class="new-badge">New</span></h3>
+          <div class="what-it-does">Compose a single corrective operation that applies multiple corrections atomically — e.g. "migrate this instance to build v2.1.4 AND move the token to the Approval node AND set variable approved = true."</div>
+        </div>
+      </div>
+      <div class="req-label">Composable Action Panel</div>
+      <div class="checklist">
+        <div class="check-item"><div class="check-box"></div> Move Token → pick target node</div>
+        <div class="check-item"><div class="check-box"></div> Migrate Instance to Build → pick target build</div>
+        <div class="check-item"><div class="check-box"></div> Change Variables → edit JSON patch</div>
+      </div>
+      <ul class="req">
+        <li>Accessible from both single-instance detail and bulk list selection</li>
+        <li>Design as a <strong>step-by-step wizard or composable action panel</strong></li>
+        <li>Any combination of the three is valid (all three, any two, or just one)</li>
+        <li>Operations execute in logical order: Change Variables → Migrate Instance → Move Token</li>
+        <li>Summary/review step before executing: what will change and on how many instances</li>
+        <li>Show per-instance result after execution (success / partial failure / failed)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Entry Points -->
+  <div class="section">
+    <h2>Entry Points</h2>
+    <div class="entry-grid">
+      <div class="entry-card">
+        <h4>① Via Process Instances</h4>
+        <p>Operator comes from the Process Instances monitoring list, selects one or more instances (filterable by process definition, status, build version, date range, initiator), and triggers corrective actions from a toolbar or row context menu.</p>
+      </div>
+      <div class="entry-card">
+        <h4>② Via UI Flow Sessions</h4>
+        <p>Operator opens a UI Flow Session, sees all process instances grouped under it, and applies corrective actions on individual instances or all instances in the session at once (session-level bulk).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- UX Principles -->
+  <div class="section">
+    <h2>UX Principles</h2>
+    <div class="principles-grid">
+      <div class="principle-card">
+        <div class="icon">🔒</div>
+        <h4>Safe by Default</h4>
+        <p>Every action requires a confirmation step with a clear impact summary: X instances affected, current state → new state.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">📋</div>
+        <h4>Auditable</h4>
+        <p>Read-only audit trail per instance: who performed which corrective action and when.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">🔍</div>
+        <h4>Filterable at Scale</h4>
+        <p>Filter by process name, status, build version, date range, initiator. Operators work with large volumes.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">👥</div>
+        <h4>Bulk-First Thinking</h4>
+        <p>Primary workflow assumes many instances at once (e.g. after a bad deployment), not just one.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">⏳</div>
+        <h4>Async Feedback</h4>
+        <p>Operations may take time. Show per-instance progress and result: in-progress, success, partial failure.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">🎨</div>
+        <h4>Status-Aware Styling</h4>
+        <p>STARTED = yellow · FAILED/ERROR = red · EXPIRED/ABORTED/TERMINATED = orange · FINISHED = green · ON_HOLD = grey</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Not in scope -->
+  <div class="section">
+    <h2>Not in Scope</h2>
+    <div class="not-in-scope">
+      <ul>
+        <li>The BPMN process editor</li>
+        <li>Build deployment or release flows</li>
+        <li>Authentication or permission management screens</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Deliverable -->
+  <div class="deliverable">
+    <h3>Deliverable</h3>
+    <p>A complete interactive prototype of the Corrective Actions screen covering all four features, both entry paths (Process Instances and UI Flow Sessions), single and bulk operation flows, and the combined action wizard. Use a <strong>dark-neutral enterprise design language</strong> consistent with a monitoring/operations console.</p>
+  </div>
+
+</div>
+</body>
+</html>
