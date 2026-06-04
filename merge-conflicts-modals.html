@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merge Conflicts – Modal Documentation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      background: #f5f6f8;
+      color: #1a1d23;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ── Header ── */
+    .page-header { margin-bottom: 40px; }
+    .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .page-header p { color: #6b7280; font-size: 13px; }
+
+    /* ── Flow diagram ── */
+    .flow-section { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 28px 32px; margin-bottom: 40px; }
+    .flow-section h2 { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+    .flow { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 0; }
+    .flow-step { display: flex; align-items: center; }
+    .flow-node {
+      background: #eff6ff;
+      border: 1.5px solid #3b82f6;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #1d4ed8;
+      white-space: nowrap;
+    }
+    .flow-node.trigger { background: #f0fdf4; border-color: #22c55e; color: #15803d; }
+    .flow-node.error   { background: #fff7ed; border-color: #f97316; color: #c2410c; }
+    .flow-node.warn    { background: #fefce8; border-color: #eab308; color: #854d0e; }
+    .flow-node.destroy { background: #fef2f2; border-color: #ef4444; color: #b91c1c; }
+    .flow-arrow { color: #9ca3af; font-size: 18px; padding: 0 6px; }
+    .flow-branch { display: flex; flex-direction: column; gap: 6px; }
+
+    /* ── Modal cards ── */
+    .section-label {
+      font-size: 11px; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: #9ca3af;
+      margin: 36px 0 12px;
+    }
+
+    .modal-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .modal-card-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 24px;
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 10px; font-weight: 600; letter-spacing: .05em;
+      padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+    }
+    .badge-modal   { background: #dbeafe; color: #1d4ed8; }
+    .badge-view    { background: #f3e8ff; color: #6b21a8; }
+    .badge-entry   { background: #dcfce7; color: #15803d; }
+    .modal-card-header h3 { font-size: 15px; font-weight: 600; flex: 1; }
+    .selector-pill {
+      font-size: 11px; background: #f1f5f9; color: #475569;
+      border: 1px solid #e2e8f0; border-radius: 4px;
+      padding: 2px 8px; font-family: monospace;
+    }
+
+    .modal-card-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 680px) { .modal-card-body { grid-template-columns: 1fr; } }
+
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .06em; }
+    .field-value { font-size: 13px; color: #374151; }
+    .field-value code { font-family: monospace; font-size: 12px; background: #f1f5f9; padding: 1px 5px; border-radius: 3px; color: #0f172a; }
+
+    .mock {
+      margin-top: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fafafa;
+      overflow: hidden;
+      grid-column: 1 / -1;
+    }
+    .mock-bar {
+      background: #e5e7eb; padding: 6px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 11px; color: #6b7280; font-weight: 500;
+    }
+    .mock-body { padding: 20px 24px; }
+    .mock-title { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+    .mock-subtitle { font-size: 12px; color: #6b7280; text-align: center; margin-bottom: 16px; }
+    .mock-tip {
+      background: #f9fafb; border-radius: 6px; padding: 8px 12px;
+      font-size: 11px; color: #374151; display: flex; align-items: flex-start; gap: 6px; margin-bottom: 12px;
+    }
+    .mock-tip-icon { color: #eab308; flex-shrink: 0; }
+    .mock-action-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; border: none; cursor: default; }
+    .btn-primary { background: #3b82f6; color: #fff; }
+    .btn-ghost { background: transparent; color: #374151; border: 1px solid #d1d5db; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-text-danger { background: transparent; color: #ef4444; font-size: 12px; padding: 7px 8px; }
+    .mock-list-item { display: flex; align-items: center; gap-8px; padding: 6px 0; border-bottom: 1px solid #f3f4f6; font-size: 12px; color: #374151; }
+    .mock-list-item:last-child { border-bottom: none; }
+    .mock-accordion { border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+    .mock-accordion-header { background: #f3f4f6; padding: 8px 12px; font-size: 12px; font-weight: 600; color: #374151; display: flex; justify-content: space-between; }
+    .mock-accordion-body { padding: 8px 12px; }
+    .mock-error-item { background: #fff7ed; border-left: 3px solid #f97316; padding: 8px 12px; margin-bottom: 8px; font-size: 12px; border-radius: 0 4px 4px 0; }
+    .mock-split { display: grid; grid-template-columns: 20% 1fr; gap: 0; height: 200px; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden; }
+    .mock-tree-panel { background: #f9fafb; border-right: 1px solid #e5e7eb; padding: 8px; font-size: 11px; }
+    .mock-editor-panel { padding: 8px 12px; overflow: hidden; }
+    .mock-3col { display: grid; grid-template-columns: 1fr 44px 1fr 44px 1fr; gap: 0; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden; height: 160px; }
+    .mock-dep-col { background: #fff; padding: 8px; font-size: 11px; overflow: hidden; }
+    .mock-dep-sep { background: #f3f4f6; border-left: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; }
+    .mock-dep-arrow { color: #3b82f6; font-size: 16px; }
+    .mock-form-field { margin-bottom: 12px; }
+    .mock-form-label { font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #374151; }
+    .mock-form-label span { color: #ef4444; }
+    .mock-input { width: 100%; border: 1px solid #d1d5db; border-radius: 5px; padding: 7px 10px; font-size: 12px; background: #fff; color: #6b7280; }
+    .mock-textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 5px; padding: 7px 10px; font-size: 12px; background: #fff; color: #6b7280; height: 52px; }
+    .duplicate-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f3f4f6; font-size: 12px; }
+    .tag { display: inline-block; font-size: 10px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 3px; padding: 1px 6px; }
+
+    .route-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; grid-column: 1 / -1; }
+    .route-table th { text-align: left; padding: 7px 10px; background: #f3f4f6; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #374151; }
+    .route-table td { padding: 7px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+    .route-table tr:last-child td { border-bottom: none; }
+    .route-table code { font-family: monospace; background: #f1f5f9; padding: 1px 5px; border-radius: 3px; }
+
+    /* actions list */
+    .actions-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .actions-list li { display: flex; align-items: flex-start; gap-8px; font-size: 13px; color: #374151; }
+    .actions-list li::before { content: "•"; color: #9ca3af; flex-shrink: 0; margin-right: 6px; }
+
+    .full-col { grid-column: 1 / -1; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Merge Conflicts – Modal & View Documentation</h1>
+    <p>Auto-extracted from <code>apps/designer/src/app/modules/merge-conflicts/</code> &amp; <code>apps/designer/src/app/modules/process-details/</code> &nbsp;·&nbsp; FlowX Designer</p>
+  </div>
+
+  <!-- Flow Overview -->
+  <div class="flow-section">
+    <h2>User Flow Overview</h2>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-node trigger">Merge Branch Modal<br><span style="font-weight:400;font-size:11px">app-merge-branch-modal</span></div>
+        <div class="flow-arrow">→</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-branch">
+          <div class="flow-node warn">Duplicate Resource Identifiers<br><span style="font-weight:400;font-size:11px">flx-same-name-identifiers</span></div>
+          <div style="font-size:11px;color:#9ca3af;text-align:center">↓ if duplicates</div>
+        </div>
+        <div class="flow-arrow" style="align-self:flex-start;padding-top:10px">→</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-node">Conflicts List<br><span style="font-weight:400;font-size:11px">flx-merge-conflicts-list</span></div>
+        <div class="flow-arrow">→</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-branch" style="gap:10px">
+          <div class="flow-node">Conflict Viewer<br><span style="font-weight:400;font-size:11px">flx-conflict-viewer</span></div>
+          <div class="flow-node">Tree Conflict Viewer<br><span style="font-weight:400;font-size:11px">flx-conflict-tree-viewer</span></div>
+        </div>
+        <div class="flow-arrow" style="align-self:flex-start;padding-top:10px">→</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-branch" style="gap:10px">
+          <div class="flow-node">Merge Confirmation<br><span style="font-weight:400;font-size:11px">flx-merge-conflicts-confirmation</span></div>
+          <div class="flow-node destroy">Discard Confirmation<br><span style="font-weight:400;font-size:11px">flx-discard-conflicts-confirmation</span></div>
+          <div class="flow-node error">Merge Errors<br><span style="font-weight:400;font-size:11px">flx-merge-conflicts-errors</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────────── -->
+  <!-- ENTRY POINTS -->
+  <!-- ───────────────────────────────────────────────── -->
+  <div class="section-label">Entry Point</div>
+
+  <!-- 1. Merge Branch Modal -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-modal">Modal</span>
+      <h3>Merge Branch Modal</h3>
+      <span class="selector-pill">app-merge-branch-modal</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>apps/designer/…/process-details/components/merge-branch-modal/merge-branch-modal.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route / Trigger</div>
+        <div class="field-value">Opened programmatically via <code>FLX_MODAL_DATA</code> injection token; triggered from the version actions menu.</div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Collects branch selection and commit message before initiating the merge process. WIP branches are disabled in the dropdown.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Actions / Outputs</div>
+        <ul class="actions-list">
+          <li><strong>Cancel</strong> – closes modal, no action</li>
+          <li><strong>Merge</strong> – emits merge metadata via <code>dataEventEmitter</code>; disabled while form is invalid</li>
+        </ul>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Validation</div>
+        <ul class="actions-list">
+          <li>Branch: required</li>
+          <li>Message: required, max 50 chars, pattern (letters/digits/allowed symbols)</li>
+          <li>Branches with WIP status are disabled with tooltip explanation</li>
+        </ul>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><span>app-merge-branch-modal</span><span>Modal</span></div>
+        <div class="mock-body">
+          <div style="font-size:15px;font-weight:600;margin-bottom:16px">Merge <em>v1.0</em> Into Branch</div>
+          <div class="mock-form-field">
+            <div class="mock-form-label">Branch <span>*</span></div>
+            <div class="mock-input">Select branch ▾</div>
+          </div>
+          <div class="mock-form-field">
+            <div class="mock-form-label">Message <span>*</span></div>
+            <textarea class="mock-textarea" readonly>Enter changes description</textarea>
+          </div>
+          <div class="mock-action-row">
+            <button class="btn btn-ghost">Cancel</button>
+            <button class="btn btn-primary">Merge</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────────── -->
+  <!-- OUTER SHELL -->
+  <!-- ───────────────────────────────────────────────── -->
+  <div class="section-label">Outer Shell</div>
+
+  <!-- 2. Merge Conflicts Modal (wrapper) -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-modal">Modal Wrapper</span>
+      <h3>Merge Conflicts Modal</h3>
+      <span class="selector-pill">flx-merge-conflicts-modal</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>apps/designer/…/merge-conflicts/components/merge-conflicts-modal/merge-conflicts-modal.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route / Trigger</div>
+        <div class="field-value">Outer container; all conflict views are rendered inside its <code>&lt;router-outlet name="mergeConflicts"&gt;</code>.</div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Provides the modal chrome (close button, loading overlay with spinner) and hosts all nested routed conflict components. Emits <code>manualMergeCompleted</code> and <code>discardManualMerge</code> to parent.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Loading state</div>
+        <div class="field-value">Full-screen semi-transparent overlay with <code>flx-spinner</code> and contextual text message while API operations are in progress.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Outputs</div>
+        <ul class="actions-list">
+          <li><code>manualMergeCompleted</code> – merge finished (or close button clicked)</li>
+          <li><code>discardManualMerge</code> – merge discarded</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────────── -->
+  <!-- PRE-CONFLICT CHECK -->
+  <!-- ───────────────────────────────────────────────── -->
+  <div class="section-label">Pre-Conflict Check</div>
+
+  <!-- 3. Same Name Identifiers -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Routed View</span>
+      <h3>Duplicate Resource Identifiers</h3>
+      <span class="selector-pill">flx-same-name-identifiers</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/same-name-identifiers/same-name-identifiers.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route</div>
+        <div class="field-value"><code>/duplicate-name-entries</code></div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Shown before conflict resolution begins when resources in the two branches share the same unique identifiers. Advises the user to create new branch versions and rename identifiers before proceeding. Does <strong>not</strong> allow proceeding — only closing.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Content</div>
+        <ul class="actions-list">
+          <li>List of duplicate resources (icon, type, name)</li>
+          <li>Info button per row opens a <code>p-popover</code> showing each branch's version, creator, date, and a deep-link button to open the resource in context</li>
+          <li>Tip: resolve before proceeding by creating new branch versions</li>
+        </ul>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Actions</div>
+        <ul class="actions-list">
+          <li><strong>Close</strong> – dismisses the modal</li>
+          <li><strong>Open in &lt;branch&gt;</strong> (popover) – redirects to the resource in the selected branch</li>
+        </ul>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><span>flx-same-name-identifiers</span><span>Route: /duplicate-name-entries</span></div>
+        <div class="mock-body">
+          <div class="mock-title">Duplicate Resource Identifiers</div>
+          <div class="mock-subtitle">Some resources share unique identifiers across branches.</div>
+          <div class="mock-tip"><span class="mock-tip-icon">💡</span> Before reviewing conflicts and proceeding with the merge, resolve these issues first by creating new versions of the branches and changing the identifiers.</div>
+          <div class="duplicate-row"><span>⚙</span> Process – Name – <strong>"payment-flow"</strong> <span class="tag">ℹ</span></div>
+          <div class="duplicate-row"><span>📋</span> Enumeration – Name – <strong>"document-types"</strong> <span class="tag">ℹ</span></div>
+          <div class="mock-action-row">
+            <button class="btn btn-primary">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────────── -->
+  <!-- MAIN CONFLICT FLOW -->
+  <!-- ───────────────────────────────────────────────── -->
+  <div class="section-label">Main Conflict Resolution Flow</div>
+
+  <!-- 4. Merge Conflicts List -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Routed View</span>
+      <h3>Merge Conflicts List</h3>
+      <span class="selector-pill">flx-merge-conflicts-list</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/merge-conflicts-list/merge-conflicts-list.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route</div>
+        <div class="field-value"><code>/:mergeConflictsId</code> (default child)</div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Overview of all detected conflicts, grouped by resource type in collapsible accordions. User can navigate to each conflict to resolve it, or trigger a merge (with or without reviewing everything).</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Content</div>
+        <ul class="actions-list">
+          <li>Branch metadata header (merge-from / merge-over branch names)</li>
+          <li>Tip: changes from the source branch are prioritized unless overridden</li>
+          <li>Global conflicts (metadata, config parameters, etc.) as individual links</li>
+          <li>Resource conflicts (Processes, Views, Enumerations, etc.) in accordions with counts</li>
+          <li>Each row links to the detailed conflict viewer</li>
+        </ul>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Actions</div>
+        <ul class="actions-list">
+          <li><strong>Discard Merge</strong> – navigates to <code>discard-confirmation</code></li>
+          <li><strong>Merge</strong> – triggers merge; if unreviewed items remain, navigates to <code>confirmation</code>; otherwise merges directly. Disabled when there are unresolved errors.</li>
+        </ul>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><span>flx-merge-conflicts-list</span><span>Route: /:mergeConflictsId</span></div>
+        <div class="mock-body">
+          <div class="mock-title">Merge Conflicts Detected</div>
+          <div class="mock-subtitle" style="margin-bottom:4px">Merging from <strong>feature/auth</strong> → <strong>master</strong></div>
+          <div class="mock-tip"><span class="mock-tip-icon">💡</span> Unless specified otherwise, changes from <strong>feature/auth</strong> will be prioritized.</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Conflicts</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:8px">Open each resource and choose a resolution for the conflicts between versions.</div>
+          <div class="mock-accordion">
+            <div class="mock-accordion-header"><span>Processes (3)</span><span>▾</span></div>
+            <div class="mock-accordion-body">
+              <div class="mock-list-item">payment-flow &nbsp;<span style="margin-left:auto;color:#9ca3af">↗</span></div>
+              <div class="mock-list-item">onboarding-process &nbsp;<span style="margin-left:auto;color:#9ca3af">↗</span></div>
+            </div>
+          </div>
+          <div class="mock-accordion">
+            <div class="mock-accordion-header"><span>Views (1)</span><span>▾</span></div>
+            <div class="mock-accordion-body">
+              <div class="mock-list-item">checkout-view &nbsp;<span style="margin-left:auto;color:#9ca3af">↗</span></div>
+            </div>
+          </div>
+          <div class="mock-action-row">
+            <button class="btn btn-ghost">Discard Merge</button>
+            <button class="btn btn-primary">Merge</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Conflict Viewer -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Routed View</span>
+      <h3>Conflict Viewer</h3>
+      <span class="selector-pill">flx-conflict-viewer</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/conflict-viewer/conflict-viewer.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route</div>
+        <div class="field-value"><code>/:mergeConflictsId/:conflictKey/:conflictType</code></div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Displays the diff between two branch versions of a single resource. Routes to either <strong>General Conflict Viewer</strong> (code/JSON diff) or <strong>Dependencies Conflict Viewer</strong> depending on conflict type.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Content</div>
+        <ul class="actions-list">
+          <li>Breadcrumb navigation header with back button</li>
+          <li>"All conflicts have been reviewed" checkbox (top right)</li>
+          <li>Branch version metadata strip (<code>flx-conflict-versioning-info</code>)</li>
+          <li>Contextual instruction text</li>
+          <li>Embedded diff editor (CodeMirror 3-pane: left / result / right)</li>
+        </ul>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Actions</div>
+        <ul class="actions-list">
+          <li>Mark as reviewed via checkbox</li>
+          <li>Navigate back to conflicts list via breadcrumb</li>
+          <li>Select left or right version in CodeMirror diff view</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. General Conflict Viewer -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Embedded View</span>
+      <h3>General Conflict Viewer (CodeMirror Diff)</h3>
+      <span class="selector-pill">flx-general-conflict-viewer</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/general-conflict-viewer/general-conflict-viewer.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Used by</div>
+        <div class="field-value"><code>flx-conflict-viewer</code> when the conflict is NOT a dependency conflict</div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">3-pane CodeMirror merge editor. Left = source branch, right = target branch, center = editable result. Supports scripting language mismatch detection with per-side "select all" buttons.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Special states</div>
+        <ul class="actions-list">
+          <li><strong>Different scripting languages</strong> – shows language pills and "select all from left/right" bulk-accept buttons</li>
+          <li><strong>Parent deleted</strong> – editors are disabled with an orange warning: <em>"Parent conflict resolved as 'deleted'…"</em></li>
+          <li><strong>Invalid code</strong> – footer shows orange warning: <em>"Error invalid code. Changes will not be saved."</em></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Conflict Tree Viewer -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Routed View</span>
+      <h3>Conflict Tree Viewer</h3>
+      <span class="selector-pill">flx-conflict-tree-viewer</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/conflict-tree-viewer/conflict-tree-viewer.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route</div>
+        <div class="field-value"><code>/:mergeConflictsId/:conflictKey/:conflictType/:conflictResourceId</code></div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Hierarchical split-pane view for complex resources (e.g. Processes). Left panel shows a conflict tree; right panel shows the selected node's diff with an editor or location conflict resolver.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Content</div>
+        <ul class="actions-list">
+          <li>Breadcrumb header + "Mark all … conflicts as solved" checkbox</li>
+          <li>Left panel: <code>flx-conflicts-tree</code> – navigable conflict tree with review status indicators</li>
+          <li>Right panel: conflict path breadcrumb, versioning info strip, and either:
+            <ul style="margin-left:16px">
+              <li><code>flx-selected-conflict-tree-editor</code> – CodeMirror diff for editor conflicts</li>
+              <li><code>flx-selected-conflict-tree-location</code> – location/position conflict resolver</li>
+            </ul>
+          </li>
+          <li>"Mark this item as solved" checkbox per selected node</li>
+        </ul>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><span>flx-conflict-tree-viewer</span><span>Split-pane layout</span></div>
+        <div class="mock-body">
+          <div class="mock-split">
+            <div class="mock-tree-panel">
+              <div style="font-weight:600;margin-bottom:6px;font-size:11px">Conflict Tree</div>
+              <div style="padding:2px 0;color:#374151">▾ payment-flow</div>
+              <div style="padding:2px 0 2px 12px;color:#ef4444">● action-node-1</div>
+              <div style="padding:2px 0 2px 12px;color:#22c55e">✓ action-node-2</div>
+              <div style="padding:2px 0 2px 12px;color:#ef4444">● gateway-1</div>
+            </div>
+            <div class="mock-editor-panel">
+              <div style="font-size:11px;color:#6b7280;margin-bottom:6px">Conflict Path: Process \ action-node-1</div>
+              <div style="background:#fef2f2;border-left:3px solid #ef4444;padding:4px 8px;font-size:11px;border-radius:0 4px 4px 0;margin-bottom:4px">- old code</div>
+              <div style="background:#f0fdf4;border-left:3px solid #22c55e;padding:4px 8px;font-size:11px;border-radius:0 4px 4px 0">+ new code</div>
+              <div style="margin-top:8px;display:flex;justify-content:flex-end">
+                <span style="font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" disabled /> Mark this item as solved</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Dependencies Conflict Viewer -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Embedded View</span>
+      <h3>Dependencies Conflict Viewer</h3>
+      <span class="selector-pill">flx-dependencies-conflict-viewer</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/dependencies-conflict-viewer/dependencies-conflict-viewer.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Used by</div>
+        <div class="field-value"><code>flx-conflict-viewer</code> when <code>isDependenciesConflict()</code> is true</div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">3-column dependency tree view. Left = source branch dependencies, center = final resolution (editable), right = target branch dependencies. Arrow buttons in the separator columns allow bulk-accepting left or right version.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Interaction</div>
+        <ul class="actions-list">
+          <li>Click arrow in left separator → accept left (source) version entirely</li>
+          <li>Click arrow in right separator → accept right (target) version entirely</li>
+          <li>Center tree is the live resolution; diffs are highlighted vs. selected version</li>
+        </ul>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><span>flx-dependencies-conflict-viewer</span><span>3-column layout</span></div>
+        <div class="mock-body">
+          <div class="mock-3col">
+            <div class="mock-dep-col"><div style="font-weight:600;margin-bottom:4px;font-size:11px">feature/auth</div><div style="font-size:10px;color:#6b7280">dep-A v1.2<br>dep-B v3.0<br>dep-C v2.1</div></div>
+            <div class="mock-dep-sep"><span class="mock-dep-arrow">→</span></div>
+            <div class="mock-dep-col" style="background:#f0fdf4"><div style="font-weight:600;margin-bottom:4px;font-size:11px">Final Resolution</div><div style="font-size:10px;color:#6b7280">dep-A v1.2<br>dep-B v3.1<br>dep-C v2.1</div></div>
+            <div class="mock-dep-sep"><span class="mock-dep-arrow">←</span></div>
+            <div class="mock-dep-col"><div style="font-weight:600;margin-bottom:4px;font-size:11px">master</div><div style="font-size:10px;color:#6b7280">dep-A v1.2<br>dep-B v3.1<br>dep-D v1.0</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────────── -->
+  <!-- CONFIRMATION / DESTRUCTIVE -->
+  <!-- ───────────────────────────────────────────────── -->
+  <div class="section-label">Confirmations &amp; Error States</div>
+
+  <!-- 9. Merge Confirmation -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Routed View</span>
+      <h3>Merge Confirmation</h3>
+      <span class="selector-pill">flx-merge-conflicts-confirmation</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/merge-conflicts-confirmation/merge-conflicts-confirmation.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route</div>
+        <div class="field-value"><code>/:mergeConflictsId/confirmation</code></div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Safety prompt shown when the user clicks "Merge" before reviewing all conflicts. Confirms that unreviewed conflicts will default to source branch priority.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Actions</div>
+        <ul class="actions-list">
+          <li><strong>Back to Conflicts List</strong> – navigates to <code>../</code> (conflicts list)</li>
+          <li><strong>Merge Anyway</strong> – calls <code>startManualMerge()</code> to proceed</li>
+        </ul>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><span>flx-merge-conflicts-confirmation</span><span>Route: confirmation</span></div>
+        <div class="mock-body">
+          <div style="font-size:14px;font-weight:600;margin-bottom:8px">Merge without checking all items?</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:16px">For conflicts where it isn't otherwise specified, changes from <strong>feature/auth</strong> will be prioritized</div>
+          <div class="mock-action-row" style="justify-content:space-between">
+            <button class="btn btn-ghost">Back to Conflicts List</button>
+            <button class="btn btn-primary">Merge Anyway</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. Discard Confirmation -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Routed View</span>
+      <h3>Discard Conflicts Confirmation</h3>
+      <span class="selector-pill">flx-discard-conflicts-confirmation</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/discard-conflicts-confirmation/discard-conflicts-confirmation.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route</div>
+        <div class="field-value"><code>/:mergeConflictsId/discard-confirmation</code></div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Destructive action confirmation. Warns that all resolved conflicts will be lost and the merge must be restarted from scratch.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Actions</div>
+        <ul class="actions-list">
+          <li><strong>Continue merge</strong> – calls <code>goBack()</code> (returns to previous view)</li>
+          <li><strong>Discard merge</strong> (red) – calls <code>discard()</code>, emits <code>discardManualMerge</code> on outer modal, closes flow</li>
+        </ul>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><span>flx-discard-conflicts-confirmation</span><span>Route: discard-confirmation</span></div>
+        <div class="mock-body">
+          <div style="font-size:14px;font-weight:600;margin-bottom:8px">Are you sure you want to discard the merge process?</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:16px">All resolved conflicts will be lost, and you will need to start over.</div>
+          <div class="mock-action-row" style="justify-content:space-between">
+            <button class="btn btn-ghost">Continue merge</button>
+            <button class="btn btn-danger">Discard merge</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Merge Errors -->
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <span class="badge badge-view">Routed View</span>
+      <h3>Merge Conflicts Errors</h3>
+      <span class="selector-pill">flx-merge-conflicts-errors</span>
+    </div>
+    <div class="modal-card-body">
+      <div class="field-group">
+        <div class="field-label">File</div>
+        <div class="field-value"><code>…/merge-conflicts/components/merge-conflicts-errors/merge-conflicts-errors.component.ts</code></div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Route</div>
+        <div class="field-value"><code>/:mergeConflictsId/errors</code></div>
+      </div>
+      <div class="field-group full-col">
+        <div class="field-label">Purpose</div>
+        <div class="field-value">Shown when the merge API call fails. Displays a summary error message and a scrollable list of individual error details. Offers three recovery paths.</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Actions</div>
+        <ul class="actions-list">
+          <li><strong>Discard Merge</strong> (text, red, with trash icon) – navigates to <code>discard-confirmation</code></li>
+          <li><strong>Return Later</strong> – closes the modal without discarding (state preserved)</li>
+          <li><strong>Retry</strong> – re-attempts the merge operation</li>
+        </ul>
+      </div>
+      <div class="mock">
+        <div class="mock-bar"><span>flx-merge-conflicts-errors</span><span>Route: errors</span></div>
+        <div class="mock-body">
+          <div class="mock-title">Merge Process Failed</div>
+          <div class="mock-subtitle">An unexpected error occurred during the merge operation.</div>
+          <div class="mock-error-item"><strong>Error 1</strong><br>Conflict resolution for 'payment-flow' contains invalid references.</div>
+          <div class="mock-error-item"><strong>Error 2</strong><br>Dependency version mismatch in 'onboarding-process'.</div>
+          <div class="mock-action-row" style="justify-content:space-between;align-items:center">
+            <button class="btn btn-text-danger">🗑 Discard Merge</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost">Return Later</button>
+              <button class="btn btn-primary">Retry</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────────── -->
+  <!-- ROUTE TABLE -->
+  <!-- ───────────────────────────────────────────────── -->
+  <div class="section-label">Route Reference</div>
+  <div class="modal-card">
+    <div class="modal-card-body" style="display:block">
+      <table class="route-table">
+        <thead>
+          <tr>
+            <th>Route</th>
+            <th>Component</th>
+            <th>Selector</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/duplicate-name-entries</code></td>
+            <td>FlxSameNameIdentifiersComponent</td>
+            <td><code>flx-same-name-identifiers</code></td>
+          </tr>
+          <tr>
+            <td><code>/:mergeConflictsId</code></td>
+            <td>FlxMergeConflictsListComponent</td>
+            <td><code>flx-merge-conflicts-list</code></td>
+          </tr>
+          <tr>
+            <td><code>/:mergeConflictsId/:conflictKey/:conflictType</code></td>
+            <td>FlxConflictViewerComponent</td>
+            <td><code>flx-conflict-viewer</code></td>
+          </tr>
+          <tr>
+            <td><code>/:mergeConflictsId/:conflictKey/:conflictType/:conflictResourceId</code></td>
+            <td>FlxConflictTreeViewerComponent</td>
+            <td><code>flx-conflict-tree-viewer</code></td>
+          </tr>
+          <tr>
+            <td><code>/:mergeConflictsId/confirmation</code></td>
+            <td>FlxMergeConflictsConfirmationComponent</td>
+            <td><code>flx-merge-conflicts-confirmation</code></td>
+          </tr>
+          <tr>
+            <td><code>/:mergeConflictsId/discard-confirmation</code></td>
+            <td>FlxDiscardConflictsConfirmationComponent</td>
+            <td><code>flx-discard-conflicts-confirmation</code></td>
+          </tr>
+          <tr>
+            <td><code>/:mergeConflictsId/errors</code></td>
+            <td>FlxMergeConflictsErrorsComponent</td>
+            <td><code>flx-merge-conflicts-errors</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
