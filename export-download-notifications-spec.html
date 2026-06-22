@@ -13,7 +13,7 @@
   }
   *{box-sizing:border-box}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    max-width:860px;margin:0 auto;padding:48px 24px 96px;color:var(--text);line-height:1.62;font-size:15.5px;background:#fff;-webkit-font-smoothing:antialiased}
+    max-width:880px;margin:0 auto;padding:48px 24px 96px;color:var(--text);line-height:1.62;font-size:15.5px;background:#fff;-webkit-font-smoothing:antialiased}
   h1{font-size:2rem;font-weight:750;line-height:1.2;margin:0 0 6px}
   h2{font-size:1.4rem;font-weight:700;margin:46px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
   h3{font-size:1.12rem;font-weight:680;margin:28px 0 10px}
@@ -35,7 +35,6 @@
   th{font-weight:680;color:var(--muted);background:var(--bg-soft)}
   tbody tr:last-child td{border-bottom:0}
   hr{border:0;border-top:1px solid var(--border);margin:34px 0}
-  .lede{color:var(--muted);font-size:1.02rem}
   .meta{font-size:13px;color:var(--faint);margin-top:4px}
   .links{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 6px}
   .links a{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:9px;
@@ -45,6 +44,8 @@
   .b-done{background:var(--green-bg);color:var(--green)}
   .b-defer{background:var(--grey-bg);color:var(--muted)}
   .b-open{background:#eef4ff;color:#2a5fb0}
+  .env{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;letter-spacing:.02em}
+  .env.s{background:#1f6feb;color:#fff}.env.t{background:#f0b429;color:#503c05}.env.p{background:#3a4250;color:#fff}
   .callout{display:flex;gap:10px;background:var(--bg-soft);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:16px 0;color:var(--muted);font-size:14.5px}
   .toc{background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:24px 0}
   .toc strong{display:block;margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint)}
@@ -55,7 +56,7 @@
 <body>
 
 <h1>Export → Notify → Download — Implementation Plan</h1>
-<p class="meta">Living design doc · Last updated 2026-06-19</p>
+<p class="meta">Living design doc · Last updated 2026-06-20</p>
 
 <blockquote><p><strong>Purpose:</strong> Living design doc for the version-settings export/download + notification mechanism. Keep this updated as decisions are made. See the <strong>Decision Log</strong> at the bottom.</p></blockquote>
 
@@ -79,7 +80,7 @@
     <li><a href="#s7">7 · Edge cases</a></li>
     <li><a href="#s8">8 · Delivery phases</a></li>
     <li><a href="#s9">9 · UX explorations</a></li>
-    <li><a href="#run">Running the prototype</a></li>
+    <li><a href="#ideas">Ideas to make the center more useful</a></li>
     <li><a href="#log">Decision Log</a></li>
     <li><a href="#open">Open questions</a></li>
   </ol>
@@ -99,23 +100,17 @@
 <h2 id="s0">0 · Integration into FlowX Designer (observed UI)</h2>
 <p>Grounded in the real Designer screens (prototype is isolated, but mirrors these surfaces):</p>
 <ul>
-  <li><strong>Persistent header (dark top bar):</strong> logo · <code>SANDBOX</code> · <code>workspace / project</code> breadcrumb · branching pill (<code>main</code> / <code>draft</code> / commit msg) · <strong>Commit Changes to Version</strong> · <code>Config / Runtime</code> toggle. This is the only surface visible on <em>every</em> page → <strong>the global notification indicator must live here.</strong></li>
-  <li><strong>Branching console</strong> — opened by the <strong>Branching</strong> (git-branch) icon in the header. Full overlay with: left <strong>Version Details</strong> panel, center <strong>All Branches</strong> graph, right commit list. The export is launched from here.</li>
-  <li><strong>Export entry points:</strong> <strong>Export Version</strong> button in the left Version Details panel, and an export icon at the top of <em>All Branches</em>.</li>
-  <li><strong>Export Version modal (exists today):</strong>
-    <ul>
-      <li>Info box: <em>"Choose the target FlowX.AI version and whether to include media files in the export package. The exported ZIP can only be imported into environments running the selected version."</em></li>
-      <li><strong>Target platform version</strong> dropdown — defaults to current (e.g. <code>5.9.X — Current Version</code>); lower versions selectable (<code>5.5.x</code>, <code>5.1.x</code>, …). Choosing lower → exclusions.</li>
-      <li><strong>Include media file content</strong> toggle.</li>
-      <li><strong>Cancel</strong> / <strong>Export</strong> actions.</li>
-    </ul>
-  </li>
-  <li><strong>Existing color language:</strong> in <em>Resources changed</em>, bars are <strong>green = added, yellow = modified, red = deleted</strong>. The excluded-resources panel should align with this vocabulary when color coding is revisited.</li>
+  <li><strong>Persistent header (dark top bar):</strong> logo · <code>SANDBOX</code> · <code>workspace / project</code> breadcrumb · branching pill · <strong>Commit Changes to Version</strong> · <code>Config / Runtime</code> toggle. The only surface on <em>every</em> page → <strong>the global notification indicator lives here.</strong></li>
+  <li><strong>Branching console</strong> — opened by the <strong>Branching</strong> icon. Left <strong>Version Details</strong> · center <strong>All Branches</strong> graph · right commit list. Export is launched from here.</li>
+  <li><strong>Export entry points:</strong> <strong>Export Version</strong> button in Version Details, and an export icon atop <em>All Branches</em>.</li>
+  <li><strong>Export Version modal (exists today):</strong> info box; <strong>Target platform version</strong> dropdown (current or lower → exclusions); <strong>Include media file content</strong> toggle; <strong>Cancel</strong> / <strong>Export</strong>.</li>
+  <li><strong>Existing color language:</strong> in <em>Resources changed</em>, bars are <strong>green = added, yellow = modified, red = deleted</strong>. Align the excluded panel with this when color coding is revisited.</li>
+  <li><strong>Runtime → Builds (second export entry point):</strong> the <code>Config / Runtime</code> toggle switches to a runtime shell (Builds · Runtime Settings · Processes · UI Flows Sessions · Task Manager · Configure Params Overrides). The <strong>Builds</strong> page lists builds (e.g. <code>Bizkids 1.6.2</code>), each with an <strong>Export build</strong> icon that opens the <em>same</em> experience. The only difference is the <em>source</em>: a build vs. a committed version; labels, cache key, and the download manifest reflect it.</li>
 </ul>
-<p>This prototype rebuilds these surfaces in isolation and <strong>adds</strong> the missing post-export experience (processing → notification → download + impact).</p>
+<p>This prototype rebuilds these surfaces in isolation and <strong>adds</strong> the missing post-export experience (processing → notification → download + impact), shared by both the <strong>Config</strong> (version) and <strong>Runtime</strong> (build) entry points.</p>
 
 <h2 id="s1">1 · Core model: an asynchronous, cacheable Export Job</h2>
-<p>The export is a <strong>server-side job with a lifecycle</strong>. The notification is the messenger that tells the user the job changed state. The download is a separate action against a ready artifact.</p>
+<p>The export is a <strong>server-side job with a lifecycle</strong>. The notification tells the user the job changed state. The download is a separate action against a ready artifact.</p>
 <h3>Export Job states</h3>
 <pre><code>REQUESTED ──► PROCESSING ──► READY                     (zip ready, no exclusions)
                    │     └──► READY_WITH_EXCLUSIONS     (zip ready, some resources dropped)
@@ -141,21 +136,15 @@ READY / READY_WITH_EXCLUSIONS ──► DOWNLOADED ──► EXPIRED</code></pre
   targetPlatformVersion,                      // exclusions depend on this
   includeMediaFiles + mediaFilesRevision      // media set hash
 )</code></pre>
-<p>On a new request:</p>
 <ol>
   <li>Look up a <strong>non-expired</strong> artifact by <code>cacheKey</code>.</li>
-  <li><strong>Hit</strong> → return the existing job in <code>READY</code> / <code>READY_WITH_EXCLUSIONS</code> immediately — no worker, no 15-min wait. Download available at once.</li>
+  <li><strong>Hit</strong> → return the existing job in <code>READY</code> / <code>READY_WITH_EXCLUSIONS</code> immediately — no worker, no 15-min wait.</li>
   <li><strong>Miss</strong> → create a new job, enqueue the worker.</li>
 </ol>
-<p>Key on the <em>content revision</em> (not just version ID) and on <code>targetPlatformVersion</code>, so a changed WIP or a different target produces a distinct artifact. Store artifacts in object storage (S3/MinIO) with a TTL (24–72h). Persist the exclusion report alongside the artifact so a cache hit shows impact without recomputation.</p>
+<p>Key on the <em>content revision</em> (not just version ID) and on <code>targetPlatformVersion</code>. Store artifacts in object storage (S3/MinIO) with a TTL (24–72h). Persist the exclusion report alongside the artifact so a cache hit shows impact without recomputation.</p>
 
 <h2 id="s3">3 · Exclusion computation (the source of impact)</h2>
-<p>When the target platform version is <strong>lower</strong> than the source's, some resource types/schemas won't exist in the target. During the build the worker:</p>
-<ol>
-  <li>Enumerates resources in the source snapshot.</li>
-  <li>Checks each against the <strong>target platform version's capability/schema manifest</strong>.</li>
-  <li>Records incompatible resources in an <code>ExclusionReport</code>, each entry carrying its full location breadcrumb:</li>
-</ol>
+<p>When the target platform version is <strong>lower</strong> than the source's, some resource types/schemas won't exist in the target. During the build the worker enumerates resources, checks each against the <strong>target version's capability/schema manifest</strong>, and records incompatible ones in an <code>ExclusionReport</code> with full location breadcrumbs:</p>
 <pre><code>{
   "path": ["Integrations", "Data Sources"],
   "name": "MailQueue",
@@ -166,60 +155,68 @@ READY / READY_WITH_EXCLUSIONS ──► DOWNLOADED ──► EXPIRED</code></pre
 
 <h2 id="s4">4 · Notification mechanism</h2>
 <p>"A notification should be shown wherever the user is" → notifications are <strong>persisted + pushed in real time + survive navigation/refresh</strong>, decoupled from the modal.</p>
-<p><strong>a. Notification store (backend)</strong> — a <code>Notification</code> per user:</p>
-<pre><code>id, userId, type, status(UNREAD/READ),
-payload(jobId, exportName, targetVersion, exclusionCount, ...), createdAt</code></pre>
-<p>Types: <code>EXPORT_READY</code>, <code>EXPORT_READY_WITH_EXCLUSIONS</code>, <code>EXPORT_FAILED</code>.</p>
-<p><strong>b. Real-time delivery</strong> — on worker completion (or cache hit) the backend writes the <code>Notification</code> row and pushes it over the existing real-time channel (WebSocket/STOMP/SSE), per-user topic.</p>
-<p><strong>c. Fallback delivery</strong> — if no live socket, the row is already persisted; the frontend fetches unread notifications on next load. <em>Push if connected, pull on reconnect — never lost.</em></p>
-<p><strong>d. Frontend notification center</strong> — a global <strong>bell</strong> in the app shell (always mounted, independent of the export modal) with an unread badge; a <strong>toast</strong> for live arrivals; clicking routes to version settings and reopens the download/impact view for that <code>jobId</code>.</p>
+<p><strong>a. Notification store (backend)</strong> — a <code>Notification</code> per user (<code>id, userId, type, status, payload(jobId, exportName, targetVersion, exclusionCount…), createdAt</code>). Types: <code>EXPORT_READY</code>, <code>EXPORT_READY_WITH_EXCLUSIONS</code>, <code>EXPORT_FAILED</code>.</p>
+<p><strong>b. Real-time delivery</strong> — on completion (or cache hit) the backend writes the row and pushes it over the existing real-time channel (WebSocket/STOMP/SSE), per-user topic.</p>
+<p><strong>c. Fallback delivery</strong> — if no live socket, the row is persisted; the frontend fetches unread on next load. <em>Push if connected, pull on reconnect — never lost.</em></p>
+<h4>d. Frontend notification center (unified feed)</h4>
+<ul>
+  <li>A global <strong>bell</strong> in the app shell with an unread badge; a <strong>toast</strong> for live arrivals.</li>
+  <li><strong>Single list</strong> — the export status and the notification are the <em>same</em> row (not two sections).</li>
+  <li><strong>Statuses:</strong> <code>Preparing…</code> → <code>Export ready to download</code> / <code>Export ready — N excluded</code> / <code>Export failed</code>.</li>
+  <li><strong>Action (key):</strong> clean export (<code>READY</code>) → <strong>Download</strong> downloads the ZIP <strong>instantly</strong> (no modal); with exclusions (<code>READY_WITH_EXCLUSIONS</code>) → <strong>Review</strong> opens the impact modal first.</li>
+  <li><strong>Extensible by type</strong> — today every item is an export; the feed is built to host other kinds later (e.g. licence-expiration) — not built yet.</li>
+  <li><strong>Toast suppression (don't double-surface):</strong> the toast is suppressed when the user is already looking — the <strong>center is open</strong> (feed updates live), or the <strong>"Preparing…" modal is still open</strong>, in which case it <strong>switches straight to the download modal</strong> instead of toasting.</li>
+  <li><strong>Cross-view download readiness:</strong> exports link by version <code>tag</code> — a ready export made in <strong>Config</strong> surfaces as a green <strong>"Download ready"</strong> affordance on the matching <strong>Runtime → Builds</strong> row, and vice-versa (shared artifact).</li>
+  <li><strong>Context on every notification (multi-workspace):</strong> users switch workspace + environment from the <strong>logo menu</strong> (env groups <span class="env s">SANDBOX</span> <span class="env t">STAGING</span> <span class="env p">PRODUCTION</span>). Every export is <strong>stamped with the context it was launched in</strong> — <code>{ environment, workspace, project }</code> — and each notification (and toast, and the download modal) shows an <strong>env badge + workspace + project</strong> (e.g. <span class="env p">PRODUCTION</span> Silviu prod · bizkids).</li>
+  <li><strong>Item layout (de-crowded):</strong> two rows — <strong>context header on top</strong> (env pill · workspace · project · time · dismiss ×) and the <strong>notification below</strong> (status icon · title · source · action). Unread = blue left-accent bar.</li>
+  <li><strong>Environment filter:</strong> chips at the top — <code>All / Sandbox / Staging / Production</code> with live counts.</li>
+  <li><strong>Dismiss:</strong> per-item × removes a notification (artifact/cache untouched, so Builds "Download ready" persists).</li>
+</ul>
 <p>Because the notification lives in the app shell, the user can close the modal, navigate, refresh, or return later and still be informed.</p>
 
 <h2 id="s5">5 · Frontend UX — the two steps</h2>
 <h3>Step 1 — Request export (existing Export Version modal, extended)</h3>
 <ul>
-  <li>User picks the <strong>target platform version</strong> (dropdown, current or lower) and the <strong>Include media file content</strong> toggle.</li>
-  <li>If target platform version &lt; current → inline hint under the dropdown: <em>"Some resources may be excluded. You'll see the full list before downloading."</em></li>
-  <li>Click <strong>Export</strong> → backend responds with either a <strong>cache hit</strong> (jump to Step 2, download available now) or a <strong>new job</strong>. On a new job the modal switches to a <strong>"Preparing export… (up to 15 min)"</strong> state with copy: <em>"You can close this and keep working — we'll notify you when it's ready."</em></li>
+  <li>Pick the <strong>target platform version</strong> (current or lower) and <strong>Include media file content</strong>.</li>
+  <li>If target &lt; current → inline hint: <em>"Some resources may be excluded. You'll see the full list before downloading."</em></li>
+  <li>Click <strong>Export</strong> → <strong>cache hit</strong> (jump to Step 2) or <strong>new job</strong> → modal switches to <strong>"Preparing export…"</strong> with <em>"You can close this and keep working — we'll notify you when it's ready."</em></li>
   <li>Modal is <strong>non-blocking and closeable</strong>; the job runs server-side regardless.</li>
 </ul>
-<h3>Step 2 — Download (from notification, or by reopening the modal)</h3>
+<h3>Step 2 — Download (from notification, toast, or by reopening the modal)</h3>
 <ul>
   <li><code>READY</code> → "All resources included. Ready to download."</li>
-  <li><code>READY_WITH_EXCLUSIONS</code> → the <strong>excluded-resources panel</strong> (below), then download.</li>
-  <li>On download → mark <code>DOWNLOADED</code>.</li>
+  <li><code>READY_WITH_EXCLUSIONS</code> → the <strong>excluded-resources panel</strong>, then download.</li>
 </ul>
 <h4>Excluded-resources panel</h4>
-<p><strong>Warning banner:</strong></p>
-<blockquote><p>⚠️ These resources don't exist on <strong>{targetVersion}</strong> and will be <strong>excluded</strong> from the downloaded ZIP. Download anyway, or cancel and choose a higher target version.</p></blockquote>
+<p>The download modal can open anywhere, so its header shows the <strong>env pill + workspace + project</strong> the export belongs to.</p>
+<blockquote><p>⚠️ These resources don't exist on <strong>{targetVersion}</strong> and will be <strong>excluded</strong> from the downloaded ZIP. Download anyway, or change the target version.</p></blockquote>
 <ul>
-  <li>Actions: <strong>Download anyway</strong> (primary) · <strong>Cancel</strong> → returns to the Step 1 target-version picker.</li>
+  <li>Actions: <strong>Download anyway</strong> (primary) · <strong>Change Target Version</strong> → returns to the Step 1 target-version picker.</li>
 </ul>
-<p><strong>List header:</strong> <code>Excluded resources (N)</code></p>
-<p><strong>Each row:</strong> breadcrumb path, muted, <code>\</code>-separated, with the <strong>resource name bold</strong> at the end, divider between rows:</p>
+<p><strong>List header:</strong> <code>Excluded resources (N)</code>. <strong>Each row:</strong> muted <code>\</code>-separated breadcrumb with the <strong>resource name bold</strong> at the end:</p>
 <p style="padding:10px 14px;border-left:4px solid #cfd5de;background:var(--bg-soft);border-radius:0 8px 8px 0">Integrations \ Data Sources \ <strong>MailQueue</strong></p>
-<p>UI builds the breadcrumb from <code>path</code> + <code>name</code> in each <code>ExclusionReport</code> entry. (Row color coding intentionally <strong>out of scope for now</strong> — see Decision Log.) An optional <strong>Download exclusion report</strong> (CSV/JSON) can export the full list.</p>
+<p>(Row color coding intentionally <strong>out of scope for now</strong>.) An optional <strong>Download exclusion report</strong> (CSV/JSON) can export the full list.</p>
 
 <h2 id="s6">6 · Impact clarity — surfaced in three escalating places</h2>
 <ol>
   <li><strong>Pre-export hint</strong> (Step 1) — "may exclude resources" when target &lt; source.</li>
   <li><strong>Notification copy</strong> — "Ready — N resources excluded."</li>
-  <li><strong>Pre-download panel</strong> (Step 2) — full breadcrumb list + reasons + explicit "Download anyway" confirmation, with "choose a higher target version" as the remedy.</li>
+  <li><strong>Pre-download panel</strong> (Step 2) — full breadcrumb list + reasons + explicit "Download anyway" confirmation, with "Change Target Version" as the remedy.</li>
 </ol>
 
 <h2 id="s7">7 · Edge cases</h2>
 <ul>
   <li><strong>Concurrent identical requests</strong> — cache key + job lock; the second request attaches to the in-flight job.</li>
   <li><strong>Failure / timeout</strong> — <code>FAILED</code> notification with Retry; bound worker time.</li>
-  <li><strong>Artifact expiry</strong> — clicking a stale notification shows "Export expired — re-export," not a broken download.</li>
+  <li><strong>Artifact expiry</strong> — a stale notification shows "Export expired — re-export," not a broken download.</li>
   <li><strong>Source changed after request</strong> — content-revision in the cache key prevents reuse of a stale artifact.</li>
   <li><strong>Permissions</strong> — re-check export rights at download time, not just request time.</li>
-  <li><strong>Multiple queued exports</strong> — notifications carry <code>jobId</code> + a human label (export name + target version) to stay distinguishable.</li>
+  <li><strong>Multiple queued exports</strong> — notifications carry <code>jobId</code> + a human label to stay distinguishable.</li>
 </ul>
 
 <h2 id="s8">8 · Delivery phases</h2>
 <ol>
-  <li><strong>Async job backbone</strong> — Export Job entity + state machine, worker, object storage + TTL, status endpoint. (Download works via reopening the modal.)</li>
+  <li><strong>Async job backbone</strong> — entity + state machine, worker, object storage + TTL, status endpoint.</li>
   <li><strong>Caching/dedup</strong> — cache key + lookup → instant repeat downloads.</li>
   <li><strong>Exclusion engine</strong> — capability-manifest comparison + <code>ExclusionReport</code> + the Step 2 panel.</li>
   <li><strong>Notifications</strong> — store, real-time push, fallback pull, bell + toast, deep-link to download.</li>
@@ -227,54 +224,50 @@ payload(jobId, exportName, targetVersion, exclusionCount, ...), createdAt</code>
 </ol>
 
 <h2 id="s9">9 · UX explorations — where the notification + download live</h2>
-<p>The open design question: <strong>where do export status, the global notification, and the download action live?</strong> Three explorations.</p>
-<h3>Exploration A — Global notification bell (header) + download modal</h3>
-<ul>
-  <li>Add a <strong>bell</strong> to the dark header (near Config/Runtime or the avatar). Export runs in background; toast on completion + bell badge.</li>
-  <li>Bell dropdown lists notifications (<em>"Export of main 1.6.2 → 5.5.x ready · 5 excluded"</em>). Click → <strong>Download modal</strong> with the excluded-resources panel.</li>
-  <li><strong>Pros:</strong> satisfies "notify wherever you are" directly; familiar, reusable for builds/commits/collab later; minimal change to the Branching console.</li>
-  <li><strong>Cons:</strong> brand-new global surface to build (+ backend notification store); download is one click "behind" the notification; no persistent export <em>history</em> unless the bell keeps it.</li>
-</ul>
-<h3>Exploration B — Export Center (downloads tray/drawer)</h3>
-<ul>
-  <li>A dedicated <strong>Exports</strong> drawer (icon in header), like a browser downloads tray: every job listed with status/progress, target version, exclusion count, <strong>Download</strong> + re-download for cached artifacts. Impact panel expands inline per row. Toast + badge on completion.</li>
-  <li><strong>Pros:</strong> persistent, scannable <strong>history</strong> — strong fit since exports are cacheable &amp; re-downloaded; one obvious home for downloading; centralizes the whole feature.</li>
-  <li><strong>Cons:</strong> a second panel concept beside the Branching console ("export where? download where?"); still needs the toast for global reach; heavy surface if only exports use it.</li>
-</ul>
-<h3>Exploration C — In-console status + global toast (minimal)</h3>
-<ul>
-  <li>Status lives <strong>inside the Branching console</strong>: the exporting version shows a chip (Preparing → Ready/Excluded); Export button becomes <strong>Download</strong>. Global reach = a <strong>toast</strong> only; clicking reopens the console focused on that version's download.</li>
-  <li><strong>Pros:</strong> smallest footprint; reuses existing console; conceptually tight (export + download live with versions).</li>
-  <li><strong>Cons:</strong> toasts are ephemeral — miss it and there's no persistent "ready" indicator; weak for multiple concurrent exports or other notification types; must reopen console to act.</li>
-</ul>
-<div class="callout"><strong>Recommendation — A + a slim history (blend of A &amp; B).</strong> Lead with the <strong>header bell</strong> (best satisfies "wherever you are" + reusable), and give its dropdown/panel a small <strong>"Exports" list</strong> so cached re-downloads and past exports are discoverable. Defers B's full tray but keeps history. Build target for the prototype.</div>
+<p><strong>A — Global notification bell (header) + download modal.</strong> Pros: satisfies "notify wherever you are", reusable, minimal console change. Cons: new global surface; download one click "behind"; no history unless the bell keeps it.</p>
+<p><strong>B — Export Center (downloads tray).</strong> Pros: persistent scannable history; one home for downloads. Cons: second panel beside the console; still needs the toast; heavy if export-only.</p>
+<p><strong>C — In-console status + global toast.</strong> Pros: smallest footprint; reuses the console. Cons: ephemeral toasts; weak for multiple exports / other types.</p>
+<div class="callout"><strong>Recommendation (built):</strong> <strong>A + a slim history</strong> — header bell that satisfies "wherever you are", with an Exports list for cached re-downloads. (Since evolved into the unified feed in §4d.)</div>
 
-<h2 id="run">Running the prototype</h2>
-<ul>
-  <li>Files: <code>index.html</code> (self-contained app), <code>server.js</code> (tiny Node static server, no deps).</li>
-  <li>Start: <code>node server.js</code> from the project folder → open <strong>http://localhost:8000</strong>. Or just open the <a href="https://madalinagheorghiu-ux.github.io/export-version/">live page</a>.</li>
-  <li>Note: the folder name contains a <code>:</code>, which breaks raw <code>file://</code> URLs and Python's <code>http.server</code> in some sandboxes — serve over HTTP via <code>server.js</code> instead.</li>
-  <li>Gotcha (fixed): Babel standalone's <code>react</code> preset defaults to the <strong>automatic</strong> JSX runtime (emits <code>import</code> → fails in a classic <code>&lt;script&gt;</code>). The page registers a <code>react-classic</code> preset (<code>runtime: 'classic'</code>) so JSX compiles to <code>React.createElement</code>.</li>
-</ul>
+<h2 id="ideas">Ideas to make the center more useful (future features)</h2>
+<p><strong>Shipped so far:</strong> unified feed · per-notification env/workspace/project context · two-row layout · environment filter · dismiss · instant-vs-impact download · context shown in the download modal · cross-view "Download ready".</p>
+<p><strong>Next candidates (rough priority):</strong></p>
+<ol>
+  <li><strong>Type filter / tabs</strong> — once there are more kinds (exports, build status, licence expiry, errors): <code>All / Downloads / System / Alerts</code>.</li>
+  <li><strong>Deep-link "Go to"</strong> — jump to the build/version/project a notification refers to (auto-switch workspace/env context).</li>
+  <li><strong>Expiry indicator + Retry</strong> — show when a download artifact expires (TTL); "Export expired — re-export"; Retry on <code>FAILED</code>.</li>
+  <li><strong>Bulk actions</strong> — "Download all ready", "Clear read", "Clear all", multi-select.</li>
+  <li><strong>Grouping</strong> — by time (Today / Earlier) or by workspace, once volume grows.</li>
+  <li><strong>Unread-only toggle</strong> + search.</li>
+  <li><strong>Priority / severity</strong> — errors and licence-expiry styled distinctly, optionally pinned to top.</li>
+  <li><strong>Persistence</strong> — survive reload/login (backend-backed); <strong>"See all"</strong> full-page activity view.</li>
+  <li><strong>Preferences</strong> — mute types, do-not-disturb; optional email/desktop for long-running exports.</li>
+</ol>
 
 <h2 id="log">Decision Log</h2>
 <table>
   <thead><tr><th>Date</th><th>Decision</th><th>Status</th></tr></thead>
   <tbody>
-    <tr><td>2026-06-19</td><td>Impact UX = inline grouped breadcrumb list + warning banner in the modal (per provided mockup). Path format <code>Category \ Subcategory \ <strong>Name</strong></code>.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
-    <tr><td>2026-06-19</td><td>Row <strong>color coding</strong> of excluded resources — deferred. NB: FlowX already uses green=added / yellow=modified / red=deleted in <em>Resources changed</em>; align with this when revisited.</td><td><span class="badge b-defer">⏸️ Deferred</span></td></tr>
-    <tr><td>2026-06-19</td><td>Prototype is <strong>isolated</strong> from the FlowX codebase but mirrors the real Designer surfaces (header, Branching console, Export Version modal).</td><td><span class="badge b-done">✅ Decided</span></td></tr>
-    <tr><td>2026-06-19</td><td>Export launches from the existing <strong>Branching console → Export Version</strong> modal; missing post-export screens to be built.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
-    <tr><td>2026-06-19</td><td>Notification + download surface = <strong>Exploration A + slim history</strong>: header notification bell (toast + badge), download modal with excluded-resources panel, and a small Exports list inside the bell panel for cached re-downloads.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
-    <tr><td>2026-06-19</td><td>Prototype format = <strong>interactive React app</strong> (single self-contained <code>index.html</code>, React 18 + Babel via CDN, no build step), with a mocked backend (compressed delay, in-memory cache/dedup, simulated notifications).</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td>Iteration workflow = <strong>publish-on-demand</strong>: work on the prototype branch (pushes update PR #1); live URL updates only on explicit "publish".</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td><strong>Same export experience reused in Runtime → Builds</strong>, parameterized by source (build vs version).</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td><strong>Notification center = single unified feed.</strong> Clean exports download instantly; only excluded exports open the impact modal.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td><strong>Don't double-surface a ready export:</strong> suppress the toast when the center is open; the "Preparing…" modal switches straight to the download modal.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td><strong>Cross-view download readiness</strong> links Config↔Runtime by version tag.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td><strong>Notifications carry workspace context</strong> ({environment, workspace, project}); env badge + workspace + project shown everywhere.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td><strong>Notification item redesign:</strong> context header on top, notification below; env filter chips + per-item dismiss.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-20</td><td>Download modal CTA renamed <strong>"Cancel &amp; choose higher version" → "Change Target Version"</strong>.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td>Impact UX = inline grouped breadcrumb list + warning banner in the modal.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td>Row <strong>color coding</strong> of excluded resources — deferred (align with green=added / yellow=modified / red=deleted when revisited).</td><td><span class="badge b-defer">⏸️ Deferred</span></td></tr>
+    <tr><td>2026-06-19</td><td>Prototype is <strong>isolated</strong> from the FlowX codebase but mirrors the real Designer surfaces.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-19</td><td>Prototype format = <strong>interactive React app</strong> (single self-contained <code>index.html</code>, React 18 + Babel via CDN), mocked backend.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
   </tbody>
 </table>
 
 <h2 id="open">Open questions</h2>
 <ul>
-  <li><span class="badge b-open">open</span> <strong>Notification infra</strong> — reuse existing FlowX real-time/notification infrastructure vs. build a dedicated export notification path. (Recommend reuse; needs codebase confirmation.)</li>
-  <li><span class="badge b-open">open</span> <strong>Job cancelability</strong> — can an in-flight export be canceled from the modal/notification, or does it run to completion?</li>
-  <li><span class="badge b-open">open</span> <strong>Color-bar semantics</strong> — if/when color coding returns: severity (fully excluded vs. partially affected) vs. resource category vs. decorative; add a legend if meaningful.</li>
+  <li><span class="badge b-open">open</span> <strong>Notification infra</strong> — reuse existing FlowX real-time/notification infrastructure vs. build a dedicated export path.</li>
+  <li><span class="badge b-open">open</span> <strong>Job cancelability</strong> — can an in-flight export be canceled, or does it run to completion?</li>
+  <li><span class="badge b-open">open</span> <strong>Color-bar semantics</strong> — if/when color coding returns: severity vs. resource category vs. decorative; add a legend if meaningful.</li>
   <li><span class="badge b-open">open</span> <strong>Artifact TTL</strong> — exact retention window (24h / 48h / 72h).</li>
   <li><span class="badge b-open">open</span> <strong>Exclusion report export</strong> — include CSV/JSON download in v1 or later?</li>
 </ul>
