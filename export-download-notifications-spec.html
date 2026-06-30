@@ -10,6 +10,7 @@
     --blue:#1f6feb; --bg-code:#f6f8fa; --bg-soft:#f7f8fa;
     --amber-bg:#fdf7e6; --amber-bd:#f0e0ad; --amber-tx:#8a6a16;
     --green:#197a47; --green-bg:#e7f6ee; --red:#c2392e; --grey-bg:#eef0f3;
+    --orange-bg:#fff5f0; --orange-bd:#f0956d; --orange-tx:#7a3a1a;
   }
   *{box-sizing:border-box}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -44,19 +45,24 @@
   .b-done{background:var(--green-bg);color:var(--green)}
   .b-defer{background:var(--grey-bg);color:var(--muted)}
   .b-open{background:#eef4ff;color:#2a5fb0}
+  .b-resolved{background:#f0f0f0;color:#888;text-decoration:line-through}
   .env{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;letter-spacing:.02em}
   .env.s{background:#1f6feb;color:#fff}.env.t{background:#f0b429;color:#503c05}.env.p{background:#3a4250;color:#fff}
   .callout{display:flex;gap:10px;background:var(--bg-soft);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:16px 0;color:var(--muted);font-size:14.5px}
+  .callout.warn{background:var(--orange-bg);border-color:var(--orange-bd);color:var(--orange-tx)}
   .toc{background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:24px 0}
   .toc strong{display:block;margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint)}
   .toc ol{columns:2;column-gap:32px;margin:0}
+  .opt-box{border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:12px 0;background:var(--bg-soft)}
+  .opt-box h4{margin:0 0 8px}
+  .opt-box ul{margin:6px 0}
   @media(max-width:620px){.toc ol{columns:1}}
 </style>
 </head>
 <body>
 
 <h1>Export → Notify → Download — Implementation Plan</h1>
-<p class="meta">Living design doc · Last updated 2026-06-20</p>
+<p class="meta">Living design doc · Last updated 2026-06-30</p>
 
 <blockquote><p><strong>Purpose:</strong> Living design doc for the version-settings export/download + notification mechanism. Keep this updated as decisions are made. See the <strong>Decision Log</strong> at the bottom.</p></blockquote>
 
@@ -79,7 +85,8 @@
     <li><a href="#s6">6 · Impact clarity</a></li>
     <li><a href="#s7">7 · Edge cases</a></li>
     <li><a href="#s8">8 · Delivery phases</a></li>
-    <li><a href="#s9">9 · UX explorations</a></li>
+    <li><a href="#s9">9 · Corrective Actions — Bulk Migration</a></li>
+    <li><a href="#s10">10 · UX explorations</a></li>
     <li><a href="#ideas">Ideas to make the center more useful</a></li>
     <li><a href="#log">Decision Log</a></li>
     <li><a href="#open">Open questions</a></li>
@@ -105,7 +112,8 @@
   <li><strong>Export entry points:</strong> <strong>Export Version</strong> button in Version Details, and an export icon atop <em>All Branches</em>.</li>
   <li><strong>Export Version modal (exists today):</strong> info box; <strong>Target platform version</strong> dropdown (current or lower → exclusions); <strong>Include media file content</strong> toggle; <strong>Cancel</strong> / <strong>Export</strong>.</li>
   <li><strong>Existing color language:</strong> in <em>Resources changed</em>, bars are <strong>green = added, yellow = modified, red = deleted</strong>. Align the excluded panel with this when color coding is revisited.</li>
-  <li><strong>Runtime → Builds (second export entry point):</strong> the <code>Config / Runtime</code> toggle switches to a runtime shell (Builds · Runtime Settings · Processes · UI Flows Sessions · Task Manager · Configure Params Overrides). The <strong>Builds</strong> page lists builds (e.g. <code>Bizkids 1.6.2</code>), each with an <strong>Export build</strong> icon that opens the <em>same</em> experience. The only difference is the <em>source</em>: a build vs. a committed version; labels, cache key, and the download manifest reflect it.</li>
+  <li><strong>Runtime → Builds (second export entry point):</strong> the <code>Config / Runtime</code> toggle switches to a runtime shell. The <strong>Builds</strong> page lists builds (e.g. <code>Bizkids 1.6.2</code>), each with an <strong>Export build</strong> icon that opens the <em>same</em> experience. The only difference is the <em>source</em>: a build vs. a committed version.</li>
+  <li><strong>Runtime → Corrective Actions (migration entry point):</strong> the <strong>Corrective Actions</strong> page (under Runtime Control) surfaces <strong>Bulk Migration</strong> and <strong>Move Token Bulk</strong> as the two operation types.</li>
 </ul>
 <p>This prototype rebuilds these surfaces in isolation and <strong>adds</strong> the missing post-export experience (processing → notification → download + impact), shared by both the <strong>Config</strong> (version) and <strong>Runtime</strong> (build) entry points.</p>
 
@@ -161,13 +169,13 @@ READY / READY_WITH_EXCLUSIONS ──► DOWNLOADED ──► EXPIRED</code></pre
 <h4>d. Frontend notification center (unified feed)</h4>
 <ul>
   <li>A global <strong>bell</strong> in the app shell with an unread badge; a <strong>toast</strong> for live arrivals.</li>
-  <li><strong>Single list</strong> — the export status and the notification are the <em>same</em> row (not two sections).</li>
+  <li><strong>Single list</strong> — the export status and the notification are the <em>same</em> row (not two sections). Migration notifications share this same feed.</li>
   <li><strong>Statuses:</strong> <code>Preparing…</code> → <code>Export ready to download</code> / <code>Export ready — N excluded</code> / <code>Export failed</code>.</li>
-  <li><strong>Action (key):</strong> clean export (<code>READY</code>) → <strong>Download</strong> downloads the ZIP <strong>instantly</strong> (no modal); with exclusions (<code>READY_WITH_EXCLUSIONS</code>) → <strong>Review</strong> opens the impact modal first.</li>
-  <li><strong>Extensible by type</strong> — today every item is an export; the feed is built to host other kinds later (e.g. licence-expiration) — not built yet.</li>
-  <li><strong>Toast suppression (don't double-surface):</strong> the toast is suppressed when the user is already looking — the <strong>center is open</strong> (feed updates live), or the <strong>"Preparing…" modal is still open</strong>, in which case it <strong>switches straight to the download modal</strong> instead of toasting.</li>
+  <li><strong>Action (key):</strong> clean export (<code>READY</code>) → <strong>Download</strong> downloads the ZIP <strong>instantly</strong> (no modal); with exclusions (<code>READY_WITH_EXCLUSIONS</code>) → <strong>Review &amp; download</strong> opens the impact modal first.</li>
+  <li><strong>Extensible by type</strong> — the feed is built to host other notification kinds (e.g. licence-expiration, bulk migration) — migration is now also in the feed.</li>
+  <li><strong>Toast suppression (don't double-surface):</strong> suppressed when the center is open (feed updates live), or the "Preparing…" modal is still open (switches straight to the download modal).</li>
   <li><strong>Cross-view download readiness:</strong> exports link by version <code>tag</code> — a ready export made in <strong>Config</strong> surfaces as a green <strong>"Download ready"</strong> affordance on the matching <strong>Runtime → Builds</strong> row, and vice-versa (shared artifact).</li>
-  <li><strong>Context on every notification (multi-workspace):</strong> users switch workspace + environment from the <strong>logo menu</strong> (env groups <span class="env s">SANDBOX</span> <span class="env t">STAGING</span> <span class="env p">PRODUCTION</span>). Every export is <strong>stamped with the context it was launched in</strong> — <code>{ environment, workspace, project }</code> — and each notification (and toast, and the download modal) shows an <strong>env badge + workspace + project</strong> (e.g. <span class="env p">PRODUCTION</span> Silviu prod · bizkids).</li>
+  <li><strong>Context on every notification (multi-workspace):</strong> every export/migration is stamped with <code>{ environment, workspace, project }</code> — shown in the notification, toast, and download modal. Env badge uses color: <span class="env s">SANDBOX</span> <span class="env t">STAGING</span> <span class="env p">PRODUCTION</span>.</li>
   <li><strong>Item layout (de-crowded):</strong> two rows — <strong>context header on top</strong> (env pill · workspace · project · time · dismiss ×) and the <strong>notification below</strong> (status icon · title · source · action). Unread = blue left-accent bar.</li>
   <li><strong>Environment filter:</strong> chips at the top — <code>All / Sandbox / Staging / Production</code> with live counts.</li>
   <li><strong>Dismiss:</strong> per-item × removes a notification (artifact/cache untouched, so Builds "Download ready" persists).</li>
@@ -223,14 +231,170 @@ READY / READY_WITH_EXCLUSIONS ──► DOWNLOADED ──► EXPIRED</code></pre
   <li><strong>Polish</strong> — exclusion report export, retry-on-fail, expiry UX, analytics.</li>
 </ol>
 
-<h2 id="s9">9 · UX explorations — where the notification + download live</h2>
+<h2 id="s9">9 · Corrective Actions — Bulk Migration</h2>
+
+<h3>Overview</h3>
+<p><strong>Bulk Migration</strong> moves running process instances from a source build to a target build. Like the export flow it is a long-running async operation (seconds to minutes in production) that notifies the user on completion and offers a result detail view.</p>
+
+<h3>Migration Job states</h3>
+<pre><code>IN_PROGRESS ──► COMPLETED
+            └──► FAILED</code></pre>
+<table>
+  <thead><tr><th>State</th><th>Meaning</th><th>User-facing</th></tr></thead>
+  <tbody>
+    <tr><td><code>IN_PROGRESS</code></td><td>Worker migrating instances</td><td>spinner / progress bar</td></tr>
+    <tr><td><code>COMPLETED</code></td><td>All instances processed</td><td>✅ "Bulk migration completed"</td></tr>
+    <tr><td><code>FAILED</code></td><td>Worker error</td><td>❌ "Bulk migration failed"</td></tr>
+  </tbody>
+</table>
+<p>Each instance within a completed migration has its own outcome: <strong>Success</strong>, <strong>Failed</strong>, or <strong>Terminated</strong>.</p>
+
+<h3 id="s9-1">9.1 · Migration flow (step by step)</h3>
+<p><strong>Entry point:</strong> Corrective Actions → <code>+</code> button → <strong>Migrate Bulk</strong></p>
+
+<ol>
+  <li>
+    <p><strong>Setup modal (Step 1)</strong></p>
+    <ul>
+      <li>Header: <em>"Only process instances in an active or incident state can be migrated."</em></li>
+      <li>Info box: instances on process definitions not present in the target can be skipped or moved to <strong>TERMINATED</strong>; <strong>Change Source Build Active Policy</strong> to prevent new instances starting.</li>
+      <li>Two build pickers: <strong>Source Build</strong> (with <code>ⓘ</code> info icon) and <strong>Target Build</strong>. Target excludes the selected source.</li>
+      <li><strong>Continue</strong> advances to the summary; <strong>Cancel</strong> dismisses.</li>
+    </ul>
+
+    <h4>Edge case: source build with no running instances</h4>
+    <p>Migration can only proceed when the source build has at least one instance in a running (active/incident) state. Two options were evaluated:</p>
+
+    <div class="opt-box">
+      <h4>Option A — Inline validation after selection</h4>
+      <p>User selects any build freely; if the chosen source has no running instances an error is shown below the dropdown and <strong>Continue</strong> is disabled.</p>
+      <ul>
+        <li>✅ Simple dropdown — no visual noise upfront.</li>
+        <li>✅ Familiar form-validation pattern (feedback after input).</li>
+        <li>❌ Error-after-action: the user must undo a choice already made.</li>
+        <li>❌ Trial-and-error if many builds have no instances.</li>
+      </ul>
+    </div>
+
+    <div class="opt-box" style="border-color:var(--blue);">
+      <h4>Option B — Disabled dropdown items with tooltip <span class="badge b-done">✅ Implemented</span></h4>
+      <p>Builds with no running instances are shown in the dropdown but grayed out and non-selectable. Hovering reveals a styled tooltip: <em>"No running instances on this build."</em> An always-visible <em>"No instances"</em> inline tag provides additional discoverability without requiring hover.</p>
+      <ul>
+        <li>✅ Error-prevention over error-recovery (Nielsen #5) — invalid choices are never made.</li>
+        <li>✅ Full eligibility picture at a glance: valid vs. ineligible builds visible together.</li>
+        <li>✅ Tooltip educates inline — no docs required.</li>
+        <li>❌ Tooltip discoverability is lower on touch/mobile.</li>
+        <li>❌ Requires a safeguard for the all-ineligible edge case (see below).</li>
+      </ul>
+      <p><strong>Tooltip messages (both styled with dark CSS pill — no native browser <code>title</code>):</strong></p>
+      <ul>
+        <li><code>ⓘ</code> icon → <em>"Only active or incident instances can be migrated"</em></li>
+        <li>Disabled dropdown item → <em>"No running instances on this build"</em></li>
+      </ul>
+      <p><strong>Safeguard:</strong> when <em>all</em> builds have no running instances, an orange callout appears above the Source Build field: <em>"No builds currently have running instances. Migration requires at least one active or incident process instance."</em> <strong>Continue</strong> is disabled (reduced opacity + <code>not-allowed</code> cursor). This prevents the user from being left with a fully-disabled dropdown and no explanation.</p>
+      <p><em>Mock data (prototype): builds 3.8, 3.9, 3.9.1 have instances; 3.7 and 3.10 do not.</em></p>
+    </div>
+  </li>
+
+  <li>
+    <p><strong>Summary modal (Step 2) — "Bulk Migration Summary"</strong></p>
+    <ul>
+      <li>Subtitle: <em>Migrate running instances from</em> [🔨 src] → [🔨 tgt] (hammer icons on build chips).</li>
+      <li>Intro: <em>"When you start the operation the following will happen:"</em></li>
+      <li>Three collapsible sections (chevron toggle), each with a build chip in the header:
+        <ul>
+          <li><strong>Migrate to 🔨 {tgt}</strong> — processes whose instances will move. Description per row: <em>"Instances will be moved to the target build."</em></li>
+          <li><strong>Terminate running instances</strong> — instances that move to <code>TERMINATED</code>. Description: <em>"Instances move to a TERMINATED state."</em></li>
+          <li><strong>Leave on 🔨 {src}</strong> — processes that stay untouched. Description: <em>"Instances stay on the source build, untouched."</em></li>
+        </ul>
+      </li>
+      <li>Process rows use alternating icons (doc / folder) to differentiate process types visually.</li>
+      <li>Orange warning box: <em>"Affected instances cannot be resumed once the migration runs."</em></li>
+      <li>Actions: <strong>Back to Setup</strong> · <strong>Start Migration</strong>.</li>
+    </ul>
+  </li>
+
+  <li>
+    <p><strong>Processing modal — "Operation in Progress..."</strong></p>
+    <ul>
+      <li>Large spinner at the top; title <em>"Operation in Progress..."</em>; subtitle with build chips: <em>Migrating running instances from</em> [🔨 src] <em>to</em> [🔨 tgt].</li>
+      <li>Body: <em>"This corrective action may take few minutes. You can close this window and keep working. We'll notify you when it's done."</em></li>
+      <li>Progress bar (full-width, animated).</li>
+      <li>On completion the modal <strong>auto-transitions</strong> to the Migration Detail Page.</li>
+      <li><strong>Close - keep working</strong> (blue, right-aligned) dismisses the modal; the job continues; a toast fires on completion (unless the bell panel is already open).</li>
+    </ul>
+  </li>
+
+  <li>
+    <p><strong>Notification + toast</strong> (mirrors export pattern)</p>
+    <ul>
+      <li>Migration appears in the unified bell feed alongside exports, sorted by timestamp.</li>
+      <li>Bell badge increments on completion; feed item shows "Bulk migration completed" + <code>{src} → {tgt}</code> + process count.</li>
+      <li>Toast: <em>"Bulk migration completed · View results"</em> — clicking opens the Migration Detail Page.</li>
+      <li><strong>Toast suppression:</strong> no toast when (a) the bell panel is open, or (b) the processing modal for that migration is still open.</li>
+      <li>Each migration is stamped with <code>{ environment, workspace, project }</code> — shown in the feed and toast.</li>
+    </ul>
+  </li>
+
+  <li>
+    <p><strong>Migration Detail Page</strong> (full-page, replaces the content area)</p>
+    <ul>
+      <li>Opened by: clicking a completed live row in the Corrective Actions table, clicking "View results" in the toast, or clicking the bell feed item.</li>
+      <li><strong>Breadcrumb:</strong> <code>← Operations / Migration {opId}…</code> — clicking "Operations" returns to the list.</li>
+      <li><strong>Summary card:</strong> two-column layout — left has <em>"Bulk Migration"</em> title + meta row (Operation ID with copy icon · date icon · <em>"Ran in Xs"</em>); right has <strong>SOURCE BUILD → TARGET BUILD</strong> chips (with hammer icon) in the top-right corner.</li>
+      <li><strong>Process Instances card (three-zone layout):</strong>
+        <ul>
+          <li><em>Header:</em> "Process Instances" · subtitle (single line, no wrap): <em>"Per-instance result of this migration run. Failed and terminated instances can be retried individually."</em> · search box.</li>
+          <li><em>Outcome zone:</em> OUTCOME label · total count · segmented progress bar (green/red/amber) · clickable stat chips: Success N (X%) · Failed N (X%) · Terminated N (X%).</li>
+          <li><em>Table:</em> PROCESS INSTANCE UUID · PROCESS NAME · STATUS · DETAILS · MIGRATED AT. Coloured status pills: Success (green) · Failed (red) · Terminated (amber).</li>
+        </ul>
+      </li>
+      <li><strong>Status filter:</strong> clicking a stat chip in the Outcome zone filters the table. Active chip gets a coloured background. Click again to clear. Resets to page 1.</li>
+    </ul>
+  </li>
+
+  <li>
+    <p><strong>Migration Details modal (kebab ⋮)</strong> — compact alternative</p>
+    <ul>
+      <li>Clicking <code>⋮</code> on any <em>live completed</em> row opens a compact modal with the process-group breakdown (Migrated to / Terminated / Left on).</li>
+      <li>Distinct from the full-page detail — the modal is a quick-glance summary; the full page has the per-instance table.</li>
+      <li>Kebab click stops row-click propagation so it doesn't also navigate to the detail page.</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="s9-2">9.2 · Notification feed integration</h3>
+<p>Migrations share the unified bell panel feed with exports. The <code>notifStatus</code> helper branches on <code>item.type</code>:</p>
+<table>
+  <thead><tr><th>type</th><th>state</th><th>Feed title</th><th>Icon</th></tr></thead>
+  <tbody>
+    <tr><td><code>migration</code></td><td><code>IN_PROGRESS</code></td><td>Bulk migration in progress…</td><td>spinner</td></tr>
+    <tr><td><code>migration</code></td><td><code>COMPLETED</code></td><td>Bulk migration completed</td><td>✅</td></tr>
+    <tr><td><code>migration</code></td><td><code>FAILED</code></td><td>Bulk migration failed</td><td>❌</td></tr>
+  </tbody>
+</table>
+<p>Feed action on a completed migration: <em>"View results"</em> → navigates to Runtime → Corrective Actions, sets <code>migDetailId</code> to open the Migration Detail Page.</p>
+
+<h3 id="s9-3">9.3 · Prototype implementation notes</h3>
+<ul>
+  <li><code>MIGRATION_PROCESS_MS = 8000</code> (8 s simulated, representing minutes in production).</li>
+  <li><code>BUILDS_WITH_INSTANCES = Set(['3.8', '3.9', '3.9.1'])</code> — mock eligibility for the source build validation (Option B).</li>
+  <li><code>migrations</code> state array in App; each entry: <code>{ id, type:'migration', opType, opId, srcBuild, tgtBuild, state, summary, ctx, read, dismissed, ts }</code>.</li>
+  <li><code>migDetailId</code> state controls full-page routing — checked <strong>before</strong> the Config/Runtime routing branch.</li>
+  <li><code>migWatchRef</code> tracks whether the processing modal is still open for toast suppression (mirrors <code>watchRef</code> for exports).</li>
+  <li><code>MOCK_INSTANCES</code> (20 rows, deterministically seeded at page load) is the shared fixture for all Migration Detail Pages.</li>
+</ul>
+
+<hr/>
+
+<h2 id="s10">10 · UX explorations — where the notification + download live</h2>
 <p><strong>A — Global notification bell (header) + download modal.</strong> Pros: satisfies "notify wherever you are", reusable, minimal console change. Cons: new global surface; download one click "behind"; no history unless the bell keeps it.</p>
 <p><strong>B — Export Center (downloads tray).</strong> Pros: persistent scannable history; one home for downloads. Cons: second panel beside the console; still needs the toast; heavy if export-only.</p>
 <p><strong>C — In-console status + global toast.</strong> Pros: smallest footprint; reuses the console. Cons: ephemeral toasts; weak for multiple exports / other types.</p>
-<div class="callout"><strong>Recommendation (built):</strong> <strong>A + a slim history</strong> — header bell that satisfies "wherever you are", with an Exports list for cached re-downloads. (Since evolved into the unified feed in §4d.)</div>
+<div class="callout"><strong>Recommendation (built):</strong> <strong>A + a slim history</strong> — header bell that satisfies "wherever you are", with an Exports list for cached re-downloads. Evolved into the unified feed in §4d, which also surfaces migration notifications — proving the "extensible by type" design.</div>
 
 <h2 id="ideas">Ideas to make the center more useful (future features)</h2>
-<p><strong>Shipped so far:</strong> unified feed · per-notification env/workspace/project context · two-row layout · environment filter · dismiss · instant-vs-impact download · context shown in the download modal · cross-view "Download ready".</p>
+<p><strong>Shipped so far:</strong> unified feed · per-notification env/workspace/project context · two-row layout · environment filter · dismiss · instant-vs-impact download · context shown in the download modal · cross-view "Download ready" · <strong>Bulk Migration flow</strong> (setup → summary → processing → completion) · <strong>migration notifications in the unified bell feed</strong> · <strong>Migration Detail Page</strong> (full-page: summary card + outcome bar + per-instance table) · <strong>status filter on instances</strong> (click Success / Failed / Terminated chip to filter) · <strong>Migration Details modal via kebab</strong> (compact process-group summary) · <strong>Option B source build validation</strong> (disabled dropdown items + styled CSS tooltips + all-empty callout safeguard).</p>
 <p><strong>Next candidates (rough priority):</strong></p>
 <ol>
   <li><strong>Type filter / tabs</strong> — once there are more kinds (exports, build status, licence expiry, errors): <code>All / Downloads / System / Alerts</code>.</li>
@@ -260,6 +424,13 @@ READY / READY_WITH_EXCLUSIONS ──► DOWNLOADED ──► EXPIRED</code></pre
     <tr><td>2026-06-19</td><td>Row <strong>color coding</strong> of excluded resources — deferred (align with green=added / yellow=modified / red=deleted when revisited).</td><td><span class="badge b-defer">⏸️ Deferred</span></td></tr>
     <tr><td>2026-06-19</td><td>Prototype is <strong>isolated</strong> from the FlowX codebase but mirrors the real Designer surfaces.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
     <tr><td>2026-06-19</td><td>Prototype format = <strong>interactive React app</strong> (single self-contained <code>index.html</code>, React 18 + Babel via CDN), mocked backend.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-30</td><td><strong>Bulk Migration added to Corrective Actions.</strong> 4-step flow: Setup modal (source + target build) → Summary modal (Migrate to / Terminate / Leave on breakdown, collapsible) → Processing modal (auto-transitions to detail page on completion) → Migration Detail Page. Same toast-suppression and bell-feed rules as exports.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-30</td><td><strong>Migration Detail Page = full-page view</strong> (not a modal). Replaces the content area via <code>migDetailId</code> state, checked before the Config/Runtime routing branch. Breadcrumb returns to the Corrective Actions list.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-30</td><td><strong>Dual access pattern for completed migrations:</strong> row click → full Migration Detail Page (summary + per-instance table); kebab ⋮ → compact Migration Details modal (process-group summary only). Static seed rows don't open anything on kebab.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-30</td><td><strong>Outcome zone lives inside the Instances card</strong>, between the card header and the table. Summary card is identity-only. Instances card: header · outcome · table.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-30</td><td><strong>Status filter on instances table.</strong> Clicking Success / Failed / Terminated in the Outcome zone filters the table. Active chip gets coloured background. Click again to clear. No badge in the "Instances" heading — the highlighted chip is the only filter indicator.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-30</td><td><strong>Migrations surface in the unified bell feed</strong> alongside exports — proving the "extensible by type" design. Feed item action "View results" → navigates to Runtime → Corrective Actions + opens Migration Detail Page.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
+    <tr><td>2026-06-30</td><td><strong>Source build with no running instances — Option B chosen.</strong> Builds with no instances are shown grayed out + non-selectable in the Source Build dropdown. Hover shows a styled CSS tooltip ("No running instances on this build") plus an always-visible "No instances" inline tag. The <code>ⓘ</code> icon uses the same styled tooltip ("Only active or incident instances can be migrated"). Safeguard: if all builds are empty, an orange callout replaces per-item tooltips as the primary signal. Continue is disabled while an ineligible source is selected.</td><td><span class="badge b-done">✅ Decided</span></td></tr>
   </tbody>
 </table>
 
@@ -270,6 +441,7 @@ READY / READY_WITH_EXCLUSIONS ──► DOWNLOADED ──► EXPIRED</code></pre
   <li><span class="badge b-open">open</span> <strong>Color-bar semantics</strong> — if/when color coding returns: severity vs. resource category vs. decorative; add a legend if meaningful.</li>
   <li><span class="badge b-open">open</span> <strong>Artifact TTL</strong> — exact retention window (24h / 48h / 72h).</li>
   <li><span class="badge b-open">open</span> <strong>Exclusion report export</strong> — include CSV/JSON download in v1 or later?</li>
+  <li><span class="badge b-resolved">resolved</span> <strong>Bulk Migration — source build with no running instances</strong> — Option B implemented. See §9.1 and Decision Log (2026-06-30).</li>
 </ul>
 
 </body>
