@@ -385,6 +385,63 @@ READY / READY_WITH_EXCLUSIONS ──► DOWNLOADED ──► EXPIRED</code></pre
   <li><code>MOCK_INSTANCES</code> (20 rows, deterministically seeded at page load) is the shared fixture for all Migration Detail Pages.</li>
 </ul>
 
+<h3 id="s9-4">9.4 · Node mapping vs Move tokens — clarity redesign</h3>
+<p><strong>Product challenge.</strong> Inside a process card the two controls — <em>Node mapping between builds</em> and <em>Move tokens</em> — look like equal siblings, but they answer completely different questions and have opposite defaults. Users can't tell what each is for or which they must act on.</p>
+
+<p><strong>The two concepts.</strong></p>
+<table>
+  <thead><tr><th></th><th>Node mapping</th><th>Move tokens</th></tr></thead>
+  <tbody>
+    <tr><td>Perspective</td><td><strong>Process / structural</strong> (design-time)</td><td><strong>Runtime / intent</strong></td></tr>
+    <tr><td>Premise</td><td>The diagram changed between builds</td><td>The user <em>knows</em> tokens are blocked on a node</td></tr>
+    <tr><td>Unit</td><td>Node → node correspondence</td><td><strong>All tokens blocked on a chosen node</strong> → target node</td></tr>
+    <tr><td>Token-aware?</td><td><strong>No</strong> — mapped even if no tokens sit there</td><td><strong>Yes</strong> — the whole point is stuck tokens</td></tr>
+    <tr><td>Default</td><td>Automatic → last visited node</td><td>None — opt in</td></tr>
+    <tr><td>Required?</td><td><strong>Conditional</strong> — only when source and target diagrams differ; identical processes need no mapping</td><td><strong>No</strong> (optional)</td></tr>
+  </tbody>
+</table>
+<p>In one line each:</p>
+<ul>
+  <li><strong>Node mapping = recreate the process on the target so running instances keep a valid path</strong> (structural, token-agnostic, mostly automatic — act only on unmatched nodes).</li>
+  <li><strong>Move tokens = reposition tokens blocked on a node, by intent</strong> (runtime, node-level bulk, always optional).</li>
+</ul>
+<p><strong>Recreated-node exception.</strong> If a configurator deletes a node by mistake and recreates it — even with the same name — the new node has a different <strong>node ID</strong>, so it will <strong>not</strong> map automatically. This is the main case where the user must intervene.</p>
+
+<p><strong>Ordering — keep mapping first, re-weight instead of reorder.</strong></p>
+<ul>
+  <li><strong>Why mapping stays first (dependency, not preference):</strong> move tokens' "resume at node" target can only be a node that exists on the target build — that node-space is exactly what mapping establishes. Mapping is upstream. Unresolved mapping is also a <em>silent risk</em>: if a recreated node fell back to "last visited node" and the user reroutes tokens before noticing, they move tokens relative to a mislabeled node. <strong>Correctness before intent.</strong></li>
+  <li><strong>Why it feels like move tokens should win:</strong> mapping is usually automatic (zero effort), while move tokens is the deliberate thing the user came to do. The fix is <strong>prominence, not position</strong> — the checkout pattern: "confirm address" precedes "place order," but the order button is the loud one.</li>
+  <li><strong>Rejected alternative:</strong> conditional ordering (move tokens first only when mapping is clean). A section that changes position by state is disorienting; stable order + prominence gets the same benefit without the instability.</li>
+</ul>
+
+<p><strong>Design — state-driven mapping, prominent move tokens.</strong> Node mapping carries a single status chip that escalates, and is only heavy when it must be:</p>
+<table>
+  <thead><tr><th>State</th><th>Trigger</th><th>Treatment</th><th>Copy</th></tr></thead>
+  <tbody>
+    <tr><td>Nothing to map</td><td>Diagrams identical</td><td>Collapsed, quiet ✓</td><td><em>"No node changes between builds — nothing to map."</em></td></tr>
+    <tr><td>Auto-mapped</td><td>Diagrams differ, all matched</td><td>Collapsed with "Review mapping" toggle</td><td><em>"All changed nodes matched automatically."</em></td></tr>
+    <tr><td>Needs attention</td><td>Diagrams differ, ≥1 unmatched</td><td>Expanded; unmatched rows only (auto-mapped behind "Show auto-mapped")</td><td><em>"N changed nodes need your attention."</em></td></tr>
+  </tbody>
+</table>
+<ul>
+  <li><strong>Node mapping subtitle:</strong> <em>"Recreate the process on {target} for running instances by mapping each current node to its new node. Unmatched nodes fall back to the last visited node."</em></li>
+  <li><strong>Unmatched row:</strong> reason + manual target picker + fallback note — <em>"<code>{node}</code> no longer exists on {target}. If you recreated it, its node ID changed, so it can't match automatically — pick the new node, or it falls back to the last visited node."</em></li>
+  <li><strong>Move tokens:</strong> <strong>Optional</strong> chip; subtitle <em>"If tokens are blocked on a node, move all tokens waiting on it to another node on {target} — forward or back — based on your fix."</em> Columns relabelled <strong>"Blocked on node" → "Resume at node"</strong> with helper <em>"All tokens currently on this node will be moved."</em> Default empty state shows a faint example — <em>"e.g. you corrected a validation task — send tokens blocked before it back to it, or forward past it."</em> Action: <code>+ Add token move</code>.</li>
+  <li><strong>Framing line</strong> atop the expanded card + a <strong>"What's the difference?"</strong> inline expander with the two-liner.</li>
+  <li><strong>Prominence rule:</strong> mapping auto / nothing-to-map → collapses to a status line so move tokens becomes the dominant block; mapping needs-attention → it expands and leads.</li>
+</ul>
+
+<p><strong>Prototype build steps.</strong></p>
+<ol>
+  <li>Extend <code>MIG_CONFIG_PROCESSES</code> mock: <code>mappingState: 'unchanged' | 'auto' | 'attention'</code>, per-node <code>{ from, to, matched, reason }</code>, node-level <code>moveTokens: [{ blockedNode, resumeNode }]</code>; include one process demonstrating the recreated-node exception.</li>
+  <li>Add the framing line + "What's the difference?" expander.</li>
+  <li>Rewrite the node-mapping block: status chip, conditional collapse, unmatched-only rows with the recreated-node hint + manual picker.</li>
+  <li>Rewrite the move-tokens block: Optional chip, relabel, helper, example empty state.</li>
+  <li>Apply the prominence / collapse behaviour.</li>
+  <li>CSS: mapping status-chip variants, "auto" row tag, subgroup labels, expander.</li>
+</ol>
+<p><strong>Out of scope (mocked).</strong> Real diagram-diff detection, actual node IDs / token counts, and backend behaviour are simulated with mock states; the prototype demonstrates the <em>interaction and framing</em>, not live mapping logic.</p>
+
 <hr/>
 
 <h2 id="s10">10 · UX explorations — where the notification + download live</h2>
