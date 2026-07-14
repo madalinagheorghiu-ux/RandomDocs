@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Versioning tree — branch &amp; version UX spec</title>
+<style>
+  :root {
+    --blue-50:#e6f0fb; --blue-500:#006bd8; --blue-700:#004c99;
+    --green-50:#e6f2ef; --green-500:#008060; --green-700:#005b44;
+    --yellow-50:#fff8e7; --yellow-700:#b4830d;
+    --red-500:#e62200; --red-700:#a31800;
+    --n-50:#f7f8f9; --n-100:#e3e8ed; --n-200:#cbd1db; --n-300:#a6b0be; --n-400:#8390a2;
+    --n-500:#64748b; --n-700:#475263; --n-900:#1d232c;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:32px 24px; background:var(--n-50); color:var(--n-900);
+         font-family:'Open Sans',-apple-system,sans-serif; font-size:14px; line-height:24px; }
+  .page { max-width: 920px; margin: 0 auto; display:flex; flex-direction:column; gap:16px; }
+  .card { background:#fff; border-radius:16px; box-shadow:2px 2px 24px rgba(22,52,98,.08); padding:24px; }
+  h1 { margin:0; font-size:24px; line-height:38px; font-weight:700; }
+  h2 { margin:0 0 6px; font-size:18px; line-height:28px; font-weight:700; }
+  h3 { margin:16px 0 6px; font-size:14px; line-height:24px; font-weight:700; }
+  .desc { margin:0; font-size:12px; line-height:16px; color:var(--n-500); }
+  p { margin:8px 0; }
+  table { border-collapse:collapse; width:100%; margin:8px 0; font-size:13px; }
+  th, td { border:1px solid var(--n-100); padding:8px 10px; text-align:left; vertical-align:top; line-height:20px; }
+  th { background:var(--n-50); font-size:12px; font-weight:600; color:var(--n-500); }
+  code { font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--n-50); border:1px solid var(--n-100); border-radius:4px; padding:1px 5px; }
+  ul { margin:8px 0; padding-left:22px; }
+  li { margin:4px 0; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:120px; font-size:11px; font-weight:600;
+          background:var(--n-50); border:1px solid var(--n-100); }
+  .pill.blue { color:var(--blue-700); } .pill.green { color:var(--green-700); }
+  .pill.gray { color:var(--n-500); } .pill.yellow { color:var(--yellow-700); }
+  .ok { color:var(--green-700); font-weight:700; } .no { color:var(--red-700); font-weight:700; }
+  .quote { border-left:3px solid var(--n-100); padding:4px 12px; color:var(--n-500); font-size:13px; margin:8px 0; }
+  .decision { background:var(--blue-50); border-radius:8px; padding:10px 14px; margin:8px 0; font-size:13px; line-height:20px; }
+  .decision b { color:var(--blue-700); }
+  .open { background:var(--yellow-50); border-radius:8px; padding:10px 14px; margin:8px 0; font-size:13px; line-height:20px; }
+  .meta { font-size:12px; color:var(--n-400); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="card">
+    <h1>Versioning tree — branch &amp; version UX spec</h1>
+    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.1 · 2026-07-14 · owner: Madalina</p>
+    <p>Consolidates the UX rules validated in the standalone prototype
+       (<code>/Users/madalina/flowx-code/versioning-tree-prototype/</code>, run with
+       <code>python3 -m http.server 8899 --bind 127.0.0.1</code>). The prototype renders with the real
+       <code>@flowx/gitgraph</code> engine (vendored GitgraphJS fork from <code>designer/libs/gitgraph</code>)
+       and the production <code>ApplicationVersion[]</code> history shape, so every rule here maps 1:1 onto the product model:
+       versions form linear chains per branch via <code>previousVersionId</code>; merges reference
+       <code>mergedFromVersionId</code>; one WIP per branch, always at the tip.</p>
+  </div>
+
+  <div class="card">
+    <h2>1 · Reading the tree</h2>
+    <h3>Node states</h3>
+    <table>
+      <tr><th>Node</th><th>Meaning</th></tr>
+      <tr><td>Filled dot (branch color)</td><td>Committed version</td></tr>
+      <tr><td>Dashed hollow dot</td><td>Work-in-progress (WIP) version</td></tr>
+      <tr><td>Outer solid ring</td><td>Current version — the one the user is working on ("you are here")</td></tr>
+      <tr><td>Hollow gray dot</td><td>Version on an archived branch (content parked, not active work)</td></tr>
+      <tr><td>Node where two lines join</td><td>Merge — the merge line always joins the <b>target</b> branch</td></tr>
+    </table>
+    <h3>Making main unmistakable</h3>
+    <p>Branch labels are positioned by the engine at each branch tip, so the <code>main</code> tag can appear
+       between feature tags. Three stacked cues compensate:</p>
+    <ul>
+      <li><b>Filled blue chip</b> label (white bold text) — feature branches get outlined pastel chips</li>
+      <li><b>Thicker line</b> (4px vs 3px)</li>
+      <li><b>Full-height soft blue band</b> behind main's entire column — answers "unde e master" at a glance</li>
+      <li>List: main pinned first, blue left accent, <span class="pill blue">● default</span> pill</li>
+    </ul>
+    <h3>Branch colors</h3>
+    <p>main is always blue; feature branches cycle yellow → green → orange → red (FlowX palettes:
+       line = 200-step, node = 500-step, label bg = 50-step). Assignment is pinned to the project's full
+       branch order so a branch <b>keeps its color</b> when siblings are archived or filtered.</p>
+  </div>
+
+  <div class="card">
+    <h2>2 · Branch states, ownership, filters</h2>
+    <table>
+      <tr><th>State</th><th>Definition</th><th>Pill</th></tr>
+      <tr><td>default</td><td><code>main</code> — cannot be archived; every branch eventually flows back here</td><td><span class="pill blue">● default</span></td></tr>
+      <tr><td>active</td><td>Tip version is <b>not</b> merged anywhere — the branch has unmerged changes</td><td><span class="pill green">● active</span></td></tr>
+      <tr><td>merged</td><td>Tip version has been merged somewhere (branch is "closed")</td><td><span class="pill gray">● merged</span></td></tr>
+      <tr><td>archived</td><td>Soft-deleted; hidden from active work, all versions remain in the tree</td><td><span class="pill gray">● archived</span></td></tr>
+    </table>
+    <div class="decision"><b>Requirement 2 — a merged branch stays editable (merged is a tip-state, not history).</b>
+      The <code>mergedInAnyBranch</code> freeze never blocks further work: the user can <b>start a new version</b> on a
+      merged branch and <b>merge it again</b> (re-merge). A branch that was merged and then received new commits
+      ("continued after merge") is <b>active again</b>; the list annotates it "· continued after merge".
+      Merge history never permanently closes a branch.</div>
+    <h3>Ownership &amp; filters</h3>
+    <ul>
+      <li>Every branch shows its owner; the viewer's own branches get a <span class="pill blue">you</span> chip ("MyBranches" = branches created by me).</li>
+      <li>Filters (segmented control): <b>All / Active / Merged / My branches</b>.</li>
+      <li>Filters <b>dim</b> non-matching branches instead of hiding them — topology stays readable and merge edges never dangle. Archived branches are always dimmed.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>3 · Selection &amp; branch evolution</h2>
+    <ul>
+      <li>Click any node, branch label, or list row → selects that branch (auto-selects its tip version; clicking a node or timeline entry targets that specific version). Click again / ✕ to clear.</li>
+      <li>Selected branch keeps full color; all other branches dim — "cum a evoluat un branch" in one gesture.</li>
+      <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, and an <b>Evolution</b> timeline — every version with date and badges:
+        <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
+        <span class="pill gray">build-n</span> <span class="pill">current version</span> <span class="pill yellow">work in progress</span></li>
+      <li><b>Selected archived branch</b> is visually distinct from normal selection: neutral gray line, hollow nodes, <i>italic</i> gray label chip, gray (not blue) row highlight, archived pill next to the panel title.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>4 · Version actions (status-dependent)</h2>
+    <p>Actions apply to the <b>selected version</b> and depend on its status:</p>
+    <table>
+      <tr><th>Selected version</th><th>Actions</th></tr>
+      <tr>
+        <td>WIP</td>
+        <td><b>Commit changes</b> (primary; modal asks for commit message) ·
+            <b>Delete WIP changes</b> (danger; confirm modal — committed versions unaffected; current-version marker falls back to the previous version)</td>
+      </tr>
+      <tr>
+        <td>Committed</td>
+        <td><b>Create build</b> (stamps a build tag; disabled once created) ·
+            <b>Merge…</b> (any-to-any, see §5) ·
+            <b>Start new version</b> (new WIP at branch tip; disabled only if a WIP already exists — merged branches stay editable, per req 2) ·
+            <b>Create new branch…</b> (named via modal, starts as WIP from the selected version) ·
+            <b>Edit commit message…</b> ·
+            <b>Download version</b></td>
+      </tr>
+      <tr>
+        <td>On archived branch</td>
+        <td><b>Unarchive branch</b> only</td>
+      </tr>
+    </table>
+    <p class="meta">Matches the product action surface in <code>process-version-actions/version-actions.component.ts</code>
+      (canMerge / canStartNewVersion relaxed per CORE-4974: main can be a source; merged branches stay editable).</p>
+  </div>
+
+  <div class="card">
+    <h2>5 · Merge rules (any-to-any)</h2>
+    <div class="decision"><b>Requirement 1 — merge any branch into any branch.</b> Target candidates are
+      <b>all other branches</b>, never "ancestors only": siblings into siblings, descendants into unrelated
+      branches, and main into a feature branch are all first-class merges. Eligibility is <b>state-based only</b>
+      (WIP / fully-merged / archived) — ancestry is never a criterion. Blocked targets stay visible in the
+      target list, disabled with their reason, so the rule teaches itself.</div>
+    <p><b>Source:</b> the committed <b>tip</b> of a branch (product <code>canMerge</code>:
+       <code>status === COMMITTED &amp;&amp; lastVersionInBranch</code>). A WIP can never be a merge source;
+       any branch — including <code>main</code> and already-merged branches (re-merge) — can be one.</p>
+    <p><b>Targets:</b></p>
+    <table>
+      <tr><th>Target</th><th>Allowed</th><th>Reason / copy</th></tr>
+      <tr><td>main (tip committed)</td><td class="ok">✓</td><td>Always the default destination</td></tr>
+      <tr><td>Active branch, tip committed</td><td class="ok">✓</td><td>Includes merged-then-continued branches</td></tr>
+      <tr><td>Branch with WIP at tip</td><td class="no">✕</td><td>"Commit or delete the WIP changes first"</td></tr>
+      <tr><td>Fully merged branch (tip merged, no new work)</td><td class="no">✕</td><td>"Start a new version to reopen this branch first"</td></tr>
+      <tr><td>Archived branch</td><td class="no">✕</td><td>Excluded from target list</td></tr>
+    </table>
+    <div class="decision"><b>Why WIP targets are blocked</b> (validated against product code — merge is disabled for
+      WIP-tipped targets in <code>version-actions.component.ts</code>): merging <i>into</i> the WIP would mix the merge
+      with unreviewed, uncommitted edits (git's dirty-tree problem); merging <i>underneath</i> the WIP onto the last
+      committed version would fork the linear chain — the WIP would <b>not</b> receive the merge, and committing it later
+      would silently drop the merged changes from the branch tip. Blocking forces the WIP owner to decide.</div>
+    <div class="decision"><b>Why fully-merged targets are blocked:</b> keeps "merged = done" trustworthy; reopening is an
+      explicit act (Start new version). This is a product-policy choice, not a technical necessity — git would allow it.</div>
+    <ul>
+      <li>A merge creates a <b>new committed version on the target branch</b> (<code>mergedFromVersionId</code> → source version); the source branch is untouched and may continue.</li>
+      <li>Re-merge is allowed: a branch can merge into the same target repeatedly (scenario c) and in both directions (scenario e).</li>
+      <li>Merge modal: pick target from the valid list; blocked targets appear disabled with their reason, so the rule teaches itself.</li>
+    </ul>
+    <div class="open"><b>Future option, out of v1:</b> autostash-style "move my WIP on top of the merge"
+      (stash WIP → merge onto committed tip → replay WIP on the merge result). Answers "the WIP gets the merge anyway",
+      but can trigger a second conflict pass inside the WIP. Test whether users ask for it.</div>
+  </div>
+
+  <div class="card">
+    <h2>6 · Archive (soft delete)</h2>
+    <div class="decision"><b>There is no hard delete.</b> "Delete branch" is an archive: the branch is hidden from active
+      work, every version remains in the tree, and it can be unarchived at any time (plus an immediate Undo pill).</div>
+    <h3>Eligibility — only committed AND merged branches, checked in this order</h3>
+    <table>
+      <tr><th>Condition</th><th>Blocked copy</th></tr>
+      <tr><td>Branch is <code>main</code></td><td>"The default branch cannot be archived."</td></tr>
+      <tr><td>Branch has a WIP version</td><td>"Commit or delete the work-in-progress changes first."</td></tr>
+      <tr><td>Tip not merged (state ≠ merged)</td><td>"Only merged branches can be archived — this branch has unmerged changes."</td></tr>
+      <tr><td>Holds the current version</td><td>"This branch holds the version you are working on."</td></tr>
+    </table>
+    <h3>Presentation</h3>
+    <ul>
+      <li><b>Archive is a quiet action</b>: small danger-<i>tertiary</i> (text) button in a "Branch actions" footer — never the biggest CTA in the panel. The blocked reason shows inline next to the disabled button.</li>
+      <li>Archived branches: always dimmed in the graph, <span class="pill gray">● archived</span> pill in the list, excluded from merge targets; selected-archived treatment per §3.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>7 · Open questions for user testing</h2>
+    <ul>
+      <li>Dim vs <b>hide</b> archived branches when a project accumulates many (a "show archived" toggle?).</li>
+      <li>Fully-merged branch as merge target: keep the two-step "reopen, then merge", or auto-reopen? (§5 policy choice.)</li>
+      <li>Autostash-style WIP handling on merge targets (§5).</li>
+      <li>Merge-line color follows the <b>target</b> branch — is that legible enough, or do merge edges need their own affordance (e.g., source-colored edge)?</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>8 · Implementation notes</h2>
+    <ul>
+      <li>Prototype: <code>index.html</code> (FlowX DS tokens), <code>data.js</code> (demo history + scenario catalog a–e ported from <code>versioning-scenarios.ts</code>), <code>app.js</code> (JS port of <code>createGitEventLog</code> + the interaction layer), <code>gitgraph.js</code> (built lib).</li>
+      <li>Rebuild the engine after lib changes: <code>npx nx build gitgraph</code> in <code>designer/</code>, copy <code>dist/libs/@flowx/gitgraph/index.js</code>.</li>
+      <li>Deleting/pruning a merge source is safe: unknown merge sources fall back to a plain commit on the target (same guard as <code>gitgraph.component.ts</code>).</li>
+      <li>The main-column band must be inserted into the graph's transformed <code>&lt;g&gt;</code> in local coordinates — absolute svg coordinates drift when branch labels resize.</li>
+      <li>Related: POC branch <code>poc/versioning-tree</code>, PR #6532; product spec <code>Claude_Proto/VersioningTree/versioning-tree-spec.html</code> (2026-07-13).</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
