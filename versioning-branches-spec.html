@@ -109,6 +109,7 @@
     <ul>
       <li>Click any node, branch label, or list row → selects that branch (auto-selects its tip version; clicking a node or timeline entry targets that specific version). Click again / ✕ to clear.</li>
       <li><b>Selection fades the rest — lighter, never gray.</b> The selected branch keeps its exact normal appearance (no restyling); every other branch drops to ~28% opacity, becoming a lighter version of <i>its own color</i>, never a gray substitute. The fade is applied in place on the rendered graph (no re-render), so selecting a node never flickers. Filters de-emphasize non-matching branches the same way.</li>
+      <li><b>Panel layout — details lead, navigator is light.</b> The branch list is a compact single-line navigator (swatch · name · <span class="pill blue">you</span> · state dot); owner and version counts live in the details, not the list. When a branch is selected its <b>Details card leads the panel</b> in a light surface, so the selected version's info reads first, with the navigator below for jumping elsewhere. Archived branches sit in a collapsed disclosure at the bottom (§6).</li>
       <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, and an <b>Evolution</b> timeline — every version with date and badges:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
         <span class="pill gray">build-n</span> <span class="pill">current version</span> <span class="pill yellow">work in progress</span></li>
@@ -198,7 +199,7 @@
     <h3>Presentation &amp; recovery</h3>
     <ul>
       <li><b>Archive is a quiet action</b>: small danger-<i>tertiary</i> (text) button in a "Branch actions" footer — never the biggest CTA in the panel.</li>
-      <li>Archived branches are <b>hidden from the graph and the branch list</b>; they live in an <b>Archived</b> section below the list showing owner, version count, and <b>when</b> each was archived, with an inline <b>Unarchive</b> button.</li>
+      <li>Archived branches are <b>hidden from the graph and the branch navigator</b>; they live in a <b>collapsed disclosure</b> ("▸ Archived · N") at the bottom of the navigator, expanded on demand. Each archived row is compact — swatch, name, archive date, and an inline <b>Unarchive</b> button.</li>
       <li>Excluded from merge targets while archived.</li>
       <li>Three ways back: the Archived section's Unarchive button, the immediate Undo pill after archiving, or clicking any dashed <span class="pill gray">archived</span> tag in an Evolution timeline (§3).</li>
     </ul>
