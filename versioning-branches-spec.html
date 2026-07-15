@@ -64,7 +64,7 @@
       <tr><td>Filled dot (branch color)</td><td>Committed version</td></tr>
       <tr><td>Dashed hollow dot</td><td>Work-in-progress (WIP) version</td></tr>
       <tr><td>Outer solid ring</td><td>Current version — the one the user is working on ("you are here")</td></tr>
-      <tr><td>Hollow gray dot</td><td>Version on an archived branch (content parked, not active work)</td></tr>
+      <tr><td>Bold halo ring</td><td>Selected version (see §3 — selection emphasizes, it never grays the rest)</td></tr>
       <tr><td>Node where two lines join</td><td>Merge — the merge line always joins the <b>target</b> branch</td></tr>
     </table>
     <h3>Making main unmistakable</h3>
@@ -89,7 +89,7 @@
       <tr><td>default</td><td><code>main</code> — cannot be archived; every branch eventually flows back here</td><td><span class="pill blue">● default</span></td></tr>
       <tr><td>active</td><td>Tip version is <b>not</b> merged anywhere — the branch has unmerged changes</td><td><span class="pill green">● active</span></td></tr>
       <tr><td>merged</td><td>Tip version has been merged somewhere (branch is "closed")</td><td><span class="pill gray">● merged</span></td></tr>
-      <tr><td>archived</td><td>Soft-deleted; hidden from active work, all versions remain in the tree</td><td><span class="pill gray">● archived</span></td></tr>
+      <tr><td>archived</td><td>Soft-deleted; hidden from the tree entirely, listed in the <b>Archived</b> section with its archive date; all versions remain and can be brought back</td><td><span class="pill gray">● archived</span></td></tr>
     </table>
     <div class="decision"><b>Requirement 2 — a merged branch stays editable (merged is a tip-state, not history).</b>
       The <code>mergedInAnyBranch</code> freeze never blocks further work: the user can <b>start a new version</b> on a
@@ -99,8 +99,9 @@
     <h3>Ownership &amp; filters</h3>
     <ul>
       <li>Every branch shows its owner; the viewer's own branches get a <span class="pill blue">you</span> chip ("MyBranches" = branches created by me).</li>
-      <li>Filters (segmented control): <b>All / Active / Merged / My branches</b>.</li>
-      <li>Filters <b>dim</b> non-matching branches instead of hiding them — topology stays readable and merge edges never dangle. Archived branches are always dimmed.</li>
+      <li>Filters (segmented control), in this order: <b>All / My branches / Active / Merged</b>.</li>
+      <li>Filters <b>dim</b> non-matching branches instead of hiding them — topology stays readable and merge edges never dangle.</li>
+      <li><b>Archived branches are hidden</b> from the graph and the branch list; their home is the Archived section (§6).</li>
     </ul>
   </div>
 
@@ -108,11 +109,12 @@
     <h2>3 · Selection &amp; branch evolution</h2>
     <ul>
       <li>Click any node, branch label, or list row → selects that branch (auto-selects its tip version; clicking a node or timeline entry targets that specific version). Click again / ✕ to clear.</li>
-      <li>Selected branch keeps full color; all other branches dim — "cum a evoluat un branch" in one gesture.</li>
+      <li><b>Selection emphasizes, it never grays the rest of the tree.</b> The selected branch gets a thicker, accent-colored line and a bold label with a stronger border; the selected version gets a solid halo ring. Other branches keep their full color (dimming remains the job of filters only).</li>
       <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, and an <b>Evolution</b> timeline — every version with date and badges:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
         <span class="pill gray">build-n</span> <span class="pill">current version</span> <span class="pill yellow">work in progress</span></li>
-      <li><b>Selected archived branch</b> is visually distinct from normal selection: neutral gray line, hollow nodes, <i>italic</i> gray label chip, gray (not blue) row highlight, archived pill next to the panel title.</li>
+      <li><b>Archived interactions stay legible:</b> wherever a version interacted with a now-archived branch (merge from/into, created-from), the badge or name carries a dashed <span class="pill gray">archived</span> tag with the archive date on hover — clicking it unarchives the branch directly.</li>
+      <li>Selecting a branch from the Archived section shows its details and Evolution timeline (panel only — archived branches don't render in the graph), with an archived pill next to the title.</li>
     </ul>
   </div>
 
@@ -184,26 +186,30 @@
     <h2>6 · Archive (soft delete)</h2>
     <div class="decision"><b>There is no hard delete.</b> "Delete branch" is an archive: the branch is hidden from active
       work, every version remains in the tree, and it can be unarchived at any time (plus an immediate Undo pill).</div>
-    <h3>Eligibility — only committed AND merged branches, checked in this order</h3>
+    <h3>Eligibility — any branch except main</h3>
+    <p>Only <code>main</code> is blocked ("The default branch cannot be archived."). Everything else can be archived —
+       but the confirm modal spells out the <b>impact</b> so archiving an unmerged or in-progress branch is a conscious choice:</p>
     <table>
-      <tr><th>Condition</th><th>Blocked copy</th></tr>
-      <tr><td>Branch is <code>main</code></td><td>"The default branch cannot be archived."</td></tr>
-      <tr><td>Branch has a WIP version</td><td>"Commit or delete the work-in-progress changes first."</td></tr>
-      <tr><td>Tip not merged (state ≠ merged)</td><td>"Only merged branches can be archived — this branch has unmerged changes."</td></tr>
-      <tr><td>Holds the current version</td><td>"This branch holds the version you are working on."</td></tr>
+      <tr><th>Branch condition</th><th>Impact message in the confirm modal</th></tr>
+      <tr><td>Unmerged changes (state ≠ merged)</td><td>⚠ "It has unmerged changes — they are not part of any other branch and stay parked until you unarchive and merge."</td></tr>
+      <tr><td>Has a WIP version</td><td>⚠ "Its work-in-progress version is parked untouched — nothing is committed or discarded."</td></tr>
+      <tr><td>Holds the current version</td><td>⚠ "You are working on this branch right now — the current version is hidden until you unarchive."</td></tr>
+      <tr><td>Was merged into other branches</td><td>"Versions already merged into X are kept there." (reassurance, not a warning)</td></tr>
     </table>
-    <h3>Presentation</h3>
+    <h3>Presentation &amp; recovery</h3>
     <ul>
-      <li><b>Archive is a quiet action</b>: small danger-<i>tertiary</i> (text) button in a "Branch actions" footer — never the biggest CTA in the panel. The blocked reason shows inline next to the disabled button.</li>
-      <li>Archived branches: always dimmed in the graph, <span class="pill gray">● archived</span> pill in the list, excluded from merge targets; selected-archived treatment per §3.</li>
+      <li><b>Archive is a quiet action</b>: small danger-<i>tertiary</i> (text) button in a "Branch actions" footer — never the biggest CTA in the panel.</li>
+      <li>Archived branches are <b>hidden from the graph and the branch list</b>; they live in an <b>Archived</b> section below the list showing owner, version count, and <b>when</b> each was archived, with an inline <b>Unarchive</b> button.</li>
+      <li>Excluded from merge targets while archived.</li>
+      <li>Three ways back: the Archived section's Unarchive button, the immediate Undo pill after archiving, or clicking any dashed <span class="pill gray">archived</span> tag in an Evolution timeline (§3).</li>
     </ul>
   </div>
 
   <div class="card">
     <h2>7 · Open questions for user testing</h2>
     <ul>
-      <li>Dim vs <b>hide</b> archived branches when a project accumulates many (a "show archived" toggle?).</li>
       <li>Fully-merged branch as merge target: keep the two-step "reopen, then merge", or auto-reopen? (§5 policy choice.)</li>
+      <li>Archiving a branch that holds the user's current version is allowed with a warning — should the product instead move the current-version pointer somewhere visible (e.g., main's tip)?</li>
       <li>Autostash-style WIP handling on merge targets (§5).</li>
       <li>Merge-line color follows the <b>target</b> branch — is that legible enough, or do merge edges need their own affordance (e.g., source-colored edge)?</li>
     </ul>
