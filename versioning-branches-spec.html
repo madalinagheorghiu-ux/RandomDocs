@@ -114,7 +114,7 @@
       <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, and an <b>Evolution</b> timeline — every version with date and badges:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
         <span class="pill gray">build-n</span> <span class="pill">current version</span> <span class="pill yellow">work in progress</span></li>
-      <li><b>Archived interactions stay legible:</b> wherever a version interacted with a now-archived branch (merge from/into, created-from), the badge or name carries a dashed <span class="pill gray">archived</span> tag with the archive date on hover — clicking it unarchives the branch directly.</li>
+      <li><b>Archived interactions stay legible:</b> wherever a version interacted with a now-archived branch (merge from/into, created-from), the badge or name carries a dashed <span class="pill gray">archived</span> tag. Clicking it opens the archive-details modal (when / by whom / reason + Unarchive) — see §6.</li>
       <li>Selecting a branch from the Archived section shows its details and Evolution timeline (panel only — archived branches don't render in the graph), with an archived pill next to the title.</li>
     </ul>
   </div>
@@ -188,8 +188,9 @@
     <div class="decision"><b>There is no hard delete.</b> "Delete branch" is an archive: the branch is hidden from active
       work, every version remains in the tree, and it can be unarchived at any time (plus an immediate Undo pill).</div>
     <h3>Eligibility — any branch except main</h3>
-    <p>Only <code>main</code> is blocked ("The default branch cannot be archived."). Everything else can be archived —
-       but the confirm modal spells out the <b>impact</b> so archiving an unmerged or in-progress branch is a conscious choice:</p>
+    <p>Only <code>main</code> is blocked ("The default branch cannot be archived."). Everything else can be archived.
+       The confirm modal captures an <b>optional reason</b> and records <b>who</b> archived it and <b>when</b>, and spells
+       out the <b>impact</b> so archiving an unmerged or in-progress branch is a conscious choice:</p>
     <table>
       <tr><th>Branch condition</th><th>Impact message in the confirm modal</th></tr>
       <tr><td>Unmerged changes (state ≠ merged)</td><td>⚠ "It has unmerged changes — they are not part of any other branch and stay parked until you unarchive and merge."</td></tr>
@@ -202,7 +203,8 @@
       <li><b>Archive is a quiet action</b>: small danger-<i>tertiary</i> (text) button in a "Branch actions" footer — never the biggest CTA in the panel.</li>
       <li>Archived branches are <b>hidden from the graph and the branch navigator</b>; they live in a <b>collapsed disclosure</b> ("▸ Archived · N") at the bottom of the navigator, expanded on demand. Each archived row is compact — swatch, name, archive date, and an inline <b>Unarchive</b> button.</li>
       <li>Excluded from merge targets while archived.</li>
-      <li>Three ways back: the Archived section's Unarchive button, the immediate Undo pill after archiving, or clicking any dashed <span class="pill gray">archived</span> tag in an Evolution timeline (§3).</li>
+      <li><b>Archive-details modal:</b> clicking any dashed <span class="pill gray">archived</span> tag opens a modal showing <b>when</b> it was archived, <b>by whom</b>, and the <b>reason</b> comment captured at archive time, with Cancel and <b>Unarchive branch</b> actions. Unarchiving returns the branch to the version tree.</li>
+      <li>Three ways back: the archive-details modal (from any tag), the disclosure's Unarchive button, or the immediate Undo pill after archiving.</li>
     </ul>
   </div>
 
