@@ -64,7 +64,6 @@
       <tr><td>Filled dot (branch color)</td><td>Committed version</td></tr>
       <tr><td>Dashed hollow dot</td><td>Work-in-progress (WIP) version</td></tr>
       <tr><td>Outer solid ring</td><td>Current version — the one the user is working on ("you are here")</td></tr>
-      <tr><td>Bold halo ring</td><td>Selected version (see §3 — selection emphasizes, it never grays the rest)</td></tr>
       <tr><td>Node where two lines join</td><td>Merge — the merge line always joins the <b>target</b> branch</td></tr>
     </table>
     <h3>Making main unmistakable</h3>
@@ -109,7 +108,7 @@
     <h2>3 · Selection &amp; branch evolution</h2>
     <ul>
       <li>Click any node, branch label, or list row → selects that branch (auto-selects its tip version; clicking a node or timeline entry targets that specific version). Click again / ✕ to clear.</li>
-      <li><b>Selection emphasizes, it never grays the rest of the tree.</b> The selected branch gets a thicker, accent-colored line and a bold label with a stronger border; the selected version gets a solid halo ring. Other branches keep their full color (dimming remains the job of filters only).</li>
+      <li><b>Selection fades the rest — lighter, never gray.</b> The selected branch keeps its exact normal appearance (no restyling); every other branch drops to ~28% opacity, becoming a lighter version of <i>its own color</i>, never a gray substitute. The fade is applied in place on the rendered graph (no re-render), so selecting a node never flickers. Filters de-emphasize non-matching branches the same way.</li>
       <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, and an <b>Evolution</b> timeline — every version with date and badges:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
         <span class="pill gray">build-n</span> <span class="pill">current version</span> <span class="pill yellow">work in progress</span></li>
