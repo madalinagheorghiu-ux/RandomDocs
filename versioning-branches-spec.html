@@ -63,7 +63,8 @@
       <tr><th>Node</th><th>Meaning</th></tr>
       <tr><td>Filled dot (branch color)</td><td>Committed version</td></tr>
       <tr><td>Dashed hollow dot</td><td>Work-in-progress (WIP) version</td></tr>
-      <tr><td>Outer solid ring</td><td>Current version — the one the user is working on ("you are here")</td></tr>
+      <tr><td>Outer solid ring (branch accent)</td><td>Current version — the one the user is working on ("you are here")</td></tr>
+      <tr><td>Bubble ring in the branch's deep tone</td><td>Selected version — the specific bubble you clicked (distinct from current)</td></tr>
       <tr><td>Node where two lines join</td><td>Merge — the merge line always joins the <b>target</b> branch</td></tr>
     </table>
     <h3>Making main unmistakable</h3>
@@ -72,8 +73,7 @@
     <ul>
       <li><b>Filled blue chip</b> label (white bold text) — feature branches get outlined pastel chips</li>
       <li><b>Thicker line</b> (4px vs 3px)</li>
-      <li><b>Full-height soft blue band</b> behind main's entire column — answers "unde e master" at a glance</li>
-      <li>List: main pinned first, blue left accent, <span class="pill blue">● default</span> pill</li>
+      <li>Navigator: main pinned first, blue left accent, blue name, <span class="pill blue">● default</span> pill</li>
     </ul>
     <h3>Branch colors</h3>
     <p>main is always blue; feature branches cycle yellow → green → orange → red (FlowX palettes:
@@ -109,6 +109,7 @@
     <ul>
       <li>Click any node, branch label, or list row → selects that branch (auto-selects its tip version; clicking a node or timeline entry targets that specific version). Click again / ✕ to clear.</li>
       <li><b>Selection fades the rest — lighter, never gray.</b> The selected branch keeps its exact normal appearance (no restyling); every other branch drops to ~28% opacity, becoming a lighter version of <i>its own color</i>, never a gray substitute. The fade is applied in place on the rendered graph (no re-render), so selecting a node never flickers. Filters de-emphasize non-matching branches the same way.</li>
+      <li><b>The selected bubble is ringed</b> in the branch's deep tone — like the current-version marker in the legend, but darker so "selected" reads distinct from "current". Applied as a DOM mutation on the live graph (no rebuild); clicking a different node or timeline entry moves the ring.</li>
       <li><b>Panel layout — details lead, navigator is light.</b> The branch list is a compact single-line navigator (swatch · name · <span class="pill blue">you</span> · state dot); owner and version counts live in the details, not the list. When a branch is selected its <b>Details card leads the panel</b> in a light surface, so the selected version's info reads first, with the navigator below for jumping elsewhere. Archived branches sit in a collapsed disclosure at the bottom (§6).</li>
       <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, and an <b>Evolution</b> timeline — every version with date and badges:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
