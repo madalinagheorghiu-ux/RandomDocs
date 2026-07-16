@@ -107,6 +107,7 @@
   <div class="card">
     <h2>3 · Selection &amp; branch evolution</h2>
     <ul>
+      <li><b>Default view on load / scenario switch:</b> main's <b>latest version (its tip)</b> is pre-selected — bubble ringed, main's details leading the panel — so you land on the mainline state. (Fallback with no main branch: latest version merged from main, then latest overall.) This default is <i>passive</i>: it rings the bubble and shows details but does <b>not</b> fade the rest of the tree; fading begins only on the first active selection.</li>
       <li>Click any node, branch label, or list row → selects that branch (auto-selects its tip version; clicking a node or timeline entry targets that specific version). Click again / ✕ to clear.</li>
       <li><b>Selection fades the rest — lighter, never gray.</b> The selected branch keeps its exact normal appearance (no restyling); every other branch drops to ~28% opacity, becoming a lighter version of <i>its own color</i>, never a gray substitute. The fade is applied in place on the rendered graph (no re-render), so selecting a node never flickers. Filters de-emphasize non-matching branches the same way.</li>
       <li><b>The selected bubble is ringed</b> in the branch's deep tone — like the current-version marker in the legend, but darker so "selected" reads distinct from "current". Applied as a DOM mutation on the live graph (no rebuild); clicking a different node or timeline entry moves the ring.</li>
