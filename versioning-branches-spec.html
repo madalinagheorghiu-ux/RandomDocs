@@ -46,7 +46,7 @@
 
   <div class="card">
     <h1>Versioning tree — branch &amp; version UX spec</h1>
-    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.3 · 2026-07-16 (milestone version-C) · owner: Madalina</p>
+    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.4 · 2026-07-16 (milestone version-D) · owner: Madalina</p>
     <p>Consolidates the UX rules validated in the standalone prototype
        (<code>/Users/madalina/flowx-code/versioning-tree-prototype/</code>, run with
        <code>python3 -m http.server 8899 --bind 127.0.0.1</code>). The prototype renders with the real
@@ -115,13 +115,13 @@
   <div class="card">
     <h2>3 · Selection &amp; branch evolution</h2>
     <ul>
-      <li><b>Default view on load / scenario switch:</b> focus the <b>current (latest) version</b> — the one you're working on — so its <b>details card leads the panel</b>. Passive: the graph keeps the plain "All" look (no dimming, no extra ring — the current-version marker already sits on that bubble); fading/ring begin on the first real click.</li>
-      <li>Click any node, branch label, or list row → selects that branch (auto-selects its tip version; clicking a node or timeline entry targets that specific version). Click again / ✕ to clear.</li>
+      <li><b>Default view on load / scenario switch:</b> focus the <b>current (latest) <u>committed</u> version</b> you're working on — details card leads the panel. A <b>merge-in-progress version is never seeded</b>; that state appears only transiently while a merge is resolved (§5). Passive: graph keeps the plain "All" look; fading/ring begin on the first real click.</li>
+      <li>Click any node, branch label, or list row → selects that branch (clicking a node/timeline entry targets that version). <b>Right-click a bubble</b> → selects it and opens a <b>context menu</b> with that version's full action set. <b>Selection persists across filter changes</b> (the details card no longer clears when a segment is clicked). There is no ✕ / clear-selection anymore — the panel always leads with a selected version; switch by clicking another node/branch.</li>
       <li><b>Selection fades the rest — lighter, never gray.</b> The selected branch keeps its exact normal appearance (no restyling); every other branch drops to ~28% opacity, becoming a lighter version of <i>its own color</i>, never a gray substitute. The fade is applied in place on the rendered graph (no re-render), so selecting a node never flickers. Filters de-emphasize non-matching branches the same way.</li>
       <li><b>The selected bubble is ringed</b> in the branch's deep tone — like the current-version marker in the legend, but darker so "selected" reads distinct from "current". Applied as a DOM mutation on the live graph (no rebuild); clicking a different node or timeline entry moves the ring.</li>
-      <li><b>Panel layout — details lead, navigator is light.</b> The branch list is a compact single-line navigator (swatch · name · <span class="pill blue">you</span> · state dot); owner and version counts live in the details, not the list. When a branch is selected its <b>Details card leads the panel</b> in a light surface, so the selected version's info reads first, with the navigator below for jumping elsewhere. Archived branches sit in a collapsed disclosure at the bottom (§6).</li>
+      <li><b>Panel layout — details lead, navigator is light.</b> The branch list is a compact single-line navigator (swatch · name · <span class="pill blue">you</span> · state dot). When a branch is selected its <b>Details card leads the panel</b>. The details <b>header</b> shows the branch name plus two icon buttons (replacing the old ✕): an <b>edit-name</b> pencil (rename the branch — every version moves to the new name, color preserved; disabled on main/imported/archived) and a <b>download</b> icon (export the selected version).</li>
       <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, then an <b>Evolution</b> timeline and the actions (§4).</li>
-      <li><b>Evolution timeline row:</b> committer <b>avatar</b> (initials, full name on hover), commit <b>message</b> truncated with … (full on hover), and the <b>date underneath</b> (left-aligned, muted — keeps rows uncrowded). Badges wrap below:
+      <li><b>Evolution timeline row:</b> committer <b>avatar</b> (initials, full name on hover), commit <b>message</b> truncated with … (full on hover), and the <b>date underneath</b>. On the <b>selected</b> committed row an inline <b>edit-message pencil</b> appears — the only place to rename a version's message; it follows the selection. Badges wrap below:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
         <span class="pill gray">build-n</span> <span class="pill">latest</span> <span class="pill yellow">work in progress</span></li>
       <li><b>Archived interactions stay legible:</b> wherever a version interacted with a now-archived branch (merge from/into, created-from), the badge or name carries a dashed <span class="pill gray">archived</span> tag. Clicking it opens the archive-details modal (when / by whom / reason + Unarchive) — see §6.</li>
@@ -147,19 +147,20 @@
       </tr>
       <tr>
         <td>Version actions — <b>Committed</b></td>
-        <td>In this fixed order: <b>Create build</b> (disabled once created) ·
+        <td>4-button grid: <b>Create build</b> (disabled once created) ·
             <b>Create branch</b> ·
             <b>Start version</b> (new WIP at tip; disabled if the tip is already in progress) ·
-            <b>Edit message</b> (~3-row textarea) ·
-            <b>Export version</b> (renamed from Download) ·
-            <b>Delete version</b> (danger — tip only &amp; not merged, else disabled with reason)</td>
+            <b>Delete version</b> (danger — tip only &amp; not merged, else disabled with reason).
+            <b>Edit message</b> → inline pencil on the selected Evolution row (§3);
+            <b>Export version</b> → download icon in the details header (§3).
+            <br><i>Right-click a bubble</i> for the same full set as a context menu.</td>
       </tr>
       <tr>
         <td>Branch actions</td>
         <td><b>Merge branch</b> (from the committed tip, any-to-any per §5; disabled if the tip is
             WIP/merge-in-progress, and when there are no other branches to merge into) ·
-            <b>Archive branch</b> (styled like Delete version — danger-secondary; §6; disabled on main
-            and on a merge-in-progress branch)</td>
+            <b>Archive branch</b> (danger-secondary; §6; disabled on main and on a merge-in-progress branch) ·
+            <b>Edit branch name</b> (header pencil — rename, color-stable; disabled on main/imported/archived)</td>
       </tr>
       <tr>
         <td>On archived branch</td>
