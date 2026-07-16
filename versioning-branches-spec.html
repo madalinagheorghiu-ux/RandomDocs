@@ -107,12 +107,13 @@
   <div class="card">
     <h2>3 · Selection &amp; branch evolution</h2>
     <ul>
-      <li><b>Default view on load / scenario switch:</b> main's <b>latest version (its tip)</b> is pre-selected — bubble ringed, main's details leading the panel — so you land on the mainline state. (Fallback with no main branch: latest version merged from main, then latest overall.) This default is <i>passive</i>: it rings the bubble and shows details but does <b>not</b> fade the rest of the tree; fading begins only on the first active selection.</li>
+      <li><b>Default view on load / scenario switch:</b> the <b>All</b> view — nothing selected, full-colour tree, only the current-version marker showing. No branch is pre-selected or ringed (a pre-selected main competed with the current-version marker, so it was dropped).</li>
       <li>Click any node, branch label, or list row → selects that branch (auto-selects its tip version; clicking a node or timeline entry targets that specific version). Click again / ✕ to clear.</li>
       <li><b>Selection fades the rest — lighter, never gray.</b> The selected branch keeps its exact normal appearance (no restyling); every other branch drops to ~28% opacity, becoming a lighter version of <i>its own color</i>, never a gray substitute. The fade is applied in place on the rendered graph (no re-render), so selecting a node never flickers. Filters de-emphasize non-matching branches the same way.</li>
       <li><b>The selected bubble is ringed</b> in the branch's deep tone — like the current-version marker in the legend, but darker so "selected" reads distinct from "current". Applied as a DOM mutation on the live graph (no rebuild); clicking a different node or timeline entry moves the ring.</li>
       <li><b>Panel layout — details lead, navigator is light.</b> The branch list is a compact single-line navigator (swatch · name · <span class="pill blue">you</span> · state dot); owner and version counts live in the details, not the list. When a branch is selected its <b>Details card leads the panel</b> in a light surface, so the selected version's info reads first, with the navigator below for jumping elsewhere. Archived branches sit in a collapsed disclosure at the bottom (§6).</li>
-      <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, and an <b>Evolution</b> timeline — every version with date and badges:
+      <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, then an <b>Evolution</b> timeline and the actions (§4).</li>
+      <li><b>Evolution timeline row</b> stays on one line: committer <b>avatar</b> (initials, full name on hover) · commit <b>message</b> truncated with … (full message on hover) · <b>date</b> pinned right. Badges wrap below:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
         <span class="pill gray">build-n</span> <span class="pill">current version</span> <span class="pill yellow">work in progress</span></li>
       <li><b>Archived interactions stay legible:</b> wherever a version interacted with a now-archived branch (merge from/into, created-from), the badge or name carries a dashed <span class="pill gray">archived</span> tag. Clicking it opens the archive-details modal (when / by whom / reason + Unarchive) — see §6.</li>
@@ -121,30 +122,37 @@
   </div>
 
   <div class="card">
-    <h2>4 · Version actions (status-dependent)</h2>
-    <p>Actions apply to the <b>selected version</b> and depend on its status:</p>
+    <h2>4 · Actions — Version actions vs Branch actions</h2>
+    <p>The panel groups actions under two headers: <b>Version actions</b> operate on the selected version;
+       <b>Branch actions</b> operate on the branch as a whole.</p>
     <table>
-      <tr><th>Selected version</th><th>Actions</th></tr>
+      <tr><th>Group</th><th>Actions</th></tr>
       <tr>
-        <td>WIP</td>
-        <td><b>Commit changes</b> (primary; modal asks for commit message) ·
-            <b>Delete WIP changes</b> (danger; confirm modal — committed versions unaffected; current-version marker falls back to the previous version)</td>
+        <td>Version actions — <b>WIP</b></td>
+        <td><b>Commit changes</b> (primary; textarea modal for message) ·
+            <b>Delete WIP changes</b> (danger; confirm)</td>
       </tr>
       <tr>
-        <td>Committed</td>
-        <td><b>Create build</b> (stamps a build tag; disabled once created) ·
-            <b>Merge…</b> (any-to-any, see §5) ·
-            <b>Start new version</b> (new WIP at branch tip; disabled only if a WIP already exists — merged branches stay editable, per req 2) ·
-            <b>Create new branch…</b> (named via modal, starts as WIP from the selected version) ·
-            <b>Edit commit message…</b> ·
-            <b>Download version</b></td>
+        <td>Version actions — <b>Committed</b></td>
+        <td><b>Create build</b> (disabled once created) ·
+            <b>Start new version</b> (new WIP at tip; disabled only if a WIP already exists) ·
+            <b>Create new branch…</b> ·
+            <b>Edit commit message…</b> (~3-row textarea) ·
+            <b>Export version</b> (renamed from Download) ·
+            <b>Delete version</b> (danger — tip only &amp; not merged, else disabled with reason)</td>
+      </tr>
+      <tr>
+        <td>Branch actions</td>
+        <td><b>Merge branch…</b> (from the committed tip, any-to-any per §5; disabled if the tip is WIP) ·
+            <b>Archive branch</b> (quiet danger-tertiary, §6; disabled only on main)</td>
       </tr>
       <tr>
         <td>On archived branch</td>
         <td><b>Unarchive branch</b> only</td>
       </tr>
     </table>
-    <p class="meta">Matches the product action surface in <code>process-version-actions/version-actions.component.ts</code>
+    <p class="meta"><b>Delete version</b> promotes the previous version to tip (same mechanism as discarding a WIP).
+      Matches the product action surface in <code>process-version-actions/version-actions.component.ts</code>
       (canMerge / canStartNewVersion relaxed per CORE-4974: main can be a source; merged branches stay editable).</p>
   </div>
 
