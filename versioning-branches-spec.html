@@ -46,7 +46,7 @@
 
   <div class="card">
     <h1>Versioning tree — branch &amp; version UX spec</h1>
-    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.2 · 2026-07-16 (milestone version-B) · owner: Madalina</p>
+    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.3 · 2026-07-16 (milestone version-C) · owner: Madalina</p>
     <p>Consolidates the UX rules validated in the standalone prototype
        (<code>/Users/madalina/flowx-code/versioning-tree-prototype/</code>, run with
        <code>python3 -m http.server 8899 --bind 127.0.0.1</code>). The prototype renders with the real
@@ -69,10 +69,12 @@
       <tr><td>Gray circle with a down-arrow (↓)</td><td>Imported version — read-only, brought in from another application (isolated view-only scenario, §7)</td></tr>
       <tr><td>Node where two lines join</td><td>Merge — the merge line always joins the <b>target</b> branch</td></tr>
     </table>
-    <p><b>Legend</b> (order + neutral swatches): items read <b>latest · work in progress · committed ·
+    <p><b>Legend</b> (order + neutral swatches): items read <b>selected · work in progress · committed ·
        merge in progress · imported · merge</b>, drawn in <b>neutral grays</b>
        (<code>#64748b</code> / <code>#e3e8ed</code> / <code>#a6b0be</code>) — deliberately not branch
-       colors, since the legend explains node <i>shapes/states</i>, not any one branch's hue.</p>
+       colors, since the legend explains node <i>shapes/states</i>, not any one branch's hue. The
+       <b>selected</b> swatch is a <b>border-only ring</b> (no fill); the old "latest" filled-dot entry
+       was dropped from the legend (the current-version marker still renders in the graph).</p>
     <h3>Making main unmistakable</h3>
     <p>Branch labels are positioned by the engine at each branch tip, so the <code>main</code> tag can appear
        between feature tags. Three stacked cues compensate:</p>
@@ -233,25 +235,26 @@
   </div>
 
   <div class="card">
-    <h2>7 · Imported view (isolated, view-only) — user testing</h2>
-    <p>A separate scenario in the picker — <b>"Imported · view-only (user testing)"</b> — explores how an
-       <b>imported application version</b> reads in the tree, without touching the built editing experience.</p>
+    <h2>7 · Imported (read-only) branches &amp; versions</h2>
+    <p>How an <b>imported application version</b> — brought in with its own branches and versions — reads in the tree.
+       <b>View-only is a per-branch property</b> (driven by <code>imported: true</code>), so imported branches are read-only
+       <i>wherever they appear</i> while the real branches around them stay fully editable.</p>
     <ul>
-      <li><b>What it shows:</b> an imported version with <b>its own branches and versions</b>
-          (<code>imported-baseline</code> → 2 versions, plus its sub-branch <code>imported-onboarding</code>)
-          sitting <b>alongside active branches</b> (<code>main</code>, <code>feature-live</code>) — both worlds in one graph.</li>
-      <li><b>Imported rendering:</b> imported versions are <b>grayed</b> (neutral palette) and each imported node draws
-          the <b>imported glyph</b> (gray circle + down-arrow ↓, matching the legend). Imported labels, navigator swatches,
-          and the details <span class="pill gray">imported</span> pill are all gray; branch state is <code>imported</code>
-          ("read-only. Brought in from another application with its own branches and versions").</li>
-      <li><b>View-only:</b> the whole scenario carries a <code>viewOnly</code> flag → <b>no version or branch actions</b>
-          for anything (imported or active). Nodes/branches/timeline entries stay <b>selectable</b> to inspect their info.</li>
-      <li><b>Isolation:</b> <code>SCENARIOS.imported.viewOnly === true</code> (suppresses actions) + per-version
-          <code>imported: true</code> (drives gray palette + glyph + <code>imported</code> state). Both are inert in every
-          other scenario — Demo still shows all actions and zero imported styling.</li>
+      <li><b>Woven into the Demo / full story</b> (primary): <code>imported-core</code> (2 versions) + its sub-branch
+          <code>imported-reporting</code> sit grayed inside the main tree, alongside the editable branches. Selecting an
+          imported branch shows info + Evolution but <b>no actions</b>; a real branch keeps all actions. Imported branches
+          are <b>excluded from merge targets</b> (can't merge into a read-only branch). This is the integration the product should mirror.</li>
+      <li><b>Standalone <code>imported</code> scenario</b> ("Imported · view-only"): a whole-scenario <code>viewOnly</code>
+          variant (main + feature-live + imported branches) for a focused, actions-free view — redundant now that the demo integrates imported.</li>
+      <li><b>Rendering:</b> imported versions are <b>grayed</b> (neutral palette) and each imported node draws the
+          <b>imported glyph</b> (gray circle + down-arrow ↓, matching the legend); labels, navigator swatches, and the
+          details <span class="pill gray">imported</span> pill are gray; branch state is <code>imported</code>.</li>
+      <li><b>Mechanism:</b> per-version <code>imported: true</code> drives gray palette + glyph + <code>imported</code>
+          state, suppresses that branch's actions in <i>any</i> scenario, and drops it from merge-target lists.
+          <code>SCENARIOS.imported.viewOnly === true</code> additionally makes the standalone scenario read-only for every branch.</li>
     </ul>
-    <div class="open"><b>Open (for testing):</b> final imported-node glyph (currently ↓-in-circle), and whether imported
-      nodes should also reflect WIP / merge states rather than always rendering as the imported glyph.</div>
+    <div class="open"><b>Open (for testing):</b> final imported-node glyph (currently ↓-in-circle); whether imported nodes
+      should reflect WIP/merge states; and where imported branches sit in the demo (currently branch off the initial version → bottom lanes).</div>
   </div>
 
   <div class="card">
