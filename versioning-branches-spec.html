@@ -46,7 +46,7 @@
 
   <div class="card">
     <h1>Versioning tree — branch &amp; version UX spec</h1>
-    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.4 · 2026-07-16 (milestone version-D) · owner: Madalina</p>
+    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.5 · 2026-07-16 (milestone version-E) · owner: Madalina</p>
     <p>Consolidates the UX rules validated in the standalone prototype
        (<code>/Users/madalina/flowx-code/versioning-tree-prototype/</code>, run with
        <code>python3 -m http.server 8899 --bind 127.0.0.1</code>). The prototype renders with the real
@@ -199,7 +199,7 @@
     <div class="decision"><b>Why fully-merged targets are blocked:</b> keeps "merged = done" trustworthy; reopening is an
       explicit act (Start new version). This is a product-policy choice, not a technical necessity — git would allow it.</div>
     <ul>
-      <li><b>Two-step merge, chained (conflicts):</b> confirming ("Start merge") lands a <b>merge-in-progress version</b> on the target (status <code>MERGE_IN_PROGRESS</code>, the hatched-square bubble) and <b>immediately opens the Resolve-conflicts modal</b> — the user is never dropped onto a parked conflict. Resolve via <b>Resolve conflicts</b> (→ committed merge, source marked merged), or dismiss via <b>Cancel merge</b> which <b>discards the just-started merge</b> so nothing conflicted is left parked (Esc/✕ behave the same). A <i>pre-existing</i> merge-in-progress can still be resolved/discarded from its Version actions, where plain <b>Cancel</b> just closes and leaves it parked. The source branch is untouched; a branch whose tip is merge-in-progress is "busy" (can't merge, start a version, or be archived) until resolved. The resolve modal is a placeholder for the product's merge-conflicts editor.</li>
+      <li><b>Two-step merge, chained (conflicts):</b> confirming ("Start merge") lands a <b>merge-in-progress version</b> on the target (status <code>MERGE_IN_PROGRESS</code>, the hatched-square bubble) and <b>immediately opens the Resolve-conflicts modal</b>. Resolve via <b>Resolve conflicts</b> (→ committed merge, source marked merged), or <b>close it</b> via <b>Resolve later</b> / Esc / ✕ — which <b>keeps the merge-in-progress version parked in the graph</b> (status preserved), <i>not</i> removed (changed 2026-07-16; earlier it discarded). A parked merge is resumed from its Version actions: <b>Resolve conflicts</b> (completes it) or <b>Discard merge</b> (the only way, besides completing, to remove it). The source branch is untouched; a branch whose tip is merge-in-progress is "busy" (can't merge, start a version, or be archived) until resolved. The resolve modal is a placeholder for the product's merge-conflicts editor.</li>
       <li>Re-merge is allowed: a branch can merge into the same target repeatedly (scenario c) and in both directions (scenario e).</li>
       <li>Merge modal: pick target from the valid list; blocked targets appear disabled with their reason, so the rule teaches itself.</li>
     </ul>
