@@ -46,7 +46,7 @@
 
   <div class="card">
     <h1>Versioning tree — branch &amp; version UX spec</h1>
-    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.1 · 2026-07-14 · owner: Madalina</p>
+    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.2 · 2026-07-16 (milestone version-B) · owner: Madalina</p>
     <p>Consolidates the UX rules validated in the standalone prototype
        (<code>/Users/madalina/flowx-code/versioning-tree-prototype/</code>, run with
        <code>python3 -m http.server 8899 --bind 127.0.0.1</code>). The prototype renders with the real
@@ -66,8 +66,13 @@
       <tr><td>Hatched rounded square</td><td>Merge in progress — a merge landed here and its conflicts must be resolved before it completes</td></tr>
       <tr><td>Outer solid ring (branch accent)</td><td>Latest version on the branch you're working on ("you are here")</td></tr>
       <tr><td>Bubble ring in the branch's deep tone</td><td>Selected version — the specific bubble you clicked (distinct from latest)</td></tr>
+      <tr><td>Gray circle with a down-arrow (↓)</td><td>Imported version — read-only, brought in from another application (isolated view-only scenario, §7)</td></tr>
       <tr><td>Node where two lines join</td><td>Merge — the merge line always joins the <b>target</b> branch</td></tr>
     </table>
+    <p><b>Legend</b> (order + neutral swatches): items read <b>latest · work in progress · committed ·
+       merge in progress · imported · merge</b>, drawn in <b>neutral grays</b>
+       (<code>#64748b</code> / <code>#e3e8ed</code> / <code>#a6b0be</code>) — deliberately not branch
+       colors, since the legend explains node <i>shapes/states</i>, not any one branch's hue.</p>
     <h3>Making main unmistakable</h3>
     <p>Branch labels are positioned by the engine at each branch tip, so the <code>main</code> tag can appear
        between feature tags. Three stacked cues compensate:</p>
@@ -116,7 +121,7 @@
       <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, then an <b>Evolution</b> timeline and the actions (§4).</li>
       <li><b>Evolution timeline row:</b> committer <b>avatar</b> (initials, full name on hover), commit <b>message</b> truncated with … (full on hover), and the <b>date underneath</b> (left-aligned, muted — keeps rows uncrowded). Badges wrap below:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
-        <span class="pill gray">build-n</span> <span class="pill">current version</span> <span class="pill yellow">work in progress</span></li>
+        <span class="pill gray">build-n</span> <span class="pill">latest</span> <span class="pill yellow">work in progress</span></li>
       <li><b>Archived interactions stay legible:</b> wherever a version interacted with a now-archived branch (merge from/into, created-from), the badge or name carries a dashed <span class="pill gray">archived</span> tag. Clicking it opens the archive-details modal (when / by whom / reason + Unarchive) — see §6.</li>
       <li>Selecting a branch from the Archived section shows its details and Evolution timeline (panel only — archived branches don't render in the graph), with an archived pill next to the title.</li>
     </ul>
@@ -140,17 +145,19 @@
       </tr>
       <tr>
         <td>Version actions — <b>Committed</b></td>
-        <td><b>Create build</b> (disabled once created) ·
+        <td>In this fixed order: <b>Create build</b> (disabled once created) ·
+            <b>Create branch</b> ·
             <b>Start version</b> (new WIP at tip; disabled if the tip is already in progress) ·
-            <b>Create branch…</b> ·
-            <b>Edit message…</b> (~3-row textarea) ·
+            <b>Edit message</b> (~3-row textarea) ·
             <b>Export version</b> (renamed from Download) ·
             <b>Delete version</b> (danger — tip only &amp; not merged, else disabled with reason)</td>
       </tr>
       <tr>
         <td>Branch actions</td>
-        <td><b>Merge branch…</b> (from the committed tip, any-to-any per §5; disabled if the tip is WIP) ·
-            <b>Archive branch</b> (quiet danger-tertiary, §6; disabled only on main)</td>
+        <td><b>Merge branch</b> (from the committed tip, any-to-any per §5; disabled if the tip is
+            WIP/merge-in-progress, and when there are no other branches to merge into) ·
+            <b>Archive branch</b> (styled like Delete version — danger-secondary; §6; disabled on main
+            and on a merge-in-progress branch)</td>
       </tr>
       <tr>
         <td>On archived branch</td>
@@ -189,7 +196,7 @@
     <div class="decision"><b>Why fully-merged targets are blocked:</b> keeps "merged = done" trustworthy; reopening is an
       explicit act (Start new version). This is a product-policy choice, not a technical necessity — git would allow it.</div>
     <ul>
-      <li><b>Two-step merge (conflicts):</b> confirming ("Start merge") lands a <b>merge-in-progress version</b> on the target (status <code>MERGE_IN_PROGRESS</code>, the hatched-square bubble) and focuses it. Resolve via <b>Resolve conflicts</b> (→ committed merge, source marked merged) or <b>Discard merge</b> (→ removed). The source branch is untouched; a branch whose tip is merge-in-progress is "busy" until resolved. The resolve modal is a placeholder for the product's merge-conflicts editor.</li>
+      <li><b>Two-step merge, chained (conflicts):</b> confirming ("Start merge") lands a <b>merge-in-progress version</b> on the target (status <code>MERGE_IN_PROGRESS</code>, the hatched-square bubble) and <b>immediately opens the Resolve-conflicts modal</b> — the user is never dropped onto a parked conflict. Resolve via <b>Resolve conflicts</b> (→ committed merge, source marked merged), or dismiss via <b>Cancel merge</b> which <b>discards the just-started merge</b> so nothing conflicted is left parked (Esc/✕ behave the same). A <i>pre-existing</i> merge-in-progress can still be resolved/discarded from its Version actions, where plain <b>Cancel</b> just closes and leaves it parked. The source branch is untouched; a branch whose tip is merge-in-progress is "busy" (can't merge, start a version, or be archived) until resolved. The resolve modal is a placeholder for the product's merge-conflicts editor.</li>
       <li>Re-merge is allowed: a branch can merge into the same target repeatedly (scenario c) and in both directions (scenario e).</li>
       <li>Merge modal: pick target from the valid list; blocked targets appear disabled with their reason, so the rule teaches itself.</li>
     </ul>
@@ -202,8 +209,10 @@
     <h2>6 · Archive (soft delete)</h2>
     <div class="decision"><b>There is no hard delete.</b> "Delete branch" is an archive: the branch is hidden from active
       work, every version remains in the tree, and it can be unarchived at any time (plus an immediate Undo pill).</div>
-    <h3>Eligibility — any branch except main</h3>
-    <p>Only <code>main</code> is blocked ("The default branch cannot be archived."). Everything else can be archived.
+    <h3>Eligibility — any branch except main, and not mid-merge</h3>
+    <p><code>main</code> is blocked ("The default branch cannot be archived."), and a branch whose tip
+       is a <b>merge-in-progress</b> is blocked too ("Resolve or discard the in-progress merge before
+       archiving this branch."). Everything else can be archived.
        The confirm modal captures an <b>optional reason</b> and records <b>who</b> archived it and <b>when</b>, and spells
        out the <b>impact</b> so archiving an unmerged or in-progress branch is a conscious choice:</p>
     <table>
@@ -215,7 +224,7 @@
     </table>
     <h3>Presentation &amp; recovery</h3>
     <ul>
-      <li><b>Archive is a quiet action</b>: small danger-<i>tertiary</i> (text) button in a "Branch actions" footer — never the biggest CTA in the panel.</li>
+      <li><b>Archive</b> is a small <b>danger-secondary</b> button (white fill, red text, neutral border — styled like Delete version) in the "Branch actions" footer.</li>
       <li>Archived branches are <b>hidden from the graph and the branch navigator</b>; they live in a <b>collapsed disclosure</b> ("▸ Archived · N") at the bottom of the navigator, expanded on demand. Each archived row is compact — swatch, name, archive date, and an inline <b>Unarchive</b> button.</li>
       <li>Excluded from merge targets while archived.</li>
       <li><b>Unarchiving always goes through the archive-details modal.</b> Both the dashed <span class="pill gray">archived</span> tag and the Archived-disclosure <b>Unarchive</b> CTA open the same modal — <b>when</b> / <b>by whom</b> / <b>reason</b> — with Cancel and <b>Unarchive branch</b>. On unarchive the branch returns to the tree <b>and is focused</b> (selected in the graph + its details card shown).</li>
@@ -224,7 +233,29 @@
   </div>
 
   <div class="card">
-    <h2>7 · Open questions for user testing</h2>
+    <h2>7 · Imported view (isolated, view-only) — user testing</h2>
+    <p>A separate scenario in the picker — <b>"Imported · view-only (user testing)"</b> — explores how an
+       <b>imported application version</b> reads in the tree, without touching the built editing experience.</p>
+    <ul>
+      <li><b>What it shows:</b> an imported version with <b>its own branches and versions</b>
+          (<code>imported-baseline</code> → 2 versions, plus its sub-branch <code>imported-onboarding</code>)
+          sitting <b>alongside active branches</b> (<code>main</code>, <code>feature-live</code>) — both worlds in one graph.</li>
+      <li><b>Imported rendering:</b> imported versions are <b>grayed</b> (neutral palette) and each imported node draws
+          the <b>imported glyph</b> (gray circle + down-arrow ↓, matching the legend). Imported labels, navigator swatches,
+          and the details <span class="pill gray">imported</span> pill are all gray; branch state is <code>imported</code>
+          ("read-only. Brought in from another application with its own branches and versions").</li>
+      <li><b>View-only:</b> the whole scenario carries a <code>viewOnly</code> flag → <b>no version or branch actions</b>
+          for anything (imported or active). Nodes/branches/timeline entries stay <b>selectable</b> to inspect their info.</li>
+      <li><b>Isolation:</b> <code>SCENARIOS.imported.viewOnly === true</code> (suppresses actions) + per-version
+          <code>imported: true</code> (drives gray palette + glyph + <code>imported</code> state). Both are inert in every
+          other scenario — Demo still shows all actions and zero imported styling.</li>
+    </ul>
+    <div class="open"><b>Open (for testing):</b> final imported-node glyph (currently ↓-in-circle), and whether imported
+      nodes should also reflect WIP / merge states rather than always rendering as the imported glyph.</div>
+  </div>
+
+  <div class="card">
+    <h2>8 · Open questions for user testing</h2>
     <ul>
       <li>Fully-merged branch as merge target: keep the two-step "reopen, then merge", or auto-reopen? (§5 policy choice.)</li>
       <li>Archiving a branch that holds the user's current version is allowed with a warning — should the product instead move the current-version pointer somewhere visible (e.g., main's tip)?</li>
@@ -234,7 +265,7 @@
   </div>
 
   <div class="card">
-    <h2>8 · Implementation notes</h2>
+    <h2>9 · Implementation notes</h2>
     <ul>
       <li>Prototype: <code>index.html</code> (FlowX DS tokens), <code>data.js</code> (demo history + scenario catalog a–e ported from <code>versioning-scenarios.ts</code>), <code>app.js</code> (JS port of <code>createGitEventLog</code> + the interaction layer), <code>gitgraph.js</code> (built lib).</li>
       <li>Rebuild the engine after lib changes: <code>npx nx build gitgraph</code> in <code>designer/</code>, copy <code>dist/libs/@flowx/gitgraph/index.js</code>.</li>
