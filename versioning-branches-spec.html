@@ -46,7 +46,7 @@
 
   <div class="card">
     <h1>Versioning tree — branch &amp; version UX spec</h1>
-    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.7 · 2026-07-17 · owner: Madalina</p>
+    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.8 · 2026-07-17 · owner: Madalina</p>
     <p>Consolidates the UX rules validated in the prototype
        (<code>/Users/madalina/flowx-code/versioning-tree-prototype/</code>, run with
        <code>python3 -m http.server 8899 --bind 127.0.0.1</code> — standalone console at <code>/</code>,
@@ -80,6 +80,10 @@
        The legend lives in a <b>pinned quiet bar at the bottom of the console</b> (10px muted type,
        12px swatches, bottom-aligned with the action footers) — chrome, not content — and stays
        visible in both List and Tree views (2026-07-17).</p>
+    <h3>Branch labels</h3>
+    <p><b>All branch labels are left-aligned to a common left edge</b> (2026-07-17) — the engine
+       anchors each label at its own lane, which reads staggered; the prototype re-aligns them after
+       every engine re-layout so they scan as one tidy column.</p>
     <h3>Making main unmistakable</h3>
     <p>Branch labels are positioned by the engine at each branch tip, so the <code>main</code> tag can appear
        between feature tags. Three stacked cues compensate:</p>
@@ -153,9 +157,11 @@
       </tr>
       <tr>
         <td><b>List ⇄ Tree</b> (center, flex)</td>
-        <td>A segmented <b>view toggle</b> swaps the compact <b>branch navigator</b> (List) and the <b>graph</b>
-            (Tree, default); the <b>All / My branches / Active / Merged</b> filter sits beside it. Toggling is pure
-            show/hide — the graph is built once, never rebuilt on switch (no flicker). The <b>legend bar</b> is
+        <td>The <b>All / My branches / Active / Merged</b> filter sits on the <b>left</b>, aligned to the tree;
+            the <b>List/Tree view toggle</b> is a compact <b>icon control in the top-right corner</b>. It swaps the
+            compact <b>branch navigator</b> (List) and the <b>graph</b> (Tree, default) — pure show/hide, the graph
+            is built once, never rebuilt on switch (no flicker). The <b>tree anchors to the bottom</b> of the pane
+            (root by the legend bar, clean space above; inert once the graph scrolls). The <b>legend bar</b> is
             pinned at the bottom (quiet chrome, §1).</td>
       </tr>
       <tr>
@@ -167,9 +173,10 @@
             <span class="pill yellow">merge in progress</span> / <span class="pill gray">imported</span>] ·
             <span class="pill">latest</span> · <b>build chip</b> with a hammer icon — the downloadable package built
             from this version); the <b>message row</b> with the edit-message pencil inline; author avatar · date;
-            version-level Merge from / Merged into; and <b>Resources changed</b> — a fixed-height scrollable list
-            (colored left bar: green = added, yellow = modified, red = removed; hover eye opens the diff, stubbed) vs
-            the previous version, or vs the compared version (§5). Pinned footer: status-dependent <b>Version actions</b>.</td>
+            version-level Merge from / Merged into; and <b>Resources changed</b> — a fixed-height scrollable list at
+            caption size (12px; colored left bar: green = added, yellow = modified, red = removed; hover eye opens
+            the diff, stubbed) vs the previous version, or vs the compared version (§5). Pinned footer:
+            status-dependent <b>Version actions</b>.</td>
       </tr>
     </table>
     <p><b>Platform context:</b> in the product shell the console opens as a <b>bottom drawer</b> —
@@ -185,7 +192,9 @@
     <ul>
       <li><b>Enter:</b> the compare toggle in the Version-details head arms picking ("Select another
           version in the tree or an Evolution list — only two versions can be compared", with Cancel).
-          The next click on a <b>graph node</b> or an <b>Evolution row</b> becomes the compare target.</li>
+          If the center pane is on the List view, arming <b>auto-switches it to Tree</b> so versions are
+          on screen to pick. The next click on a <b>graph node</b> or an <b>Evolution row</b> becomes the
+          compare target.</li>
       <li><b>Graph:</b> the selected (base) version keeps its <b>solid</b> ring; the compare target gets a
           <b>dashed</b> ring, each in its branch's deep tone.</li>
       <li><b>Summary card</b> replaces the single-version blocks at the top of the pane: a "Comparing"
