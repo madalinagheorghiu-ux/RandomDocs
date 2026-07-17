@@ -46,11 +46,13 @@
 
   <div class="card">
     <h1>Versioning tree — branch &amp; version UX spec</h1>
-    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.5 · 2026-07-16 (milestone version-E) · owner: Madalina</p>
-    <p>Consolidates the UX rules validated in the standalone prototype
+    <p class="desc">CORE-4974 · merge any branch into any branch + continue after merge · v0.7 · 2026-07-17 · owner: Madalina</p>
+    <p>Consolidates the UX rules validated in the prototype
        (<code>/Users/madalina/flowx-code/versioning-tree-prototype/</code>, run with
-       <code>python3 -m http.server 8899 --bind 127.0.0.1</code>). The prototype renders with the real
-       <code>@flowx/gitgraph</code> engine (vendored GitgraphJS fork from <code>designer/libs/gitgraph</code>)
+       <code>python3 -m http.server 8899 --bind 127.0.0.1</code> — standalone console at <code>/</code>,
+       platform page with the console as a bottom drawer at <code>/platform.html</code>). The prototype
+       renders with the real <code>@flowx/gitgraph</code> engine (vendored GitgraphJS fork from
+       <code>designer/libs/gitgraph</code>)
        and the production <code>ApplicationVersion[]</code> history shape, so every rule here maps 1:1 onto the product model:
        versions form linear chains per branch via <code>previousVersionId</code>; merges reference
        <code>mergedFromVersionId</code>; one WIP per branch, always at the tip.</p>
@@ -66,7 +68,7 @@
       <tr><td>Hatched rounded square</td><td>Merge in progress — a merge landed here and its conflicts must be resolved before it completes</td></tr>
       <tr><td>Outer solid ring (branch accent)</td><td>Latest version on the branch you're working on ("you are here")</td></tr>
       <tr><td>Bubble ring in the branch's deep tone</td><td>Selected version — the specific bubble you clicked (distinct from latest)</td></tr>
-      <tr><td>Gray circle with a down-arrow (↓)</td><td>Imported version — read-only, brought in from another application (isolated view-only scenario, §7)</td></tr>
+      <tr><td>Gray circle with a down-arrow (↓)</td><td>Imported version — read-only, brought in from another application (isolated view-only scenario, §9)</td></tr>
       <tr><td>Node where two lines join</td><td>Merge — the merge line always joins the <b>target</b> branch</td></tr>
     </table>
     <p><b>Legend</b> (order + neutral swatches): items read <b>selected · work in progress · committed ·
@@ -74,7 +76,10 @@
        (<code>#64748b</code> / <code>#e3e8ed</code> / <code>#a6b0be</code>) — deliberately not branch
        colors, since the legend explains node <i>shapes/states</i>, not any one branch's hue. The
        <b>selected</b> swatch is a <b>border-only ring</b> (no fill); the old "latest" filled-dot entry
-       was dropped from the legend (the current-version marker still renders in the graph).</p>
+       was dropped from the legend (the current-version marker still renders in the graph).
+       The legend lives in a <b>pinned quiet bar at the bottom of the console</b> (10px muted type,
+       12px swatches, bottom-aligned with the action footers) — chrome, not content — and stays
+       visible in both List and Tree views (2026-07-17).</p>
     <h3>Making main unmistakable</h3>
     <p>Branch labels are positioned by the engine at each branch tip, so the <code>main</code> tag can appear
        between feature tags. Three stacked cues compensate:</p>
@@ -108,31 +113,100 @@
       <li>Every branch shows its owner; the viewer's own branches get a <span class="pill blue">you</span> chip ("MyBranches" = branches created by me).</li>
       <li>Filters (segmented control), in this order: <b>All / My branches / Active / Merged</b>.</li>
       <li>Filters <b>dim</b> non-matching branches instead of hiding them — topology stays readable and merge edges never dangle.</li>
-      <li><b>Archived branches are hidden</b> from the graph and the branch list; their home is the Archived section (§6).</li>
+      <li><b>Archived branches are hidden</b> from the graph and the branch list; their home is the Archived section (§8).</li>
     </ul>
   </div>
 
   <div class="card">
     <h2>3 · Selection &amp; branch evolution</h2>
     <ul>
-      <li><b>Default view on load / scenario switch:</b> focus the <b>current (latest) <u>committed</u> version</b> you're working on — details card leads the panel. A <b>merge-in-progress version is never seeded</b>; that state appears only transiently while a merge is resolved (§5). Passive: graph keeps the plain "All" look; fading/ring begin on the first real click.</li>
+      <li><b>Default view on load / scenario switch:</b> focus the <b>current (latest) <u>committed</u> version</b> you're working on — details card leads the panel. A <b>merge-in-progress version is never seeded</b>; that state appears only transiently while a merge is resolved (§7). Passive: graph keeps the plain "All" look; fading/ring begin on the first real click.</li>
       <li>Click any node, branch label, or list row → selects that branch (clicking a node/timeline entry targets that version). <b>Right-click a bubble</b> → selects it and opens a <b>context menu</b> with that version's full action set. <b>Selection persists across filter changes</b> (the details card no longer clears when a segment is clicked). There is no ✕ / clear-selection anymore — the panel always leads with a selected version; switch by clicking another node/branch.</li>
       <li><b>Selection fades the rest — lighter, never gray.</b> The selected branch keeps its exact normal appearance (no restyling); every other branch drops to ~28% opacity, becoming a lighter version of <i>its own color</i>, never a gray substitute. The fade is applied in place on the rendered graph (no re-render), so selecting a node never flickers. Filters de-emphasize non-matching branches the same way.</li>
       <li><b>The selected bubble is ringed</b> in the branch's deep tone — like the current-version marker in the legend, but darker so "selected" reads distinct from "current". Applied as a DOM mutation on the live graph (no rebuild); clicking a different node or timeline entry moves the ring.</li>
-      <li><b>Panel layout — details lead, navigator is light.</b> The branch list is a compact single-line navigator (swatch · name · <span class="pill blue">you</span> · state dot). When a branch is selected its <b>Details card leads the panel</b>. The details <b>header</b> shows the branch name plus two icon buttons (replacing the old ✕): an <b>edit-name</b> pencil (rename the branch — every version moves to the new name, color preserved; disabled on main/imported/archived) and a <b>download</b> icon (export the selected version).</li>
-      <li>Details panel: state explanation in plain language, owner, created-from, merges in, merged into, then an <b>Evolution</b> timeline and the actions (§4).</li>
+      <li><b>Layout — the console is a 3-pane split</b> (superseding the earlier single side-panel): Branch details · List⇄Tree · Version details — see §4 for the full anatomy, pane titles, and pinned action footers.</li>
+      <li>Branch details pane: state explanation in plain language, owner, created-from, merges in, merged into, then an <b>Evolution</b> timeline; the <b>edit-name</b> pencil sits on the pane's title row (rename the branch — every version moves to the new name, color preserved; disabled on main/imported/archived).</li>
       <li><b>Evolution timeline row:</b> committer <b>avatar</b> (initials, full name on hover), commit <b>message</b> truncated with … (full on hover), and the <b>date underneath</b>. On the <b>selected</b> committed row an inline <b>edit-message pencil</b> appears — the only place to rename a version's message; it follows the selection. Badges wrap below:
         <span class="pill blue">⭠ merge from X</span> <span class="pill green">⭢ merged into Y</span>
         <span class="pill gray">build-n</span> <span class="pill">latest</span> <span class="pill yellow">work in progress</span></li>
-      <li><b>Archived interactions stay legible:</b> wherever a version interacted with a now-archived branch (merge from/into, created-from), the badge or name carries a dashed <span class="pill gray">archived</span> tag. Clicking it opens the archive-details modal (when / by whom / reason + Unarchive) — see §6.</li>
+      <li><b>Archived interactions stay legible:</b> wherever a version interacted with a now-archived branch (merge from/into, created-from), the badge or name carries a dashed <span class="pill gray">archived</span> tag. Clicking it opens the archive-details modal (when / by whom / reason + Unarchive) — see §8.</li>
       <li>Selecting a branch from the Archived section shows its details and Evolution timeline (panel only — archived branches don't render in the graph), with an archived pill next to the title.</li>
     </ul>
   </div>
 
   <div class="card">
-    <h2>4 · Actions — Version actions vs Branch actions</h2>
-    <p>The panel groups actions under two headers: <b>Version actions</b> operate on the selected version;
-       <b>Branch actions</b> operate on the branch as a whole.</p>
+    <h2>4 · Console layout — 3 panes &amp; the platform drawer</h2>
+    <p>The console interior is a <b>3-pane grid split by 1px dividers, no inner cards</b>
+       (GitKraken-like). Each side pane has a <b>fixed head</b> with a Section Title and that pane's
+       actions, a scrolling body, and a <b>pinned footer</b> for its action buttons — the two footers
+       are bottom-aligned so CTAs never move while content scrolls. Typography follows the FlowX DS
+       <a href="https://flowx-ai.github.io/FlowX-Design-System/patterns/typography-hierarchy">typography
+       hierarchy</a>: pane titles are Section Titles (18/28 · 700), body leads (branch name, version
+       message) are Subsection Titles (14/24 · 700), supporting copy is Description (12/16 · 400).</p>
+    <table>
+      <tr><th>Pane</th><th>Content</th></tr>
+      <tr>
+        <td><b>Branch details</b> (left, ~300px)</td>
+        <td>Head: title + <b>edit-name pencil</b>. Body: branch name (with <span class="pill blue">you</span> chip / state pill),
+            plain-language state, Owner / Created from / Merges in / Merged into, the <b>Evolution</b> timeline
+            (clickable rows select a version). Pinned footer: <b>Branch actions</b> (Merge branch · Archive/Unarchive).</td>
+      </tr>
+      <tr>
+        <td><b>List ⇄ Tree</b> (center, flex)</td>
+        <td>A segmented <b>view toggle</b> swaps the compact <b>branch navigator</b> (List) and the <b>graph</b>
+            (Tree, default); the <b>All / My branches / Active / Merged</b> filter sits beside it. Toggling is pure
+            show/hide — the graph is built once, never rebuilt on switch (no flicker). The <b>legend bar</b> is
+            pinned at the bottom (quiet chrome, §1).</td>
+      </tr>
+      <tr>
+        <td><b>Version details</b> (right, ~360px)</td>
+        <td>Head: title + the pane's <b>ACTIONS</b> — the <b>compare</b> toggle and a labeled
+            <b>Download</b> CTA — kept deliberately apart from the tags. Body: one <b>TAGS row</b>
+            (branch chip [main = filled blue, feature = outlined pastel, imported = gray] · status chip
+            [<span class="pill yellow">draft</span> dashed / <span class="pill gray">committed</span> /
+            <span class="pill yellow">merge in progress</span> / <span class="pill gray">imported</span>] ·
+            <span class="pill">latest</span> · <b>build chip</b> with a hammer icon — the downloadable package built
+            from this version); the <b>message row</b> with the edit-message pencil inline; author avatar · date;
+            version-level Merge from / Merged into; and <b>Resources changed</b> — a fixed-height scrollable list
+            (colored left bar: green = added, yellow = modified, red = removed; hover eye opens the diff, stubbed) vs
+            the previous version, or vs the compared version (§5). Pinned footer: status-dependent <b>Version actions</b>.</td>
+      </tr>
+    </table>
+    <p><b>Platform context:</b> in the product shell the console opens as a <b>bottom drawer</b> —
+       full width, ~80% of the viewport height — from the <b>branching button</b> next to the version
+       indicator in the page header. The header's <b>version pill mirrors the console selection</b>
+       live (same branch/status chip language); Esc closes an open console modal first, the drawer
+       second. The same console also runs standalone.</p>
+  </div>
+
+  <div class="card">
+    <h2>5 · Compare two versions</h2>
+    <p>Any two versions can be compared — and <b>only two</b>.</p>
+    <ul>
+      <li><b>Enter:</b> the compare toggle in the Version-details head arms picking ("Select another
+          version in the tree or an Evolution list — only two versions can be compared", with Cancel).
+          The next click on a <b>graph node</b> or an <b>Evolution row</b> becomes the compare target.</li>
+      <li><b>Graph:</b> the selected (base) version keeps its <b>solid</b> ring; the compare target gets a
+          <b>dashed</b> ring, each in its branch's deep tone.</li>
+      <li><b>Summary card</b> replaces the single-version blocks at the top of the pane: a "Comparing"
+          header with ✕, then both sides — <i>Selected version:</i> / <i>compared with:</i> — each with its
+          branch + status chips, the commit message, and author · date, split by a dashed divider.</li>
+      <li><b>Resources changed</b> switches to the <b>differences between the two versions</b>
+          ("Differences between “A” and “B”", with count).</li>
+      <li><b>Only two, enforced:</b> while a compare is active, further version clicks <b>replace the
+          target</b> (the base moves only by exiting). Switching branch context, the card's ✕, the toggle,
+          or a scenario switch exits compare. Cross-branch compares are first-class — each side shows its
+          own branch chip.</li>
+      <li>Version actions in the pinned footer keep applying to the <b>selected (base)</b> version; the
+          platform header pill keeps mirroring the base too.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>6 · Actions — Version actions vs Branch actions</h2>
+    <p><b>Version actions</b> operate on the selected version and sit in the Version-details pane's
+       <b>pinned footer</b>; <b>Branch actions</b> operate on the branch as a whole and sit in the
+       Branch-details pane's pinned footer — bottom-aligned, fixed in place (§4).</p>
     <table>
       <tr><th>Group</th><th>Actions</th></tr>
       <tr>
@@ -151,16 +225,16 @@
             <b>Create branch</b> ·
             <b>Start version</b> (new WIP at tip; disabled if the tip is already in progress) ·
             <b>Delete version</b> (danger — tip only &amp; not merged, else disabled with reason).
-            <b>Edit message</b> → inline pencil on the selected Evolution row (§3);
-            <b>Export version</b> → download icon in the details header (§3).
+            <b>Edit message</b> → inline pencil on the message row / selected Evolution row (§3, §4);
+            <b>Export version</b> → the labeled <b>Download</b> CTA in the Version-details head (§4).
             <br><i>Right-click a bubble</i> for the same full set as a context menu.</td>
       </tr>
       <tr>
         <td>Branch actions</td>
-        <td><b>Merge branch</b> (from the committed tip, any-to-any per §5; disabled if the tip is
+        <td><b>Merge branch</b> (from the committed tip, any-to-any per §7; disabled if the tip is
             WIP/merge-in-progress, and when there are no other branches to merge into) ·
-            <b>Archive branch</b> (danger-secondary; §6; disabled on main and on a merge-in-progress branch) ·
-            <b>Edit branch name</b> (header pencil — rename, color-stable; disabled on main/imported/archived)</td>
+            <b>Archive branch</b> (danger-secondary; §8; disabled on main and on a merge-in-progress branch) ·
+            <b>Edit branch name</b> (pencil in the Branch-details head — rename, color-stable; disabled on main/imported/archived)</td>
       </tr>
       <tr>
         <td>On archived branch</td>
@@ -173,7 +247,7 @@
   </div>
 
   <div class="card">
-    <h2>5 · Merge rules (any-to-any)</h2>
+    <h2>7 · Merge rules (any-to-any)</h2>
     <div class="decision"><b>Requirement 1 — merge any branch into any branch.</b> Target candidates are
       <b>all other branches</b>, never "ancestors only": siblings into siblings, descendants into unrelated
       branches, and main into a feature branch are all first-class merges. Eligibility is <b>state-based only</b>
@@ -209,7 +283,7 @@
   </div>
 
   <div class="card">
-    <h2>6 · Archive (soft delete)</h2>
+    <h2>8 · Archive (soft delete)</h2>
     <div class="decision"><b>There is no hard delete.</b> "Delete branch" is an archive: the branch is hidden from active
       work, every version remains in the tree, and it can be unarchived at any time (plus an immediate Undo pill).</div>
     <h3>Eligibility — any branch except main, and not mid-merge</h3>
@@ -236,7 +310,7 @@
   </div>
 
   <div class="card">
-    <h2>7 · Imported (read-only) branches &amp; versions</h2>
+    <h2>9 · Imported (read-only) branches &amp; versions</h2>
     <p>How an <b>imported application version</b> — brought in with its own branches and versions — reads in the tree.
        <b>View-only is a per-branch property</b> (driven by <code>imported: true</code>), so imported branches are read-only
        <i>wherever they appear</i> while the real branches around them stay fully editable.</p>
@@ -259,19 +333,19 @@
   </div>
 
   <div class="card">
-    <h2>8 · Open questions for user testing</h2>
+    <h2>10 · Open questions for user testing</h2>
     <ul>
-      <li>Fully-merged branch as merge target: keep the two-step "reopen, then merge", or auto-reopen? (§5 policy choice.)</li>
+      <li>Fully-merged branch as merge target: keep the two-step "reopen, then merge", or auto-reopen? (§7 policy choice.)</li>
       <li>Archiving a branch that holds the user's current version is allowed with a warning — should the product instead move the current-version pointer somewhere visible (e.g., main's tip)?</li>
-      <li>Autostash-style WIP handling on merge targets (§5).</li>
+      <li>Autostash-style WIP handling on merge targets (§7).</li>
       <li>Merge-line color follows the <b>target</b> branch — is that legible enough, or do merge edges need their own affordance (e.g., source-colored edge)?</li>
     </ul>
   </div>
 
   <div class="card">
-    <h2>9 · Implementation notes</h2>
+    <h2>11 · Implementation notes</h2>
     <ul>
-      <li>Prototype: <code>index.html</code> (FlowX DS tokens), <code>data.js</code> (demo history + scenario catalog a–e ported from <code>versioning-scenarios.ts</code>), <code>app.js</code> (JS port of <code>createGitEventLog</code> + the interaction layer), <code>gitgraph.js</code> (built lib).</li>
+      <li>Prototype: <code>index.html</code> (standalone console) + <code>platform.html</code> (platform shell, console as bottom drawer) sharing <code>console.css</code> (FlowX DS tokens), <code>data.js</code> (demo history + scenario catalog a–e ported from <code>versioning-scenarios.ts</code>), <code>app.js</code> (JS port of <code>createGitEventLog</code> + the interaction layer; emits <code>console:selection</code> for the host shell's header pill), <code>gitgraph.js</code> (built lib).</li>
       <li>Rebuild the engine after lib changes: <code>npx nx build gitgraph</code> in <code>designer/</code>, copy <code>dist/libs/@flowx/gitgraph/index.js</code>.</li>
       <li>Deleting/pruning a merge source is safe: unknown merge sources fall back to a plain commit on the target (same guard as <code>gitgraph.component.ts</code>).</li>
       <li>The main-column band must be inserted into the graph's transformed <code>&lt;g&gt;</code> in local coordinates — absolute svg coordinates drift when branch labels resize.</li>
