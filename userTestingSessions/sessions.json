@@ -16,5 +16,14 @@
     "feature": "Bulk migration (usability test)",
     "insights": 18,
     "file": "migration-goj-2026-07-06.html"
+  },
+  {
+    "id": "config-chat-workflows-delia-2026-07-14",
+    "title": "Config chat & workflows — Delia (Dr Max legal)",
+    "date": "2026-07-14",
+    "participant": "Delia Glodeanu (Configurator)",
+    "feature": "Config way of working — multi-tab & navigation",
+    "insights": 16,
+    "file": "config-chat-workflows-delia-2026-07-14.html"
   }
 ]
