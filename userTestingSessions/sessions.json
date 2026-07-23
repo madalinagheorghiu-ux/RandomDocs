@@ -25,5 +25,14 @@
     "feature": "Config way of working — multi-tab & navigation",
     "insights": 16,
     "file": "config-chat-workflows-delia-2026-07-14.html"
+  },
+  {
+    "id": "merge-experience-cristi-d-2026-07-21",
+    "title": "Merge experience — Cristi D",
+    "date": "2026-07-21",
+    "participant": "Cristi D",
+    "feature": "Merge experience (project versioning & branching console)",
+    "insights": 13,
+    "file": "merge-experience-cristi-d-2026-07-21.html"
   }
 ]
