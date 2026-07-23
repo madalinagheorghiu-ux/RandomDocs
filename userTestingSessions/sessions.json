@@ -43,5 +43,14 @@
     "feature": "Merge experience (project versioning & branching console)",
     "insights": 12,
     "file": "merge-experience-adriana-2026-07-22.html"
+  },
+  {
+    "id": "merge-experience-goj-2026-07-22",
+    "title": "Merge experience — Alex Goj (SaaS)",
+    "date": "2026-07-22",
+    "participant": "Alex Goj",
+    "feature": "Merge experience (project versioning & branching console)",
+    "insights": 15,
+    "file": "merge-experience-goj-2026-07-22.html"
   }
 ]
