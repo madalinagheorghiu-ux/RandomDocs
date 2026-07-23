@@ -264,7 +264,7 @@
 <body>
 <div class="wrap">
   <header class="mast">
-    <div class="eyebrow" data-ro="User testing · 2026-07-22 · înregistrare (ultimele ~2 min lipsă)">User testing · 2026-07-22 · recording (last ~2 min missing)</div>
+    <div class="eyebrow" data-ro="User testing · 2026-07-22 · înregistrare completă · transcript reparat">User testing · 2026-07-22 · full recording · transcript repaired</div>
     <h1 data-ro="Merge experience — Adriana">Merge experience — Adriana</h1>
     <div class="sub" data-ro="34 min · 3 vorbitori (diarizați) · consolă project versioning &amp; branching">34 min · 3 speakers (diarized) · project versioning &amp; branching console</div>
     <div class="legend">
@@ -354,7 +354,7 @@
   </section>
 
   <section id="view-rep" class="hidden">
-    <div class="note" data-ro="&lt;b&gt;User test — merge experience.&lt;/b&gt; Adriana Girla (participant) a parcurs prototipul consolei de project versioning &amp; branching; Mădălina (UX) a facilitat, Antonia (PM) a sondat nevoi &amp; a explicat decizii. Transcris (Gemini) în bucăți de 5 min; filler-ele „ăă" eliminate. &lt;b&gt;Note:&lt;/b&gt; diarizarea rotește etichetele în unele segmente (atribuiri setate din conținut); ultimele ~2 min nu au fost transcrise (cotă zilnică API)."><b>User test — merge experience.</b> Adriana Girla (participant) walked the project versioning &amp; branching console prototype; Mădălina (UX) facilitated and Antonia (PM) probed needs &amp; explained decisions. Transcribed (Gemini) in 5-minute chunks; „ăă" fillers removed. <b>Notes:</b> diarization rotates labels in some segments (attributions set from content); the last ~2 min weren’t transcribed (API daily quota). See the confirm / query buckets.</div>
+    <div class="note" data-ro="&lt;b&gt;User test — merge experience.&lt;/b&gt; Adriana Girla (participant) a parcurs prototipul consolei de project versioning &amp; branching; Mădălina (UX) a facilitat, Antonia (PM) a sondat nevoi &amp; a explicat decizii. Transcris (Gemini) în bucăți de 5 min; filler-ele „ăă" eliminate. &lt;b&gt;Note:&lt;/b&gt; diarizarea rotește etichetele în unele segmente (atribuiri setate din conținut)"><b>User test — merge experience.</b> Adriana Girla (participant) walked the project versioning &amp; branching console prototype; Mădălina (UX) facilitated and Antonia (PM) probed needs &amp; explained decisions. Transcribed (Gemini) in 5-minute chunks; „ăă" fillers removed. <b>Notes:</b> diarization rotates labels in some segments (attributions set from content) See the confirm / query buckets.</div>
     <p class="hint">Phase-1 repairs. <span style="color:var(--green)">Green</span> = applied ·
       <span style="color:var(--amber)">amber</span> = confirm · <span style="color:var(--mark)">red</span> = needs you.</p>
     <div id="repairs"></div>
@@ -787,7 +787,24 @@ const TURNS = [
  ["P", "31:43", "Da, da, da, cu commit. Pentru că ăla draft ul e gol și ăsta e plin. Am înțeles. Doar ăsta e asocierea de dincolo. Adică eu când văd așa, mă gândesc că e committed. La fel când te duci sus în versionare, când era și când e gol e nu e committed."],
  ["F", "32:02", "Ok."],
  ["F", "32:05", "Se înțelege lista asta ce reprezintă?"],
- ["P", "32:09", "Da."]
+ ["P", "32:09", "Da."],
+ ["F", "32:10", "Ți se pare că are vreo valoare sau nu-i vezi deloc folosul?"],
+ ["P", "32:16", "nu știu. Nu știu. Da, p-atunci aș folosi-o. Și dacă fac click pe el, ce se întâmplă? Mă duce.. Clicul unde e? E e e cu scop doar informativ, nu? Dacă clicuești, spre exemplu, adică bănuiesc că nu mai există.."],
+ ["F", "32:38", "Păi te duce unde vrei să-l deschizi."],
+ ["P", "32:40", "Acolo. Okay. E cu scop informativ, nu? Dacă apăs pe ăsta, nu mă duce pe.. Da, n-are de ce să mă ducă, e doar lista cu selecții."],
+ ["F", "32:53", "Dar ți se reselectează.. Ți-l highlight-ează în grafic."],
+ ["P", "32:56", "Ah, okay. Deci dacă apăs pe ăsta și mă duc înapoi în grafic e.. okay, da."],
+ ["F", "33:01", "Și panoul din dreapta este și el selectat, adică și pe alt context."],
+ ["P", "33:06", "Da."],
+ ["F", "33:06", "E doar un alt fel de mod de vizualizare a graficului și comunică între ele păstrând selecția din unul în altul. Dacă din grafic ești pe o pe o versiune și vii pe listă, o vezi în listă expandată."],
+ ["P", "33:19", "Yes."],
+ ["F", "33:20", "Dar mă întreb dacă.. dacă modul vizual e cu dinadins sau aveți situații în care e super complicat graficul și te-ar ajuta doar să le vezi într-o listă și să.."],
+ ["P", "33:31", "Da, da. Da, da, da, da. Și dacă.. dacă clicuești și ți-l highlight-ează."],
+ ["F", "33:36", "Adică te-ar ajuta doar ca să-l identifici și te duci acolo ca să-l vezi totuși în context."],
+ ["P", "33:41", "Exact."],
+ ["F", "33:42", "Mda. Bine. păi suntem la final de sesiune. Mulțumim mult!"],
+ ["P", "33:49", "Și eu!"],
+ ["F", "33:50", "Cu mult drag!"]
 ];
 
 const IDEAS = [
@@ -1022,8 +1039,8 @@ const IDEAS = [
   "title": "In list view she reads the filled vs empty bubble as committed vs draft",
   "title_ro": "În vederea listă citește bulina plină vs goală ca committed vs draft",
   "category": "design_insight",
-  "detail": "In the list view Adriana associated the extra bubble with a commit — a filled bubble means committed, an empty one means draft/not committed — carrying over the same association from the versioning view. A consistent affordance she read correctly without prompting.",
-  "detail_ro": "În vederea listă, Adriana a asociat bulina în plus cu un commit — bulina plină înseamnă committed, cea goală înseamnă draft/necommitted — ducând mai departe aceeași asociere din vederea de versionare. Un affordance consistent pe care l-a citit corect fără indiciu.",
+  "detail": "In the list view Adriana associated the extra bubble with a commit — filled = committed, empty = draft/not committed — carrying over the same association from the versioning view. She also understood the list as a linked alternative visualization: selection syncs between graph and list, so she'd use the list to identify a version and then jump back to the graph to see it in context.",
+  "detail_ro": "În vederea listă, Adriana a asociat bulina în plus cu un commit — plină = committed, goală = draft/necommitted — ducând mai departe aceeași asociere din vederea de versionare. A înțeles lista și ca o vizualizare alternativă legată: selecția se sincronizează între graf și listă, așa că ar folosi lista ca să identifice o versiune și apoi să sară înapoi în graf ca s-o vadă în context.",
   "quote": "draft-ul e gol și ăsta e plin… când văd așa, mă gândesc că e committed.",
   "speaker": "P",
   "confidence": "medium",
@@ -1106,12 +1123,7 @@ const REPAIRS = {
    "Auto-diarization rotates the three speakers' labels across some segments; card attributions were set from content, not the raw labels."
   ]
  ],
- "query": [
-  [
-   "last ~2 min (32:10–34:07) not transcribed",
-   "Gemini free-tier daily quota was exhausted; the tail (session wrap-up) is missing — can be appended once quota resets."
-  ]
- ]
+ "query": []
 };
 
 const turnToIdeas={};
