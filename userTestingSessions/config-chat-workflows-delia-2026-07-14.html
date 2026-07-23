@@ -452,7 +452,7 @@ const TURNS = [
  ["P", "00:54", "Da, deci cum ar fi pe use case ul de la Dr Max pe care eram în stant trecut."],
  ["F", "01:00", "Da."],
  ["P", "01:01", "Da. E ok."],
- ["F", "01:03", "Ă, stau și."],
+ ["F", "01:03", "stau și."],
  ["P", "01:04", "Stau și recording ca să avem."],
  ["F", "01:06", "Da."],
  ["P", "01:07", "Ok."],
@@ -460,14 +460,13 @@ const TURNS = [
  ["P", "01:09", "A, bun."],
  ["F", "01:15", "Așa."],
  ["P", "01:16", "Bun."],
- ["F", "01:17", "Ă și scopul nu e deloc să vedem cum faci tu, dacă faci cum ne am aștepta să faci configurarea asta sau nu, ci dimpotrivă este să surprindem lucruri din real configuration world. Cum îți deschizi tab uri și de ce? Cum îți referențiezi resursa și dacă e scriptul pe care l ai ales ce trebuie sau cum poți să te asiguri. Nu știu, poți să zici evident că sunt sigură că asta e că eu am făcut o și o fac tot timpul înainte să referențiez sau orice de genul ăsta, că scopul nostru este să îmbunătățim experiența de configurare, dar să și observăm gap uri sau lucruri pe care care simți că ți îngreunează munca."],
+ ["F", "01:17", "și scopul nu e deloc să vedem cum faci tu, dacă faci cum ne am aștepta să faci configurarea asta sau nu, ci dimpotrivă este să surprindem lucruri din real configuration world. Cum îți deschizi tab uri și de ce? Cum îți referențiezi resursa și dacă e scriptul pe care l ai ales ce trebuie sau cum poți să te asiguri. Nu știu, poți să zici evident că sunt sigură că asta e că eu am făcut o și o fac tot timpul înainte să referențiez sau orice de genul ăsta, că scopul nostru este să îmbunătățim experiența de configurare, dar să și observăm gap uri sau lucruri pe care care simți că ți îngreunează munca."],
  ["F", "02:00", "Așa că pe cât posibil gândește cu voce tare sau că ți amintești lucruri cu care te ai confruntat acolo pentru că acum poate o să fie mai ușor peste zile. Ca să putem să să le avem ca starting point măcar."],
  ["P", "02:14", "Ok."],
- ["P", "02:16", "Ăă."],
  ["F", "02:18", "Zi ne un pic ce ai de la Dr Max și cum e el."],
  ["P", "02:21", "Deci în Dr Max avem acest chat care e ca și interfață. Arată așa. Și este chat ul ăsta în partea de stânga care ar trebui atunci când îi pui o întrebare punctuală, nu știu, ori legat de documente, ori legat de raportul pe care îl generează el, să răspundă fix în chat. Dar atunci când generează acest raport mare structurat, de fapt nu chat ul răspunde, ci sunt mai mulți agenți care fac fiecare porțiune din acest răspuns și noi îl salvăm într un persistence și îl afișăm în partea asta, iar în chat dăm un răspuns care este mereu la fel, a fost generat raportul."],
  ["F", "03:11", "Raportul ăsta pentru cine e necesar?"],
- ["P", "03:14", "Ăă, pentru departamentul lor de legal, ei vin cu o situație. Cineva a furat din magazin și trebuie să fac să l dau în judecată și el analizează situația dată și cu documentele puse în chat că am veni și acea opțiune nouă de documente și plus documentele de ei le încarcă în zona asta de bibliotecă și în funcție de cadrul legal în care se încadrează această faptă, ar trebui să dea un raport juridic."],
+ ["P", "03:14", "pentru departamentul lor de legal, ei vin cu o situație. Cineva a furat din magazin și trebuie să fac să l dau în judecată și el analizează situația dată și cu documentele puse în chat că am veni și acea opțiune nouă de documente și plus documentele de ei le încarcă în zona asta de bibliotecă și în funcție de cadrul legal în care se încadrează această faptă, ar trebui să dea un raport juridic."],
  ["F", "03:47", "Și să fac."],
  ["P", "03:48", "Bun."],
  ["F", "03:52", "Și să fac."],
@@ -480,9 +479,8 @@ const TURNS = [
  ["P", "04:57", "Avem mult mai mult control asupra lui."],
  ["P", "05:00", "Și în partea de chat, când l am configurat, ne am gândit la efectiv ce ar trebui să poată întreba în chat și avem un primul workflow. Ăsta care este de tipul chat driven, nu este singurul așa. Care face multe chestii."],
  ["F", "05:32", "Workflow ul acesta e făcut de mai mulți, la care ați contribuit sau l ai făcut tu?"],
- ["P", "05:36", "Ăă,"],
  ["F", "05:38", "Am înțeles că ești super familiarizată cu el sau ați contribuit."],
- ["P", "05:42", "Sunt foarte familiarizată cu el. Efectiv structura lui am făcut-o eu, pe la prompturi și nu știu dacă mai e și în altă parte, a mai lucrat o colegă. Deci pe acolo au mai fost schimbări, dar în rest eu l-am făcut în mare parte. Cred că pe ei s-a mai făcut altceva față de ce am făcut eu. Dar acest workflow în mare parte primește mesajul de la user, tot atunci primește și un ID de caz ca să identificăm ce caz este. Utilizatorii pot să iasă din caz și să l continue mai încolo, de aceea noi nu prea lucrăm pe sesiune de chat, că poate să fie mai multe sesiuni pe același caz. Și noi mereu ne uităm după ID-ul de caz. Căutăm cazul în persistence, ne pregătim inputul, avem un chat care, un chat, doamne, un agent care reformulează în termeni mai formali ce a vrut utilizatorul să zică. Ăă, aici este un sub workflow special pentru documentele atașate în chat. Nu știu cum să zic. Așa. Care ăsta ia documentele pe care userul le a uploadat noi în chat și le salvează tot într un persistence, pentru că noi trebuie să le ținem pe toate din toate sesiunile deschise de chat pe cazul respectiv. Și noi întotdeauna ne folosim de ele din persistence, nu din KB ul automat legat la chat, ăla l-am deconectat. Și le dăm noi în context tot timpul. Așa, după ce se reformulează, se salvează documentele, după avem partea de router și am împărțit noi deocamdată în cred că vreo patru rute. Dacă vrea să genereze această analiză structurată, dacă este o întrebare follow up pe documente sau pe răspunsul structurat, dacă este o întrebare, prima întrebare pe documentație să întrebe, nu știu, ce spune în legea nu știu care. Și dacă întreabă ceva care n-are nicio legătură. Și aici se fac mai multe condiții, în funcție de asta se duce în într-un sub workflow diferit și mai este un agent care caută, deci el primește și ultimul mesaj, dar primește și un istoric al mesajelor trecute și dacă cumva el vrea să zice, nu știu, regenerează-mi analiza, dar mesajul ăla nu se prezintă iar situația. El caută în istoric situația inițială și adaugă la ea dacă s-au adăugat niște informații noi atunci când s-a cerut preanalizarea situației. Dacă nu, trimite iar mesajul ăla original unde se cere unde se prezintă efectiv situația. Și cel mai complex este partea de acest raport. Care începe din acest workflow apelat din workflow trecut. Și ăsta, aici mai este o parte. Userii în interfață mai pot să vină aici și să debifeze anumite"],
+ ["P", "05:42", "Sunt foarte familiarizată cu el. Efectiv structura lui am făcut-o eu, pe la prompturi și nu știu dacă mai e și în altă parte, a mai lucrat o colegă. Deci pe acolo au mai fost schimbări, dar în rest eu l-am făcut în mare parte. Cred că pe ei s-a mai făcut altceva față de ce am făcut eu. Dar acest workflow în mare parte primește mesajul de la user, tot atunci primește și un ID de caz ca să identificăm ce caz este. Utilizatorii pot să iasă din caz și să l continue mai încolo, de aceea noi nu prea lucrăm pe sesiune de chat, că poate să fie mai multe sesiuni pe același caz. Și noi mereu ne uităm după ID-ul de caz. Căutăm cazul în persistence, ne pregătim inputul, avem un chat care, un chat, doamne, un agent care reformulează în termeni mai formali ce a vrut utilizatorul să zică. aici este un sub workflow special pentru documentele atașate în chat. Nu știu cum să zic. Așa. Care ăsta ia documentele pe care userul le a uploadat noi în chat și le salvează tot într un persistence, pentru că noi trebuie să le ținem pe toate din toate sesiunile deschise de chat pe cazul respectiv. Și noi întotdeauna ne folosim de ele din persistence, nu din KB ul automat legat la chat, ăla l-am deconectat. Și le dăm noi în context tot timpul. Așa, după ce se reformulează, se salvează documentele, după avem partea de router și am împărțit noi deocamdată în cred că vreo patru rute. Dacă vrea să genereze această analiză structurată, dacă este o întrebare follow up pe documente sau pe răspunsul structurat, dacă este o întrebare, prima întrebare pe documentație să întrebe, nu știu, ce spune în legea nu știu care. Și dacă întreabă ceva care n-are nicio legătură. Și aici se fac mai multe condiții, în funcție de asta se duce în într-un sub workflow diferit și mai este un agent care caută, deci el primește și ultimul mesaj, dar primește și un istoric al mesajelor trecute și dacă cumva el vrea să zice, nu știu, regenerează-mi analiza, dar mesajul ăla nu se prezintă iar situația. El caută în istoric situația inițială și adaugă la ea dacă s-au adăugat niște informații noi atunci când s-a cerut preanalizarea situației. Dacă nu, trimite iar mesajul ăla original unde se cere unde se prezintă efectiv situația. Și cel mai complex este partea de acest raport. Care începe din acest workflow apelat din workflow trecut. Și ăsta, aici mai este o parte. Userii în interfață mai pot să vină aici și să debifeze anumite"],
  ["F", "09:35", "Da, să nu fie luate în calcul anumite documente."],
  ["P", "09:37", "Da. Iar el când cere aici regenerează, ar trebui să fie regenerat fără să ia în calcul aceste documente. E același lucru și mai jos la situația asemănătoare. Și acest lucru se întâmplă aici. Noi atunci le salvăm într un persistence și le dăm un"],
  ["P", "10:00", "status. Odată ce le am salvat, sunt statusul not process. Dacă peste ele s-ar rulat o analiză, adică au fost luate în calcul, ele trec în statul de process. Dacă nu se rulează analiză pe ele și se dă un refresh, de exemplu, ele se șterg. Tot ce este cu statusul not progress se șterge. Și aici ne uităm dacă este ceva ce nu trebuie să luăm în analiză. Și acelea le punem într un array care mai încolo ne ajutăm să filtrăm pe metadatele din KB ca avem o metadată de titlu de document din bibliotecă și ar trebui ca acel titlu să nu se afle în lista asta de titluri pe care noi vrem să le excludem."],
@@ -494,7 +492,7 @@ const TURNS = [
  ["P", "14:52", "Deci la partea asta așa cu documentația, să zic, pentru caz."],
  ["P", "15:01", "M."],
  ["F", "15:02", "Dar cum ajung și chunk urile astea relevante?"],
- ["P", "15:04", "Deci, dacă să zicem că e prima dată când generează ăă cum se cheamă? Această multitudine de chunk uri relevante, el intră în acest loop in documents, care facem imediat. Așa. Aici nu facem mare lucru, decât caută ceva și are și el un tot un sub workflow. Care ăsta face o căutare în KB de două tipuri. O dată face hibrid și o dată numai după niște keywords pe care îi extrage mai devreme. După avem două scripturi care unul o dată scoate toate titlurile le dedublifică, să zic. Ca să vedem câte au fost scoase, fiindcă nu vrem să scoatem mai mult de 10. Și mai este un script care e de exemplu, dacă sunt două chunk uri pe același document, scoate ca un singur obiect, un document cu două chunk uri. Și aici avem un loop care face asta de mai multe ori, pentru că nu ne ajungea să scoatem o singură dată 10 chunk uri, având documente foarte mari. Cel mai probabil scotea dintr un singur document. Și astea la final, după ce se face ăsta și revine în workflow ul care îl apelează, face un insert în persistence, care inserează acele chunk uri văzute mai devreme. Și asta ziceam că dacă nu aduce nimic nou la ultima situație, nu mai caută încă o dată în documente, nu mai face această căutare în KB, se duce direct în persistence și ia de acolo chunk urile, ia informația necesară din documentație."],
+ ["P", "15:04", "Deci, dacă să zicem că e prima dată când generează cum se cheamă? Această multitudine de chunk uri relevante, el intră în acest loop in documents, care facem imediat. Așa. Aici nu facem mare lucru, decât caută ceva și are și el un tot un sub workflow. Care ăsta face o căutare în KB de două tipuri. O dată face hibrid și o dată numai după niște keywords pe care îi extrage mai devreme. După avem două scripturi care unul o dată scoate toate titlurile le dedublifică, să zic. Ca să vedem câte au fost scoase, fiindcă nu vrem să scoatem mai mult de 10. Și mai este un script care e de exemplu, dacă sunt două chunk uri pe același document, scoate ca un singur obiect, un document cu două chunk uri. Și aici avem un loop care face asta de mai multe ori, pentru că nu ne ajungea să scoatem o singură dată 10 chunk uri, având documente foarte mari. Cel mai probabil scotea dintr un singur document. Și astea la final, după ce se face ăsta și revine în workflow ul care îl apelează, face un insert în persistence, care inserează acele chunk uri văzute mai devreme. Și asta ziceam că dacă nu aduce nimic nou la ultima situație, nu mai caută încă o dată în documente, nu mai face această căutare în KB, se duce direct în persistence și ia de acolo chunk urile, ia informația necesară din documentație."],
  ["F", "16:57", "Care nu sunt în KB ul este Adică de ce vrei să nu persistence este pentru că vrei să ai istoricul pe conversație și să ai mereu același istoric, nu, da."],
  ["P", "17:11", "Păi motivul pentru care am ales persistence, adică el oricum la bază are KB ul. Și aici sunt doar niște chunk uri. Nu m aș fi gândit la situația să le salvez și pe astea tot în KB, ele deja reprezentând doar informația relevantă, adică nu aș mai fi căutat încă o dată în ele. Și oricum se schimbă, adică dacă îi dă altceva diferit la situație sau debifează ceva, bifează iar prin interfață, el oricum nu o să se schimbe și s ar fi indexat și astea de mai multe ori. Și nu știu, așa sincer asta mi a fost primul instinct să le salvăm într un persistence."],
  ["F", "17:55", "Asta ar fi un motiv de, nu știu, faster retrieval în Da."],
@@ -503,7 +501,7 @@ const TURNS = [
  ["P", "19:46", "Păi, de exemplu, dacă eu am de lucru în acest workflow cu jurisprudență, cam întotdeauna în partea asta țin workflow ul ăsta care în care îl apelez, să zic. Cam"],
  ["P", "20:00", "așa lucrez eu cu ele. Aici am workflow ul părinte. Aici îl am pe celălalt și tot așa. Dacă mai este încă un nivel sub, probabil e și ăla în alt tab. Și așa, în rest, atunci când Așa. Atunci când testez, de obicei am acest tab în care testez și mai am un tab în care mă uit la logouri. Și văd că ceva nu merge, mă uit în logouri să văd unde e problema și după mai încolo revin în workflow uri să îmi dau seama efectiv care e problema."],
  ["F", "20:39", "Păi, de la când ai ai de fapt ai și la părinte, de la cel mai de sus nivel și te duci în jos sau?"],
- ["P", "20:47", "Ă da. Adică cam asta o fac pe logouri. Mă duc din workflow în workflow și tot așa. Și depinde până unde pot să ajung și după de acolo mă duc direct în workflow uri. Să mă uit punctual."],
+ ["P", "20:47", "da. Adică cam asta o fac pe logouri. Mă duc din workflow în workflow și tot așa. Și depinde până unde pot să ajung și după de acolo mă duc direct în workflow uri. Să mă uit punctual."],
  ["F", "21:07", "Da, puțin mai înainte sau dacă poți să intri pe configurare. Că ne uităm la configurarea de chat, că le aș lua un pic de la început, de cum ai gândit proiectul, ai știut că ai nevoie de un chat și apoi ai început cu configurarea de workflows, nu? Sau de workflow uri, de să faci toată logica. Cum a cum a început proiectul? Cum ai a început? Generează ți acum."],
  ["P", "21:30", "Deci oricum nu"],
  ["F", "21:30", "proiectul a avut o poveste mai mare, să zic."],
@@ -596,14 +594,14 @@ const TURNS = [
  ["P", "40:11", "Și abia la un moment dat găsesc că nu știu, la un database e eroare sau ceva și în situația aia oricum este ăsta mult mai lung. Aici e super scurt."],
  ["P", "40:21", "M."],
  ["F", "40:26", "M."],
- ["F", "40:29", "Ă ne cam apropiem de final, așa ca timp. Cred că suntem chiar, adică suntem mai puțin la o oră, dar voiam să te întreb Raluca, dacă ai ceva întrebări pe așa rapid prin ce am putea să trecem prin prin chat sau configurare UI designer de UI flows."],
+ ["F", "40:29", "ne cam apropiem de final, așa ca timp. Cred că suntem chiar, adică suntem mai puțin la o oră, dar voiam să te întreb Raluca, dacă ai ceva întrebări pe așa rapid prin ce am putea să trecem prin prin chat sau configurare UI designer de UI flows."],
  ["F", "40:49", "Da, eram curioasă la partea de chat, cum cum ți s a părut configurarea lui, dacă te ai lovit de ceva, adică în afară de aspectul pe care l ai menționat mai devreme cu conversation trigger ul care te ai fi așteptat să fie pe chat."],
- ["F", "41:01", "Ă cum ai găsit diferitele în sensul cum formulez întrebarea? Cum ai găsit diferitele opțiuni? Știi că poți și documente, poți să pui voice sau să nu pui voice."],
+ ["F", "41:01", "cum ai găsit diferitele în sensul cum formulez întrebarea? Cum ai găsit diferitele opțiuni? Știi că poți și documente, poți să pui voice sau să nu pui voice."],
  ["F", "41:13", "Cum ai navigat pe acolo și dacă ți s a părut ușor să le să le găsești atunci când ai configurat chat ul overall."],
  ["P", "41:22", "Da, cum să zic? Nu mi s a părut așa ceva foarte complicat să zic. Adică inițial oricum nu am umblat pe partea asta pentru că nu aveam funcționalitatea de documente și pe partea de nu mai știu cum era, voice nu aveam nevoie. Deci foarte târziu după am adăugat partea asta cu documentele care na, e cum e și la un upload normal."],
  ["P", "42:07", "M."],
  ["P", "42:08", "Și nu pot să zic neapărat că am văzut ceva care nu mi se părea că ar fi cum m aș fi gândit. Aici singurul lucru nu știu, mă așteptam puțin chat ul să fie mai n am cuvântul acum."],
- ["P", "42:30", "Ă un pic mai custom din punct de vedere al UI ului, poate."],
+ ["P", "42:30", "un pic mai custom din punct de vedere al UI ului, poate."],
  ["F", "42:36", "M."],
  ["P", "42:36", "Adică știu că atunci când am făcut UI ul, am încercat să l aduc un pic mai aproape, de exemplu, cum aveam noi făcut în Figma. Și până la urmă m am lăsat."],
  ["F", "42:47", "Mai customizabil."],
@@ -612,10 +610,10 @@ const TURNS = [
  ["F", "42:53", "Ce ai încercat să modifici?"],
  ["F", "42:54", "Ce elemente, da, ți au dat de furcă? Adică pe care ai stat cel mai mult și n ai, crezi că n ai reușit pe unele să le"],
  ["P", "43:01", "Stai să mi aduc aminte."],
- ["P", "43:05", "Ă Era o chestie legat de acest background din zona de mesaje și cum el în nu mai știu, era o știu că am încercat să modific background ul ăsta să fie altă culoare, dar după rămânea în altă zonă culoarea inițială și am încercat să modific peste tot și nu se făcea absolut peste tot, dar nu mai știu acum să zic. Știu că și la butonul ăsta m am jucat un pic cu el, cel de trimitere mesaj că nu trebuia să arate fix așa, dar nu mai știu, mi se pare că dacă voiam să fie efectiv nu știu, o imagine cu această săgeată, să zic, și să nu fie verde, să fie transparent ceva, parcă nu puteam fix așa cum mi aș fi dorit eu să l fac."],
+ ["P", "43:05", "Era o chestie legat de acest background din zona de mesaje și cum el în nu mai știu, era o știu că am încercat să modific background ul ăsta să fie altă culoare, dar după rămânea în altă zonă culoarea inițială și am încercat să modific peste tot și nu se făcea absolut peste tot, dar nu mai știu acum să zic. Știu că și la butonul ăsta m am jucat un pic cu el, cel de trimitere mesaj că nu trebuia să arate fix așa, dar nu mai știu, mi se pare că dacă voiam să fie efectiv nu știu, o imagine cu această săgeată, să zic, și să nu fie verde, să fie transparent ceva, parcă nu puteam fix așa cum mi aș fi dorit eu să l fac."],
  ["P", "44:06", "Cred adică erau și chestii legate că le lua direct din temă, din culorile alea principale și cumva aici nu mi aș fi dorit fix culorile alea."],
  ["F", "44:20", "Și care sunt lucrurile pe care te au scos cel mai mult din te au scos cel mai mult din configurare?"],
- ["P", "44:25", "Ă nu știu, faptul că deschizi din container app în continuu și dai refresh să vezi dacă arată ca aici, că nu arată musta în aplicație cum arată în pagina aceasta sau ceva mai degrabă de configuri pe workflow sau."],
+ ["P", "44:25", "nu știu, faptul că deschizi din container app în continuu și dai refresh să vezi dacă arată ca aici, că nu arată musta în aplicație cum arată în pagina aceasta sau ceva mai degrabă de configuri pe workflow sau."],
  ["P", "44:43", "Da, de obicei chestia asta că trebuie de obicei am multe taburi deschise, cu multe workflow uri, nu mai îmi aduc exact aminte care în ce ordine e pus și trebuie să mă uit să mai deschid și după mai întreb."],
  ["P", "45:00", "încă unul, că îmi dau seama că mai are legătură cu un workflow și pe ăla îl deschid în alt tab și cum mai ziceam, uneori vreau să văd ambele informații deodată și și mai făceam, făceam split pe pagini pe Google, dar de exemplu, în UI flow e foarte greu să mai vezi cum e cum se vede normal atunci când e splituit pe două într un ecran. Și dar uneori și la workflow, nu știu, când vreau să configurez un nod agentic, de exemplu, mi se pare că nu văd chiar toată informația atunci când îl splituiesc și tot la două taburi ajung de obicei. Și de obicei lucrez eu. Să zic că ecranul ăsta îl am pe ecranul mare. Și pe același ecran fac așa între taburi, iar pe cel mic pe laptop am un, nu știu, efectiv ce vreau să fac, o cerință, o un chat, un cloud, ceva să mă ajute. Adică de obicei aici am chestia ajutătoare, dar ce configurez e tot pe un singur ecran."],
  ["F", "46:16", "Workflow urile alea, când ai mai multe taburi cu workflow uri deschise, le îți dai seama care e după cum arată diagrama? Cum faci?"],
@@ -645,9 +643,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   174,
-   175,
-   177
+   172,
+   173,
+   175
   ],
   "topics": [
    "Working in multiple tabs",
@@ -667,9 +665,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   180,
-   181,
-   177
+   178,
+   179,
+   175
   ],
   "topics": [
    "Working in multiple tabs"
@@ -688,9 +686,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   113,
-   112,
-   109
+   111,
+   110,
+   107
   ],
   "topics": [
    "Navigation & context"
@@ -709,9 +707,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   118,
-   117,
-   122
+   116,
+   115,
+   120
   ],
   "topics": [
    "Navigation & context"
@@ -730,9 +728,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
+   135,
    137,
-   139,
-   141
+   139
   ],
   "topics": [
    "Navigation & context",
@@ -752,8 +750,8 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   146,
-   147
+   144,
+   145
   ],
   "topics": [
    "Debugging & errors"
@@ -772,8 +770,8 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   83,
-   87
+   81,
+   85
   ],
   "topics": [
    "Hidden nodes & rules"
@@ -792,9 +790,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   91,
-   92,
-   95
+   89,
+   90,
+   93
   ],
   "topics": [
    "Hidden nodes & rules"
@@ -813,9 +811,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   115,
-   107,
-   173
+   113,
+   105,
+   171
   ],
   "topics": [
    "Test/preview loop"
@@ -834,9 +832,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   161,
-   170,
-   171
+   159,
+   168,
+   169
   ],
   "topics": [
    "Chat UI"
@@ -855,9 +853,9 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   36,
-   23,
-   33
+   35,
+   22,
+   32
   ],
   "topics": [
    "Config way of working"
@@ -876,8 +874,8 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   40,
-   42
+   38,
+   40
   ],
   "topics": [
    "Config workarounds"
@@ -896,7 +894,7 @@ const IDEAS = [
   "confidence": "medium",
   "needs": false,
   "anchors": [
-   45
+   43
   ],
   "topics": [
    "Config workarounds"
@@ -915,8 +913,8 @@ const IDEAS = [
   "confidence": "high",
   "needs": false,
   "anchors": [
-   54,
-   53
+   52,
+   51
   ],
   "topics": [
    "Config workarounds"
@@ -935,7 +933,7 @@ const IDEAS = [
   "confidence": "medium",
   "needs": false,
   "anchors": [
-   52
+   50
   ],
   "topics": [
    "Config workarounds"
@@ -954,7 +952,7 @@ const IDEAS = [
   "confidence": "medium",
   "needs": false,
   "anchors": [
-   65
+   63
   ],
   "topics": [
    "Config way of working"
