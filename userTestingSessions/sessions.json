@@ -1,14 +1,5 @@
 [
   {
-    "id": "migration-goj-2026-07-06",
-    "title": "Bulk migration — usability test (Goj)",
-    "date": "2026-07-06",
-    "participant": "Goj",
-    "feature": "Bulk migration (usability test)",
-    "insights": 18,
-    "file": "migration-goj-2026-07-06.html"
-  },
-  {
     "id": "config-chat-workflows-delia-2026-07-14",
     "title": "Config chat & workflows — Delia (Dr Max legal)",
     "date": "2026-07-14",
@@ -34,5 +25,14 @@
     "feature": "Bulk migration (process-instance migration)",
     "insights": 17,
     "file": "bulk-migration-adelina-2026-07-09.html"
+  },
+  {
+    "id": "migration-goj-2026-07-06",
+    "title": "Bulk migration — usability test (Goj)",
+    "date": "2026-07-06",
+    "participant": "Goj",
+    "feature": "Bulk migration (usability test)",
+    "insights": 18,
+    "file": "migration-goj-2026-07-06.html"
   }
 ]
