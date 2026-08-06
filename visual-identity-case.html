@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Visual Identity, One Owner — Product &amp; UX Case</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --text: #1e2733;
+    --text-soft: #5b6672;
+    --accent: #006bd8;
+    --accent-soft: #e8f1fc;
+    --warn: #b45309;
+    --warn-soft: #fef3e2;
+    --danger: #b91c1c;
+    --danger-soft: #fdecec;
+    --ok: #15803d;
+    --ok-soft: #e9f7ee;
+    --border: #e2e8f0;
+    --code-bg: #f1f5f9;
+    --shadow: 0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1520;
+      --surface: #161e2b;
+      --text: #e6ebf2;
+      --text-soft: #97a3b2;
+      --accent: #4c9ef0;
+      --accent-soft: #12293f;
+      --warn: #e5a53c;
+      --warn-soft: #2e2211;
+      --danger: #ef6a6a;
+      --danger-soft: #331616;
+      --ok: #57bf7d;
+      --ok-soft: #12291a;
+      --border: #273347;
+      --code-bg: #1d2736;
+      --shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 880px; margin: 0 auto; padding: 48px 24px 96px; }
+  header.doc {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 28px; margin-bottom: 40px;
+  }
+  .kicker {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent);
+    background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; margin-bottom: 14px;
+  }
+  h1 { font-size: 34px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -.02em; }
+  .subtitle { font-size: 19px; color: var(--text-soft); margin: 0 0 18px; }
+  .meta { font-size: 13.5px; color: var(--text-soft); }
+  .meta b { color: var(--text); font-weight: 600; }
+  h2 {
+    font-size: 23px; letter-spacing: -.01em; margin: 56px 0 16px;
+    padding-top: 24px; border-top: 1px solid var(--border);
+  }
+  h2 .num { color: var(--accent); margin-right: 8px; }
+  h3 { font-size: 17.5px; margin: 32px 0 10px; }
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 16px; padding-left: 24px; }
+  li { margin-bottom: 6px; }
+  code {
+    font: 13px/1.5 ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 5px; padding: 1px 6px; white-space: nowrap;
+  }
+  .callout {
+    border-radius: 10px; padding: 16px 20px; margin: 20px 0;
+    border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow);
+  }
+  .callout.accent { border-left: 4px solid var(--accent); }
+  .callout.warn   { border-left: 4px solid var(--warn); background: var(--warn-soft); }
+  .callout.quote  { border-left: 4px solid var(--accent); background: var(--accent-soft); font-size: 17px; }
+  .callout p:last-child { margin-bottom: 0; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 10px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; background: var(--surface); font-size: 14.5px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--text-soft); background: color-mix(in srgb, var(--surface) 60%, var(--bg));
+  }
+  tr:last-child td { border-bottom: none; }
+  .pill { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+  .pill.overlap { color: var(--danger); background: var(--danger-soft); }
+  .pill.only    { color: var(--text-soft); background: var(--code-bg); }
+  .pill.missing { color: var(--warn); background: var(--warn-soft); }
+  .pill.low  { color: var(--ok); background: var(--ok-soft); }
+  .pill.med  { color: var(--warn); background: var(--warn-soft); }
+  .pill.high { color: var(--danger); background: var(--danger-soft); }
+  .prob { margin: 22px 0; padding: 18px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); }
+  .prob .ptag { font-size: 12px; font-weight: 800; color: var(--danger); letter-spacing: .05em; margin-bottom: 4px; }
+  .prob h4 { margin: 0 0 8px; font-size: 16.5px; }
+  .prob p { margin: 0; color: var(--text-soft); font-size: 15px; }
+  .prob p b { color: var(--text); }
+  .principle { display: flex; gap: 14px; margin: 14px 0; align-items: flex-start; }
+  .principle .n {
+    flex: 0 0 32px; height: 32px; border-radius: 8px; background: var(--accent-soft); color: var(--accent);
+    font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 15px; margin-top: 2px;
+  }
+  .principle .body b { display: block; margin-bottom: 2px; }
+  .principle .body { font-size: 15.5px; }
+  .principle .body span { color: var(--text-soft); }
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-soft); }
+  .appendix li { font-size: 14px; color: var(--text-soft); margin-bottom: 8px; }
+  .appendix code { white-space: normal; word-break: break-all; }
+  @media print {
+    body { background: #fff; }
+    .page { max-width: none; padding: 0; }
+    .prob, .callout, .table-wrap { box-shadow: none; break-inside: avoid; }
+    h2 { break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="doc">
+  <span class="kicker">Product &amp; UX Case · Draft for discussion</span>
+  <h1>One Visual Identity, One Owner</h1>
+  <p class="subtitle">Where Theme, Branding, and Fonts should live in the FlowX platform</p>
+  <p class="meta"><b>Author:</b> Madalina Gheorghiu &nbsp;·&nbsp; <b>Date:</b> 2026-08-06 &nbsp;·&nbsp; <b>Evidence base:</b> field-level audit of the designer codebase (references in Appendix)</p>
+</header>
+
+<h2><span class="num">1</span>Executive summary</h2>
+
+<p>A solution's visual identity — what end-users actually see — is <b>one job, owned by one persona: the configurator</b>. Today that job is fragmented across <b>two permission scopes</b> (Organization vs Workspace), <b>three surfaces</b> (Theme, Branding, UI Designer), and <b>three different data models</b> for the same concepts.</p>
+
+<p>The audit question is not <i>"where should Themes vs Branding vs Fonts live?"</i> It is:</p>
+
+<div class="callout quote"><p><b>Can the persona accountable for the end-user experience complete the visual-identity job without a hand-off?</b></p></div>
+
+<p>Today the answer is <b>no</b> — and the codebase shows the split is historical, not intentional:</p>
+<ul>
+  <li><b>6 of Branding's 8 fields duplicate Theme concepts</b> (colors, background, header layout, shadow) in a flat, lossy, unreconciled copy.</li>
+  <li><b>The header is configurable in three places</b> with three incompatible models (Branding, Theme's mobile-only navigation section, UI Designer's HEADER element).</li>
+  <li><b>The two Fonts pages are literally the same component, service, and API</b> mounted twice behind different permission guards — the duplication is pure navigation, not functionality.</li>
+  <li>The code itself flags the debt: the Themes route carries a <code>TODO: Temporary, long term this might not stay here</code>, and Branding's config code is hard-coded <code>'default'</code> with a comment promising future multi-config support.</li>
+</ul>
+
+<div class="callout accent"><p><b>Recommendation in one line:</b> keep the Org/Workspace permission boundary, but re-sort the <i>specs</i> so that <b>Org&nbsp;=&nbsp;governance &amp; defaults</b> (font library, default theme, portal/listing branding) and <b>Workspace/Solution&nbsp;=&nbsp;everything that shapes a specific solution's experience</b> (theme, solution header via UI Designer, background), with <b>inheritance downward</b> so nothing starts blank and nothing is defined twice.</p></div>
+
+<h2><span class="num">2</span>Current state — what the code actually says</h2>
+
+<h3>2.1 Theme <span style="color:var(--text-soft);font-weight:400">(Workspace · cms/themes)</span></h3>
+<p>A deep, tokenised, platform-aware model — clearly the platform's "real" visual identity system:</p>
+<ul>
+  <li><b>Shared color tokens</b> (primary/secondary/success/warning/error/neutrals, each with 11 shades, light+dark)</li>
+  <li>Per-platform (web / Android / iOS): <b>typography tokens</b>, <b>shadow tokens</b>, <b>general settings</b> (incl. <code>appBackground</code>, accent color, 7 font-role assignments), and <b>~40 component sections</b> (button, inputs, table, modal, chat, navigation, …)</li>
+  <li>Compiled <b>server-side</b> per platform and applied by the renderer</li>
+  <li>Inheritance exists <b>inside</b> a theme; duplication exists <b>inside</b> a workspace (<i>"Copy of X"</i>); the <b>only cross-workspace path is manual export&nbsp;→&nbsp;import</b></li>
+  <li>A new workspace gets no usable theme by default — only the backend-seeded system theme; there is <b>no org-level default-theme cascade</b></li>
+</ul>
+<div class="callout warn"><p><b>Code signal:</b> the themes route is annotated <code>// TODO Theming: Temporary, long term this might not stay here.</code> — its current placement is acknowledged as provisional.</p></div>
+
+<h3>2.2 Branding <span style="color:var(--text-soft);font-weight:400">(Organization · organisation-admin/branding)</span></h3>
+<p>Eight flat fields, applied client-side as CSS variables on the generic container app:</p>
+<p><code>showHeader</code> · <code>logoUrl</code> · <code>shadow {blur, color, alpha}</code> · <code>headerLayout {height, 4×padding}</code> · <code>primaryColor</code> · <code>secondaryColor</code> · <code>headerBackgroundColor</code> · <code>backgroundColor</code></p>
+<ul>
+  <li><b>One config per org, hard-coded</b> (<code>configCode = 'default'</code>, with a code comment: <i>"This will be changed when we will support multiple configs per organization"</i>)</li>
+  <li><b>No favicon</b> field exists anywhere in the platform</li>
+  <li><b>No typography/fonts</b> in branding</li>
+  <li>The container app's header <b>appears not to consume <code>logoUrl</code> at all</b> — it imports a static FlowX SVG (needs verification; if true, the logo override is silently broken)</li>
+  <li>Colors are single hex values — a lossy shadow of the theme's 11-shade token scale</li>
+  <li>Shadow is a lossy subset of theme shadows (no x/y/spread)</li>
+</ul>
+
+<h3>2.3 Fonts <span style="color:var(--text-soft);font-weight:400">(both Org and Workspace)</span></h3>
+<p><b>Same list component, same detail component, same store, same service, same API endpoints</b> (<code>cms/api/fonts/*</code>). The only difference is routing and permission guards (<code>org_font_*</code> vs <code>wks_font_*</code>); scoping happens via an HTTP header, not the URL. The "two places" are one feature with two doors.</p>
+
+<h3>2.4 Header — three homes, three models</h3>
+<div class="table-wrap"><table>
+  <tr><th>Surface</th><th>Model</th><th>Scope</th></tr>
+  <tr><td><b>Branding</b></td><td><code>showHeader</code>, <code>headerBackgroundColor</code>, <code>headerLayout</code> (height + 4 paddings), logo, shadow</td><td>Org — styles the container app's fixed React header</td></tr>
+  <tr><td><b>Theme → Navigation</b></td><td><code>titleFont</code>, <code>backgroundColor</code>, <code>titleColor</code>, <code>iconColor</code></td><td>Workspace — <b>mobile-only</b> (explicitly excluded for web)</td></tr>
+  <tr><td><b>UI Designer → HEADER</b></td><td>Full layout model (height, paddings, margins, position, flex/grid) but <b>no content model</b> (no logo, title, menu); only padding+gap themable</td><td>Process/UI-flow — the "global navigation element"</td></tr>
+</table></div>
+<p>Three teams' worth of header concepts, no shared source of truth.</p>
+
+<h3>2.5 Overlap map</h3>
+<div class="table-wrap"><table>
+  <tr><th>Visual concept</th><th>Theme (WS)</th><th>Branding (Org)</th><th>UI Designer</th><th>Verdict</th></tr>
+  <tr><td>Primary / accent color</td><td>11-shade token scale</td><td>single hex</td><td>—</td><td><span class="pill overlap">Overlap</span></td></tr>
+  <tr><td>Secondary color</td><td>token scale</td><td>single hex</td><td>—</td><td><span class="pill overlap">Overlap</span></td></tr>
+  <tr><td>Page / app background</td><td><code>appBackground</code></td><td><code>backgroundColor</code></td><td>—</td><td><span class="pill overlap">Overlap</span></td></tr>
+  <tr><td>Header background</td><td>navigation (mobile)</td><td><code>headerBackgroundColor</code></td><td>via container bg</td><td><span class="pill overlap">3× Overlap</span></td></tr>
+  <tr><td>Header height / padding</td><td>navigation (mobile)</td><td><code>headerLayout</code></td><td>full layout model</td><td><span class="pill overlap">3× Overlap</span></td></tr>
+  <tr><td>Shadow</td><td>full tokens (x, y, blur, spread)</td><td>lossy subset</td><td>token ref</td><td><span class="pill overlap">Overlap</span></td></tr>
+  <tr><td>Logo</td><td>—</td><td><code>logoUrl</code> (apparently unread)</td><td>—</td><td><span class="pill only">Branding-only</span></td></tr>
+  <tr><td>Typography / fonts</td><td>full token system</td><td>—</td><td>—</td><td><span class="pill only">Theme-only</span></td></tr>
+  <tr><td>Favicon</td><td>—</td><td>—</td><td>—</td><td><span class="pill missing">Missing everywhere</span></td></tr>
+</table></div>
+
+<h2><span class="num">3</span>The problems, stated as user pain</h2>
+
+<div class="prob"><div class="ptag">P1 · CORE PROBLEM</div><h4>The accountability / permission mismatch</h4>
+<p>The configurator is accountable for what end-users see, but Branding sits behind <b>org_config_edit</b>. Every branding change is a ticket to an org admin — a hand-off with no preview, no ownership, and no way for the configurator to verify the result. For the <b>most brand-sensitive</b> part of the experience (the shell customers see first), the person who owns the outcome has the least access.</p></div>
+
+<div class="prob"><div class="ptag">P2</div><h4>Split-brain visual identity</h4>
+<p>Primary color, secondary color, background, header background, shadow: each is defined <b>twice</b> — once in Theme (tokens, per-platform, server-compiled) and once in Branding (flat hex, CSS vars, client-side). Nothing reconciles them. A configurator can perfect the theme and still ship a solution whose shell clashes with it, because the shell reads a different, org-owned copy of "the brand."</p></div>
+
+<div class="prob"><div class="ptag">P3</div><h4>The header lottery</h4>
+<p>To control the header, a user must understand three models and their interaction: disable the container header in Branding (org admin needed), then build a HEADER element in UI Designer (which has layout but no content/branding model), styled via a theme section that is mobile-only for navigation. The current workaround — <b>disable the container app to avoid two headers</b> — is the UI equivalent of turning off the feature to fix the feature.</p></div>
+
+<div class="prob"><div class="ptag">P4</div><h4>Cold-start workspaces</h4>
+<p>A new workspace starts theme-less even when the org already has a perfected theme next door. The only reuse path is export → import — a manual file round-trip for something that should be a default. This punishes exactly the orgs that scale (more workspaces = more re-setup).</p></div>
+
+<div class="prob"><div class="ptag">P5</div><h4>Duplicate doors, one room (Fonts)</h4>
+<p>Same list in two navigation locations teaches users the wrong mental model (<i>"are these different font sets? do I need to upload twice?"</i>). The duplication exists to solve an access problem (configurators can't reach Org Settings) — it's a <b>permission patch expressed as information architecture</b>.</p></div>
+
+<div class="prob"><div class="ptag">P6</div><h4>Multi-brand orgs are structurally impossible</h4>
+<p>Tenancy is mixed: some orgs are one brand, some host solutions for multiple client brands, and per-solution standalone containers exist. A single hard-coded org-level branding config cannot serve the multi-brand case <b>at all</b> — there is no per-solution or per-workspace branding override.</p></div>
+
+<div class="prob"><div class="ptag">P7</div><h4>Branding under-delivers even on its own promise</h4>
+<p>No favicon. Logo override apparently unread by the container header. Lossy shadow. Single flat hexes. As a "white-label the shell for your client" feature, it's incomplete — and its gaps can't be patched by the workspace-level theme because the two systems don't talk.</p></div>
+
+<h2><span class="num">4</span>Design principles (the argument's spine)</h2>
+
+<div class="principle"><div class="n">1</div><div class="body"><b>Ownership follows accountability.</b><span>Every spec that shapes a <i>solution's</i> end-user experience must be reachable by the configurator, without an org-admin hand-off. Org Settings is for <i>governance</i> (what's allowed, what's default), not for <i>design work</i>.</span></div></div>
+<div class="principle"><div class="n">2</div><div class="body"><b>Define once, inherit down.</b><span>Org sets defaults and shared assets → workspaces inherit them automatically → solutions may override where it matters (standalone containers, client-specific brands). Nothing starts blank; nothing is authored twice.</span></div></div>
+<div class="principle"><div class="n">3</div><div class="body"><b>One concept, one home.</b><span>Each visual concept (header, background, color, font) has exactly one authoring surface; other surfaces may <i>read</i> or <i>reference</i> it, never redefine it.</span></div></div>
+<div class="principle"><div class="n">4</div><div class="body"><b>Theme is the single source of visual truth.</b><span>It is already the richest, platform-aware, token-based model. Branding-type needs should become <i>consumers of theme tokens</i>, not a parallel flat copy.</span></div></div>
+
+<h2><span class="num">5</span>Recommendation — target model</h2>
+<p>Keep the Org/Workspace permission boundary (fixed constraint). <b>Move specs, not scopes.</b></p>
+
+<h3>5.1 Org Settings → becomes "Governance &amp; Defaults"</h3>
+<div class="table-wrap"><table>
+  <tr><th>Keeps</th><th>Why</th></tr>
+  <tr><td><b>Font library</b> (canonical, single)</td><td>Fonts are licensed org assets; org-wide availability is the point. Already technically one list — make the IA say so.</td></tr>
+  <tr><td><b>Default theme designation</b> (+ optional org theme catalog)</td><td>Org decides what new workspaces start from. Fixes P4 without moving Theme itself.</td></tr>
+  <tr><td><b>Portal branding</b> (the <i>listing page</i> where clients see all solutions)</td><td>The portal is genuinely tenant-wide: logo, listing background, favicon (to be added). This is the <i>legitimate</i> residue of today's Branding page.</td></tr>
+</table></div>
+
+<h3>5.2 Workspace → remains the theme home, gains what it's missing</h3>
+<ul>
+  <li><b>Theme stays at workspace level</b> (validated: configurators without org access must own it) — but new workspaces <b>inherit the org default theme</b> (linked copy or reference — see Q1).</li>
+  <li>Theme gains a <b>web Navigation/Header section</b> (today mobile-only) so the solution shell's look is themable like everything else.</li>
+  <li>Fonts page at workspace level remains as a <b>read/manage view of the org library</b> — one entity, clearly labeled ("Organization font library"). No behavior change needed; only labeling and IA honesty.</li>
+</ul>
+
+<h3>5.3 Header → one home: UI Designer</h3>
+<p>The <b>global navigation element in UI Designer becomes the single authoring surface for the solution header</b>.</p>
+<ul>
+  <li>Extend the HEADER element with the content model it lacks (logo slot, title, nav items) — today it's layout-only.</li>
+  <li>Its <i>styling</i> binds to theme tokens (the new web navigation section) — consistent with every other component.</li>
+  <li>Branding's header fields (<code>showHeader</code>, <code>headerBackgroundColor</code>, <code>headerLayout</code>, header shadow) are <b>deprecated</b>: the container app either shows the <i>solution-defined</i> header or its minimal portal chrome. The "disable the container to avoid two headers" workaround disappears because there is only one header definition.</li>
+</ul>
+
+<h3>5.4 Branding page → renamed &amp; reduced to "Portal settings"</h3>
+<p>What remains org-level is only what is genuinely org-scoped: portal logo, portal listing background, favicon, legal/footer bits. Everything solution-facing (colors, backgrounds, header) is served by theme + UI Designer. For <b>multi-brand orgs / standalone containers</b>, the solution's own theme + header simply <i>are</i> the branding — no org bottleneck, no parallel model.</p>
+
+<h3>5.5 Sequencing (strawman)</h3>
+<div class="table-wrap"><table>
+  <tr><th>Phase</th><th>Move</th><th>Cost</th><th>Kills</th></tr>
+  <tr><td><b>Quick wins</b></td><td>New WS inherits org default theme; relabel Fonts pages as one library; fix/verify <code>logoUrl</code>; add favicon</td><td><span class="pill low">Low</span></td><td>P4, P5, part of P7</td></tr>
+  <tr><td><b>Structural 1</b></td><td>Web navigation section in Theme; HEADER content model in UI Designer</td><td><span class="pill med">Medium</span></td><td>P3</td></tr>
+  <tr><td><b>Structural 2</b></td><td>Container reads solution theme tokens (replaces branding CSS vars); Branding → Portal settings</td><td><span class="pill high">High</span></td><td>P1, P2, P6</td></tr>
+</table></div>
+
+<h2><span class="num">6</span>Assumptions to validate</h2>
+<ul>
+  <li><b>A1.</b> Configurators consider the container-app shell "their" responsibility (not a platform-team concern). <i>Validate with 3–5 configurator interviews.</i></li>
+  <li><b>A2.</b> Org admins experience branding requests as toil, not as a control point they want to keep. <i>If they want governance, solve it with an approval/lock on theme sections, not with feature placement.</i></li>
+  <li><b>A3.</b> The backend can scope/compile theme tokens for the container app (today the container is a React app reading CSS vars; themes are compiled per-platform elsewhere).</li>
+  <li><b>A4.</b> <code>logoUrl</code> really is unread by the container header (code suggests a static SVG import) — <i>verify before citing in the pitch</i>.</li>
+  <li><b>A5.</b> No customer depends on <i>divergent</i> fonts per workspace (the API appears org-scoped either way, likely safe).</li>
+</ul>
+
+<h2><span class="num">7</span>Open questions</h2>
+<ul>
+  <li><b>Q1 — Inheritance semantics:</b> when a workspace inherits the org default theme, is it a <i>live reference</i> (org edits propagate — risky) or a <i>fork at creation</i> (safe, but drifts)? <b>Recommend: fork + "update available" signal.</b></li>
+  <li><b>Q2 — Governance counter-need:</b> do some orgs <i>want</i> to lock brand specs against configurator edits (banks)? If yes, the answer is per-section theme locking, not org-level feature placement.</li>
+  <li><b>Q3 — Migration:</b> existing orgs with configured Branding — map their 8 fields into theme tokens automatically, or run dual systems during a deprecation window?</li>
+  <li><b>Q4 — Portal identity vs solution identity:</b> when one org hosts multiple brands, whose brand does the <i>portal listing page</i> wear? (Argues the portal is org-chrome — exactly why it stays in Org Settings.)</li>
+</ul>
+
+<h2><span class="num">A</span>Appendix — evidence (code references)</h2>
+<ul class="appendix">
+  <li>Theme model: <code>apps/designer/src/app/modules/theme/services/theme-model/theme-model.types.ts</code> (+ <code>colors.ts</code>, <code>typography.ts</code>, <code>shadows.ts</code>, <code>general.ts</code>, <code>navigation-bar.ts</code>)</li>
+  <li>Theme route TODO ("Temporary, long term this might not stay here"): <code>apps/designer/src/app/modules/cms/cms-main-layout.routes.ts</code></li>
+  <li>Theme cross-workspace path is export/import only: <code>themes-management-api.service.ts</code> (<code>appmanager/api/resource/themes/{uuid}/export|import</code>)</li>
+  <li>Branding model (8 fields): <code>apps/designer/src/app/modules/workspaces/shared/commons.types.ts:88–121</code></li>
+  <li>Branding single-config hard-code + comment: <code>apps/designer/src/app/shared/api/organization-branding.api.ts</code> (<code>configCode = 'default'</code>)</li>
+  <li>Container consumes branding as CSS vars: <code>apps/container/react-saas/src/branding/BrandingContext.tsx</code>; static logo in <code>apps/container/react-saas/src/components/Header.tsx</code></li>
+  <li>Fonts: same component/service/API both scopes — <code>modules/cms/pages/font-files/*</code>; scoping via <code>Fx-Workspace-Id</code> header in <code>modules/workspaces/workspaces.interceptor.ts</code></li>
+  <li>HEADER element (layout-only props): <code>modules/ui-designer/prop-models/header.ts</code>; global for web only in <code>models/dndComponentsByCategory.ts</code>; theme binding limited to padding+gap in <code>theme-style-props.ts</code></li>
+  <li>Theme navigation section mobile-only: <code>theme-model/navigation-bar.ts</code> (<code>MOBILE_ONLY_SECTIONS</code>)</li>
+</ul>
+
+<footer>Draft — for internal discussion. Generated from a field-level audit of the FlowX designer codebase, 2026-08-06.</footer>
+
+</div>
+</body>
+</html>
