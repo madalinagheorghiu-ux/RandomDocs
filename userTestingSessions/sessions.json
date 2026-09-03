@@ -52,5 +52,14 @@
     "feature": "Merge experience (project versioning & branching console)",
     "insights": 15,
     "file": "merge-experience-goj-2026-07-22.html"
+  },
+  {
+    "id": "self-enrolment-links-goj-2026-09-03",
+    "title": "Self-enrolment links &amp; solution access",
+    "date": "2026-09-03",
+    "participant": "Alex Goj",
+    "feature": "Self-enrolment links & solution access",
+    "insights": 18,
+    "file": "self-enrolment-links-goj-2026-09-03.html"
   }
 ]
