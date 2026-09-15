@@ -54,15 +54,6 @@
     "file": "merge-experience-goj-2026-07-22.html"
   },
   {
-    "id": "self-enrolment-links-cristi-d-2026-08-27",
-    "title": "Self-enrolment links &amp; solution access",
-    "date": "2026-08-27",
-    "participant": "Cristi D",
-    "feature": "Self-enrolment links & solution access",
-    "insights": 18,
-    "file": "self-enrolment-links-cristi-d-2026-08-27.html"
-  },
-  {
     "id": "global-navigation-stefan-2026-09-11",
     "title": "Global navigation in the FlowX platform",
     "date": "2026-09-11",
@@ -97,5 +88,14 @@
     "feature": "Global navigation",
     "insights": 16,
     "file": "global-navigation-delia-2026-09-11.html"
+  },
+  {
+    "id": "self-enrolment-links-cristi-d-2026-08-27",
+    "title": "Self-enrolment links &amp; solution access",
+    "date": "2026-08-27",
+    "participant": "Cristi D",
+    "feature": "Self-enrolment links & solution access",
+    "insights": 18,
+    "file": "self-enrolment-links-cristi-d-2026-08-27.html"
   }
 ]
