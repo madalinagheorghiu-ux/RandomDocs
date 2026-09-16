@@ -125,5 +125,14 @@
     "insights": 56,
     "file": "global-navigation-synthesis.html",
     "pin": true
+  },
+  {
+    "id": "configuration-workflow-luca-2026-09-16",
+    "title": "Configuration workflow in FlowX.AI",
+    "date": "2026-09-16",
+    "participant": "Luca",
+    "feature": "Configuration workflow — exploratory discussion",
+    "insights": 17,
+    "file": "configuration-workflow-luca-2026-09-16.html"
   }
 ]
