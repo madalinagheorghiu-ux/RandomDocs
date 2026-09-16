@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Session Review — KB Export/Import (full)</title>
+<style>
+  :root{
+    --paper:#FBF8F1; --paper-2:#F3EEE2; --ink:#211F1B; --ink-soft:#5A554C;
+    --rule:#D8D1C0; --mark:#B23A2E; --amber:#9C7A1E; --green:#2E6F5E;
+    --blue:#3A5A78; --plum:#6E4A6B; --hl:#FBF1D9; --shadow:rgba(33,31,27,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:14px;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .mono{font-family:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+
+  header.mast{border-bottom:1px solid var(--rule);margin-top:36px;margin-bottom:16px}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  h1{font-size:24px;line-height:1.2;margin:8px 0 6px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--ink-soft);font-size:14px;margin-bottom:6px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-bottom:8px}
+  .legend i{font-style:normal;display:inline-flex;align-items:center;gap:5px}
+  .sw{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .mast-row{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;border-top:1px solid var(--rule);margin-top:10px;padding:12px 0}
+  .meta{display:flex;gap:26px;flex-wrap:wrap;font-size:13px}
+  .meta b{font-size:18px;font-weight:600;display:block;line-height:1}
+  .meta span{color:var(--ink-soft);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+
+  nav.tabs{display:flex;gap:4px;margin:0;flex-wrap:wrap}
+  .tab{background:none;border:1px solid var(--rule);border-radius:999px;padding:7px 16px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink-soft)}
+  .tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+  /* How this works — two-lane handoff (You ⇄ Claude across a central spine) */
+  .how{max-width:1040px}
+  .lane-row{display:grid;grid-template-columns:1fr 56px 1fr;align-items:center}
+  .lane-row .l{display:flex;justify-content:flex-end}
+  .lane-row .r{display:flex;justify-content:flex-start}
+  .next-rule{display:flex;align-items:center;gap:14px;margin:10px 0 6px}
+  .next-rule .line{flex:1;border-top:1px dashed var(--rule)}
+  .next-rule .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  .spine{align-self:stretch;position:relative;display:flex;align-items:center;justify-content:center}
+  .spine .seg{position:absolute;left:50%;width:2px;background:var(--rule);transform:translateX(-1px)}
+  .spine .seg.top{top:0;bottom:50%} .spine .seg.bot{top:50%;bottom:0}
+  .lane-row.future .spine .seg{background:none;border-left:2px dashed var(--rule)}
+  .avatar{position:relative;z-index:1;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 2px 4px rgba(31,27,22,.18)}
+  .avatar svg{width:22px;height:22px;fill:currentColor;display:block}
+  .avatar.you{background:var(--blue)} .avatar.claude{background:#C75B38}
+  .lane-row.future .avatar{background:var(--paper);border:2px dashed var(--rule);color:var(--ink-soft);box-shadow:none}
+  .lane-row.future .avatar svg{width:20px;height:20px}
+  .lane-card{max-width:480px;width:100%;margin-bottom:20px;background:#fff;border:1px solid var(--rule);border-radius:14px;padding:16px 20px;box-shadow:0 1px 2px rgba(31,27,22,.05),0 10px 22px -16px rgba(31,27,22,.25)}
+  .lane-row.future .lane-card{background:rgba(255,253,247,.5);border-style:dashed;box-shadow:none}
+  .lane-card .ch{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px}
+  .lane-card h4{margin:0;font-size:17px;font-weight:600;line-height:1.25;color:var(--ink)}
+  .lane-row.future .lane-card h4{color:#5C544A}
+  .lane-card p{margin:0;font-size:14px;line-height:1.55;color:#5A534B}
+  .lane-row.future .lane-card p{color:#857D72}
+  .phase-tag{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);border:1px solid var(--rule);border-radius:999px;padding:2px 8px;font-weight:600}
+  .here{font-size:10px;letter-spacing:.07em;text-transform:uppercase;background:var(--green);color:#fff;border-radius:999px;padding:3px 9px;font-weight:700}
+  .actor{display:inline-flex;align-items:center;gap:5px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;border-radius:7px;padding:4px 9px}
+  .actor svg{width:11px;height:11px;fill:currentColor;display:block}
+  .actor.human{background:#E7ECF1;color:#3C5871} .actor.claude{background:#F6E1D7;color:#B4542F}
+  @media (max-width:640px){
+    .lane-row{display:flex;align-items:stretch;gap:14px}
+    .lane-row .spine{order:0;flex:none;width:44px}
+    .lane-row .l,.lane-row .r{order:1;flex:1;min-width:0;justify-content:flex-start}
+    .lane-row .l:not(:has(.lane-card)),.lane-row .r:not(:has(.lane-card)){display:none}
+    .lane-card{max-width:none;padding:13px 16px}
+    .lane-card h4{font-size:15px} .lane-card p{font-size:13.5px}
+  }
+
+  .panes{display:grid;grid-template-columns:1fr minmax(300px,40%);gap:24px;align-items:start}
+  .scriptcol{order:2;position:sticky;top:0;max-height:100vh;display:flex;flex-direction:column;background:var(--paper-2);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+  .scripthead{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);display:flex;align-items:center;gap:8px;min-height:48px;padding:0 14px;border-bottom:1px solid var(--rule);flex:none}
+  .scripthead button{margin-left:auto;background:none;border:1px solid var(--rule);border-radius:7px;font:inherit;font-size:12px;padding:4px 10px;cursor:pointer;color:var(--ink-soft)}
+  .scriptwrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+  .script{overflow:auto;flex:1;min-height:0;border:none;background:transparent;padding:4px 6px;box-shadow:none}
+  .edgehint{position:absolute;left:50%;transform:translateX(-50%);z-index:6;display:none;align-items:center;gap:5px;
+    font:inherit;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--ink);cursor:pointer;
+    background:#fff;border:1px solid var(--rule);border-radius:999px;padding:5px 11px;box-shadow:0 2px 8px var(--shadow)}
+  .edgehint:hover{border-color:var(--green);color:var(--green)}
+  .edgehint .arrow{color:var(--green);font-weight:700}
+  .edgehint.show{display:inline-flex}
+  .edgehint.top{top:8px} .edgehint.bot{bottom:8px}
+  .turn{padding:8px 13px;border-radius:8px;cursor:pointer;scroll-margin:14px;transition:background .15s}
+  .turn + .turn{border-top:1px dotted var(--rule)}
+  .turn .meta-r{display:flex;gap:8px;align-items:baseline;margin-bottom:1px}
+  .turn .spk{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+  .turn .ts{font-size:10px;color:var(--ink-soft)}
+  .turn.P .spk{color:var(--blue)} .turn.F .spk{color:var(--ink-soft)}
+  .turn.B .spk{color:var(--plum)} .turn.O .spk{color:#9a948a}
+  .turn .txt{font-size:12.5px;line-height:1.45}
+  .turn:hover{background:#fff}
+  .turn.hl{background:var(--hl);box-shadow:inset 3px 0 0 var(--green)}
+  .turn.hl-primary{background:var(--hl);box-shadow:inset 3px 0 0 var(--mark)}
+  .turn.anchored .spk::after{content:"•";color:var(--green);margin-left:6px}
+  .unsure{background:#F4E6C4;border-bottom:1px dashed var(--amber);padding:0 2px;border-radius:2px;cursor:help}
+
+  /* collapsible session summary (top of the Ideas tab) */
+  .summary{border:1px solid var(--rule);border-radius:12px;background:#fff;margin:0 0 18px;
+    box-shadow:0 1px 2px rgba(33,31,27,.05),0 10px 24px -18px rgba(33,31,27,.22)}
+  .summary>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;
+    padding:13px 16px;font-weight:600;font-size:14px;color:var(--ink);user-select:none}
+  .summary>summary::-webkit-details-marker{display:none}
+  .summary>summary .chev{color:var(--ink-soft);font-size:11px;transition:transform .15s}
+  .summary[open]>summary .chev{transform:rotate(90deg)}
+  .sum-body{padding:2px 16px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 26px}
+  .sum-sec h4{margin:0 0 7px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    display:flex;align-items:center;gap:7px}
+  .sum-sec h4::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+  .sum-sec.strengths h4{color:var(--green)} .sum-sec.weaknesses h4{color:var(--mark)}
+  .sum-sec.points h4{color:var(--ink-soft)}
+  .sum-sec ul{margin:0;padding-left:17px}
+  .sum-sec li{font-size:13.5px;line-height:1.5;margin-bottom:5px;color:var(--ink-soft)}
+  .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:56px;padding:8px 2px;background:var(--paper);border-bottom:1px solid var(--rule);margin-bottom:14px;position:sticky;top:0;z-index:5}
+  .toolbar .count{font-weight:600} .toolbar .count em{color:var(--green);font-style:normal}
+  .tb-break{flex-basis:100%;height:0;margin:0}
+  .spacer{flex:1}
+  button.act{background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 13px;font:inherit;font-size:13px;cursor:pointer}
+  button.ghost{background:none;color:var(--ink);border:1px solid var(--rule)} button.ghost:hover{border-color:var(--ink)}
+  select.filter{font:inherit;font-size:13px;border:1px solid var(--rule);border-radius:8px;padding:7px 10px;background:#fff;max-width:150px}
+
+  .card{border:1px solid var(--rule);border-radius:12px;background:#fff;padding:16px 16px 14px;margin-bottom:13px;display:grid;grid-template-columns:30px 1fr;gap:13px;box-shadow:0 1px 2px rgba(33,31,27,.05),0 10px 24px -16px rgba(33,31,27,.22);transition:border-color .15s,box-shadow .15s,transform .15s;cursor:pointer}
+  .card:hover{border-color:var(--ink-soft);transform:translateY(-1px);box-shadow:0 2px 5px rgba(33,31,27,.06),0 16px 32px -18px rgba(33,31,27,.30)}
+  .card.active{border-color:var(--mark);box-shadow:0 0 0 2px var(--mark),0 10px 24px -16px rgba(33,31,27,.22)}
+  .keep{appearance:none;width:23px;height:23px;border:1.5px solid var(--ink-soft);border-radius:6px;cursor:pointer;position:relative;margin-top:2px;background:#fff;flex:none}
+  .keep:checked{background:var(--green);border-color:var(--green)}
+  .keep:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700}
+  .card h3{margin:0 0 6px;font-size:18px;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+  .tagrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:7px}
+  .tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:0;background:none;color:var(--ink-soft);display:inline-flex;align-items:center;gap:6px}
+  .tag::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+  .tag.pain_point{color:#9A352A}
+  .tag.feature_request{color:#33536F}
+  .tag.naming_copy{color:#7A6320}
+  .tag.design_decision,.tag.design_insight{color:#246253}
+  .tag.open_question{color:#856516}
+  .tag.context{color:#55514a}
+  .conf{font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;display:inline-flex;align-items:center;gap:5px;color:var(--ink-soft)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .conf .dot{display:none}
+  .src{margin-left:auto;font-size:11px;color:var(--ink-soft);font-weight:600;white-space:nowrap;transition:opacity .12s}
+  .card:hover .src,.card.editing .src{opacity:0}
+  .src .srcn{color:var(--ink-soft);font-weight:600}
+  .detail{margin:0 0 10px;font-size:14px;color:var(--ink-soft)}
+  .quote{border-left:3px solid var(--rule);padding:7px 0 7px 13px;margin:0 0 4px;font-style:italic;color:#3a372f;font-size:14px;line-height:1.5}
+  .topics{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .topic{font-size:10.5px;color:var(--ink-soft);border:1px solid var(--rule);border-radius:999px;padding:2px 9px;white-space:nowrap}
+  .taxo{border:1px solid var(--rule);border-radius:12px;background:#fff;padding:9px 12px;margin-bottom:10px}
+  .taxo-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0}
+  .taxo-lab{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;
+    color:var(--ink-soft);min-width:70px;flex:none}
+  .chip{font:inherit;font-size:11.5px;border:1px solid var(--rule);background:var(--paper);
+    border-radius:999px;padding:3px 10px;cursor:pointer;color:var(--ink-soft);
+    display:inline-flex;align-items:center;gap:6px;line-height:1.4}
+  .chip:hover{border-color:var(--ink-soft)}
+  .chip .n{font-size:10px;font-weight:700;opacity:.7}
+  .chip.cat{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+  .chip.c-pain_point{color:#9A352A} .chip.c-feature_request{color:#33536F}
+  .chip.c-naming_copy{color:#7A6320} .chip.c-design_decision,.chip.c-design_insight{color:#246253}
+  .chip.c-open_question{color:#856516} .chip.c-context{color:#55514a}
+  .chip.active{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .chip.active .n{opacity:.85}
+  .framewrap{margin-top:10px}
+  .framebtn{font:inherit;font-size:11px;color:var(--ink-soft);background:#faf9f7;border:1px solid var(--rule);border-radius:7px;padding:3px 9px;cursor:pointer;letter-spacing:.02em}
+  .framebtn:hover{border-color:var(--ink-soft);color:var(--ink)}
+  figure.frame{margin:9px 0 0}
+  figure.frame img{display:block;max-width:100%;border:1px solid var(--rule);border-radius:9px}
+  figure.frame figcaption{font-size:11px;color:var(--ink-soft);margin-top:5px}
+  .who{font-size:11px;color:var(--ink-soft);margin-top:7px;letter-spacing:.04em}
+  .tension{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--rule)}
+  .tension .tlabel{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--mark);white-space:nowrap}
+  .tension .tlink{font:inherit;font-size:12px;text-align:left;color:var(--ink);background:#fbecea;border:1px solid #e3b9b2;border-radius:7px;padding:3px 9px;cursor:pointer;line-height:1.3}
+  .tension .tlink:hover{border-color:var(--mark);color:var(--mark)}
+  .conflict-toggle[aria-pressed="true"]{background:var(--mark);color:#fff;border-color:var(--mark)}
+  .query{display:flex;gap:8px;align-items:flex-start;margin-top:11px;padding:9px 11px;background:#FBF1D9;border:1px dashed var(--amber);border-radius:8px;font-size:12.5px;color:#6f560f}
+  .query b{color:var(--amber)}
+
+  .repsec{margin-bottom:24px}
+  .repsec h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);border-bottom:1px solid var(--rule);padding-bottom:6px;margin:0 0 10px}
+  .note{background:#E3EEE9;border:1px solid #Bcd7cd;border-left:3px solid var(--green);border-radius:8px;padding:12px 14px;margin-bottom:18px;font-size:13.5px}
+  .note b{color:var(--green)}
+  .rep{display:flex;gap:12px;align-items:baseline;padding:7px 0;border-bottom:1px dotted var(--rule);font-size:14px}
+  .rep .b{flex:0 0 64px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding-top:2px}
+  .b.auto{color:var(--green)} .b.confirm{color:var(--amber)} .b.query{color:var(--mark)}
+  .orig{text-decoration:line-through;text-decoration-color:var(--mark);color:var(--ink-soft)}
+  .arrow{color:var(--mark);font-weight:700;padding:0 4px} .fix{color:var(--ink);font-weight:500}
+  .fix.drop{color:var(--ink-soft);font-style:italic;font-weight:400} .qtext{color:#6f560f}
+  .hint{font-size:13px;color:var(--ink-soft);margin:0 0 14px}
+
+  .export{display:none;border:1px solid var(--rule);border-radius:12px;background:#fff;padding:16px;margin:0 0 20px}
+  .export.show{display:block}
+  .export .row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .export textarea{width:100%;height:200px;border:1px solid var(--rule);border-radius:8px;padding:12px;font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:12px;background:var(--paper);resize:vertical}
+  /* review round-trip */
+  .review{display:none;border:1px solid var(--mark);border-radius:12px;background:#fff;padding:16px;margin:0 0 20px}
+  .review.show{display:block}
+  .review .row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .review .lead{font-size:13px;color:var(--ink-soft);margin:0 0 10px}
+  .review textarea{width:100%;height:220px;border:1px solid var(--rule);border-radius:8px;padding:12px;font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:12px;background:var(--paper);resize:vertical}
+  .review-tally{font-size:12px;color:var(--ink-soft)}
+  .review-tally em{color:var(--mark);font-style:normal;font-weight:700}
+  button.send{background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 13px;font:inherit;font-size:13px;cursor:pointer}
+  button.send[disabled]{opacity:.45;cursor:default}
+  .seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+  .seg button{background:#fff;border:none;padding:7px 14px;font:inherit;font-size:13px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  /* card tools + edit mode */
+  .card{position:relative}
+  .cardtools{position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:3;
+    background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:3px;
+    opacity:0;transition:opacity .12s;box-shadow:0 2px 8px var(--shadow)}
+  .card:hover .cardtools{opacity:1}
+  .cardtools button{font:inherit;font-size:11px;line-height:1;border:none;background:none;
+    color:var(--ink-soft);border-radius:5px;padding:5px 7px;cursor:pointer;white-space:nowrap}
+  .cardtools button:hover{background:var(--paper-2);color:var(--ink)}
+  .cardtools button.on{background:var(--mark);color:#fff}
+  .card.editing{box-shadow:0 0 0 2px var(--blue),0 1px 0 var(--shadow)}
+  .card.editing .cardtools{opacity:1}
+  .flags{display:flex;gap:6px;margin-top:9px}
+  .flag{font:inherit;font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;
+    border:none;border-radius:5px;padding:2px 7px;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+  .flag .flag-x{font-size:11px;line-height:1;opacity:.5}
+  .flag:hover .flag-x{opacity:1}
+  .flag.edit{background:#E2EBF1;color:#33536F}
+  .flag.note{background:#EDE6D6;color:#7A6320}
+  .card.excluded{opacity:.5}
+  .card.excluded h3,.card.excluded .detail,.card.excluded .quote{text-decoration:line-through;
+    text-decoration-color:var(--mark)}
+  .cmt{margin-top:10px}
+  .cmt-rm{margin-top:6px;font:inherit;font-size:11px;color:var(--ink-soft);background:none;border:none;
+    cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px}
+  .cmt-rm:hover{color:var(--mark)}
+  .cmt-in{width:100%;min-height:54px;border:1px solid var(--amber);border-radius:8px;
+    padding:8px 10px;font:inherit;font-size:13px;background:#FBF7EC;resize:vertical;color:var(--ink)}
+  .cmt-in::placeholder{color:var(--ink-soft)}
+  .mast-cmt{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:10px 0 0}
+  .langtoggle{flex:none}
+  .langtoggle button{padding:6px 12px;font-size:12px}
+  .mast-note-btn{background:none;border:1px solid var(--rule);border-radius:7px;
+    font:inherit;font-size:12px;padding:4px 10px;cursor:pointer;color:var(--ink-soft)}
+  .mast-note-btn:hover{border-color:var(--ink);color:var(--ink)}
+  .mast-note-btn.on{background:var(--mark);color:#fff;border-color:var(--mark)}
+  .rep{position:relative} .turn{position:relative}
+  .rowtool{position:absolute;top:4px;right:4px;opacity:0;transition:opacity .12s;
+    background:var(--paper);border:1px solid var(--rule);border-radius:6px;
+    font:inherit;font-size:10.5px;color:var(--ink-soft);padding:3px 7px;cursor:pointer;z-index:2}
+  .rep:hover .rowtool,.turn:hover .rowtool{opacity:1}
+  .rowtool.on{background:var(--mark);color:#fff;border-color:var(--mark);opacity:1}
+  .repsec h2{position:relative}
+  .sectool{margin-left:10px;font:inherit;font-size:11px;border:1px solid var(--rule);
+    border-radius:6px;color:var(--ink-soft);padding:2px 8px;cursor:pointer;text-transform:none;letter-spacing:0}
+  .sectool.on{background:var(--mark);color:#fff;border-color:var(--mark)}
+  .cmt.inline{margin:6px 0 2px}
+  .efield[contenteditable="true"]{outline:none;border-bottom:1px dashed var(--blue);
+    background:#F7FAFD;border-radius:3px;padding:0 2px}
+  .card.editing .quote.efield[contenteditable="true"]{background:#F7FAFD}
+  .esel{font:inherit;font-size:12px;border:1px solid var(--rule);border-radius:6px;padding:3px 6px;background:#fff}
+  .echip{display:inline-flex;align-items:center;gap:5px}
+  .echip button{border:none;background:none;color:var(--mark);cursor:pointer;font-size:12px;padding:0 2px}
+  .topic-add{font:inherit;font-size:10.5px;border:1px dashed var(--rule);border-radius:999px;
+    padding:2px 8px;width:120px}
+  footer{color:var(--ink-soft);font-size:12px;border-top:1px solid var(--rule);padding:18px 0 50px;margin-top:24px}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+  .toast.show{opacity:1}
+  @media (max-width:880px){
+    .panes{grid-template-columns:1fr}
+    .scriptcol{position:static;max-height:none;order:-1}
+    .script{max-height:300px}.toolbar{position:static}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow" data-ro="Discuție exploratorie · 2026-09-15 · fără prototip · transcript reparat">Exploratory discussion · 2026-09-15 · no prototype · transcript repaired</div>
+    <h1 data-ro="Fluxul de configurare în FlowX.AI">Configuration workflow in FlowX.AI</h1>
+    <div class="sub" data-ro="22 min · 3 vorbitori · predominant RO cu termeni EN · fără screen share, deci fără cadre de ecran">22 min · 3 speakers · RO-primary with EN terms · no screen share, so no screen frames</div>
+    <div class="legend">
+      <i><span class="sw" style="background:var(--blue)"></span><span data-ro="Horia — participant, configurator (5 luni)">Horia — participant, configurator (5 months in)</span></i>
+      <i><span class="sw" style="background:var(--ink-soft)"></span><span data-ro="Antonia — product manager, moderator">Antonia — product manager, moderator</span></i>
+      <i><span class="sw" style="background:var(--mark)"></span><span data-ro="Mădălina — UX designer">Mădălina — UX designer</span></i>
+    </div>
+    <div class="mast-cmt">
+      <button class="mast-note-btn" data-act="report-note" onclick="toggleReportNote(this)">💬 Comment on the whole report</button>
+      <span class="langtoggle seg" role="group" aria-label="Report language">
+        <button id="lang-en" aria-pressed="true" onclick="setLang('en')">EN</button>
+        <button id="lang-ro" aria-pressed="false" onclick="setLang('ro')">RO</button>
+      </span>
+    </div>
+    <div class="mast-row">
+      <div class="meta">
+        <div><b id="m-ideas">0</b><span>topics</span></div>
+        <div><b id="m-kept">0</b><span>kept</span></div>
+        <div><b id="m-rep">0</b><span>repairs</span></div>
+        <div><b id="m-query" style="color:var(--mark)">0</b><span>open queries</span></div>
+      </div>
+      <nav class="tabs">
+        <button class="tab" id="tab-ideas" aria-selected="true" onclick="showTab('ideas')">Topics + transcript</button>
+        <button class="tab" id="tab-rep" aria-selected="false" onclick="showTab('rep')">Repair log</button>
+        <button class="tab" id="tab-how" aria-selected="false" onclick="showTab('how')">How this works</button>
+      </nav>
+    </div>
+  </header>
+
+  <section id="view-ideas">
+    <details class="summary" id="summaryBox">
+      <summary><span class="chev">▶</span><span id="sum-cap">Session summary</span></summary>
+      <div class="sum-body" id="sum-body"></div>
+    </details>
+    <div class="panes">
+      <div class="scriptcol">
+        <div class="scripthead">Repaired transcript</div>
+        <div class="scriptwrap">
+          <button class="edgehint top" id="edge-up" onclick="jumpEdge(-1)" aria-label="Jump to highlighted lines above"><span class="arrow">▲</span> <span id="edge-up-n"></span> above</button>
+          <div class="script" id="script"></div>
+          <button class="edgehint bot" id="edge-dn" onclick="jumpEdge(1)" aria-label="Jump to highlighted lines below"><span class="arrow">▼</span> <span id="edge-dn-n"></span> below</button>
+        </div>
+      </div>
+      <div class="ideacol">
+        <div class="taxo" id="taxo"></div>
+        <div class="toolbar">
+          <select class="filter" id="catFilter" onchange="applyFilter()"></select>
+          <select class="filter" id="topicFilter" onchange="applyFilter()"></select>
+          <button class="ghost act" onclick="selectAll(true)">All</button>
+          <button class="ghost act" onclick="selectAll(false)">Clear</button>
+          <span class="spacer"></span>
+          <button class="ghost act conflict-toggle" id="conflictToggle" aria-pressed="false" onclick="toggleConflicts()" title="Show only insights that are in tension with another">⚡ Conflicts</button>
+          <span class="tb-break"></span>
+          <span class="review-tally" id="review-tally" data-tip=""></span>
+          <span class="spacer"></span>
+          <button class="send" data-act="send-review" id="sendReview" onclick="openReview()" disabled>Send to Claude ↑</button>
+        </div>
+        <div class="export" id="exportPanel">
+          <div class="row">
+            <div class="seg">
+              <button id="fmt-md" aria-pressed="true" onclick="setFmt('md')">Markdown</button>
+              <button id="fmt-json" aria-pressed="false" onclick="setFmt('json')">JSON</button>
+            </div>
+            <span class="spacer"></span>
+            <button class="ghost act" onclick="copyOut()">Copy</button>
+            <button class="act" onclick="downloadOut()">Download</button>
+            <button class="ghost act" onclick="closeExport()">Close</button>
+          </div>
+          <textarea id="outBox" readonly></textarea>
+        </div>
+        <div class="review" id="reviewPanel">
+          <p class="lead">Your edits, comments, and exclusions — paste this back into Claude to rebuild the report. Untouched items are omitted.</p>
+          <div class="row">
+            <div class="seg">
+              <button id="rfmt-json" aria-pressed="true" onclick="setReviewFmt('json')">JSON</button>
+              <button id="rfmt-md" aria-pressed="false" onclick="setReviewFmt('md')">Markdown</button>
+            </div>
+            <span class="spacer"></span>
+            <button class="ghost act" onclick="copyReview()">Copy</button>
+            <button class="act" onclick="downloadReview()">Download</button>
+            <button class="ghost act" onclick="closeReview()">Close</button>
+          </div>
+          <textarea id="reviewBox" readonly></textarea>
+        </div>
+        <div id="ideas"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-rep" class="hidden">
+    <div class="note" data-ro="&lt;b&gt;Discuție exploratorie, nu test pe prototip.&lt;/b&gt; Fără screen share, deci fără cadre de ecran — fiecare card trimite la momentul din înregistrare, cu citatul exact. Horia e singura voce masculină, deci fiecare linie &lt;i&gt;(m)&lt;/i&gt; e a lui și fiecare citat din carduri e sigur atribuit. Antonia și Mădălina, ambele voci feminine, au fost separate după rol: Antonia conduce întrebările pe tot parcursul, Mădălina pune un bloc focusat despre stările de eroare din canvas între 14:23 și 17:27, apoi pleacă.">&lt;b&gt;An exploratory discussion, not a prototype test.&lt;/b&gt; No screen share, so no screen frames — each card points at the moment in the recording, with the exact quote. Horia is the only male voice, so every <i>(m)</i> line is his and every card quote is safely attributed. Antonia and Mădălina, both female, were separated by role: Antonia leads the questioning throughout, Mădălina asks a focused block about canvas error states between 14:23 and 17:27 and then leaves.</div>
+    <p class="hint">Phase-1 repairs. <span style="color:var(--green)">Green</span> = applied ·
+      <span style="color:var(--amber)">amber</span> = confirm · <span style="color:var(--mark)">red</span> = needs you.</p>
+    <div id="repairs"></div>
+  </section>
+
+  <section id="view-how" class="hidden">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <symbol id="ic-human" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12.6a4.3 4.3 0 1 0 0-8.6 4.3 4.3 0 0 0 0 8.6Zm7 7.4c0-3.3-3.4-5.4-7-5.4s-7 2.1-7 5.4V21h14v-1Z"/></symbol>
+      <symbol id="ic-claude" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M20.998 10.949H24v3.102h-3v3.028h-1.487V20H18v-2.921h-1.487V20H15v-2.921H9V20H7.488v-2.921H6V20H4.487v-2.921H3V14.05H0V10.95h3V5h17.998v5.949zM6 10.949h1.488V8.102H6v2.847zm10.51 0H18V8.102h-1.49v2.847z"/></symbol>
+    </svg>
+    <div class="how">
+      <div class="lane-row">
+        <div class="l">
+          <div class="lane-card">
+            <div class="ch"><span class="actor human"><svg><use href="#ic-human"/></svg> You</span><h4>Hand over the session</h4></div>
+            <p>Drop in the transcript, the recording, and a line on what was tested — all Claude needs to start.</p>
+          </div>
+        </div>
+        <div class="spine"><div class="seg bot"></div><div class="avatar you"><svg><use href="#ic-human"/></svg></div></div>
+        <div class="r"></div>
+      </div>
+
+      <div class="lane-row">
+        <div class="l"></div>
+        <div class="spine"><div class="seg top"></div><div class="seg bot"></div><div class="avatar claude"><svg><use href="#ic-claude"/></svg></div></div>
+        <div class="r">
+          <div class="lane-card">
+            <div class="ch"><span class="actor claude"><svg><use href="#ic-claude"/></svg> Claude</span><h4>Repairs the transcript</h4><span class="phase-tag">Phase 1</span></div>
+            <p>Fixes the ASR garble, restores the English domain terms, and reconciles who-said-what — anchored by acoustic voice-print diarization, which separates even same-gender speakers. Every fix is logged in the Repair log.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lane-row">
+        <div class="l"></div>
+        <div class="spine"><div class="seg top"></div><div class="avatar claude"><svg><use href="#ic-claude"/></svg></div></div>
+        <div class="r">
+          <div class="lane-card">
+            <div class="ch"><span class="actor claude"><svg><use href="#ic-claude"/></svg> Claude</span><h4>Extracts the insights</h4><span class="phase-tag">Phase 2</span><span class="here">you are here</span></div>
+            <p>Pulls insight cards — category, quote, confidence — each anchored to its exact transcript lines.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lane-row">
+        <div class="l">
+          <div class="lane-card">
+            <div class="ch"><span class="actor human"><svg><use href="#ic-human"/></svg> You</span><h4>Review, edit &amp; classify</h4></div>
+            <p>Keep or drop cards, tweak the wording, answer the open queries, and sort them by destination database.</p>
+          </div>
+        </div>
+        <div class="spine"><div class="seg bot"></div><div class="avatar you"><svg><use href="#ic-human"/></svg></div></div>
+        <div class="r"></div>
+      </div>
+
+      <div class="lane-row">
+        <div class="l"></div>
+        <div class="spine"><div class="seg top"></div><div class="seg bot"></div><div class="avatar claude"><svg><use href="#ic-claude"/></svg></div></div>
+        <div class="r">
+          <div class="lane-card">
+            <div class="ch"><span class="actor claude"><svg><use href="#ic-claude"/></svg> Claude</span><h4>Folds in your changes</h4></div>
+            <p>Reads your edits, comments, and exclusions, then rebuilds the report with them folded in.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-rule"><div class="line"></div><span class="lbl">Next · planned, not yet built</span><div class="line"></div></div>
+
+      <div class="lane-row future">
+        <div class="l"></div>
+        <div class="spine"><div class="seg top"></div><div class="avatar claude"><svg><use href="#ic-claude"/></svg></div></div>
+        <div class="r">
+          <div class="lane-card">
+            <div class="ch"><span class="actor claude"><svg><use href="#ic-claude"/></svg> Claude</span><h4>Publishes to Notion</h4></div>
+            <p>Pushes the final insights to Notion via the Notion MCP — each into the right database.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Generated by the <b>meetinginsights</b> skill · Phase 1 repair → Phase 2 extract. Quotes are the repaired Romanian.</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// [speaker, timestamp, text]
+const TURNS = [
+ [
+  "F",
+  "00:00",
+  "...de la R&D și ne... împreună cu Mădă, care este UX designer în echipa noastră... Suntem Noi suntem în echipa core din R&D, ne ocupăm de diverse funcționalități din platformă. De regulă, cum s-au conturat până acum, sunt funcționalități generice de... și lucrăm foarte mult în zona de lucru colaborativ în platformă sau de cum... de funcționalități care... cum să explic eu? Țin de modul de utilizare al platformei și al proiectelor în general. Nu știu, pot să-ți dau exemple de funcționalități de merge conflicts, de cum este împachetat... cum sunt împachetate resursele în interiorul unui proiect, cum funcționează zona de active policies, sunt... sunt mai multe zone pe care ne uităm. Dar... în momentul acesta ne... voiam să discutăm puțin despre experiența ta de configurare și care sunt... care este workflow-ul pe care ți l-ai format de când ai început în echipă... în procesul de... în configurare. Și cred că putem să începem prin... să ne spui tu puțin despre ce... pe ce proiecte lucrezi acum, să-mi amintești cam de câte luni ai venit... că știu că ești mai nou prin... prin echipa de Customer Engineering... și pornim de acolo, discutăm."
+ ],
+ [
+  "P",
+  "01:41",
+  "La momentul actual lucrez pe Erste și sunt de cam 5 luni? 5... 5 și un pic. Nu știu, din mai am venit."
+ ],
+ [
+  "P",
+  "01:50",
+  "5 luni."
+ ],
+ [
+  "F",
+  "01:50",
+  "Mhm."
+ ],
+ [
+  "F",
+  "01:51",
+  "Okay. Ai trecut prin mai multe proiecte?"
+ ],
+ [
+  "P",
+  "01:56",
+  "A mai fost unul care nu s-a finalizat, dar, da, ăsta e al doilea, cum ar veni."
+ ],
+ [
+  "F",
+  "02:02",
+  "Am înțeles. Okay. Și care a fost... am început puțin mai diferit față de cealaltă discuție. Care a fost procesul prin care ai învățat cum să lucrezi în platformă?"
+ ],
+ [
+  "P",
+  "02:15",
+  "Inițial stăteam cu platforma deschisă și cu documentația undeva în alt tab și mai nou am început să mă orientez foarte mult de... cum să folosesc KB-ul din Claude. Și de obicei pun întrebările acolo și, de exemplu, spun: componenta X, componenta Y, ce am de făcut? Și să-mi dea niște exemple de cum aș putea să le folosesc și cum să se configureze mai rapid."
+ ],
+ [
+  "F",
+  "02:40",
+  "Okay. Interesant. Pe proiectul ăsta aveți un business analyst sau o persoană care se ocupă de documentație?"
+ ],
+ [
+  "P",
+  "02:54",
+  "Avem un Product Owner și îl avem pe Bob ca, arhitect și cumva acolo o să fie documentația."
+ ],
+ [
+  "F",
+  "03:05",
+  "Mhm. Mhm. Okay. Atunci hai să trecem puțin printr-un proces. Să spunem că pe Erste primești o nouă funcționalitate de implementat. Nu știu exact dacă e chiar corect modul în care lucrați voi, nu știu, un user story sau ceva, o nouă zonă de funcționalitate. Care-i procesul tău?"
+ ],
+ [
+  "P",
+  "03:29",
+  "Prima dată iau user story-ul, îl citesc o dată, de două ori, de trei ori, să înțeleg bine de tot ce-i acolo și să-mi pun întrebări dacă nu înțeleg ceva."
+ ],
+ [
+  "P",
+  "03:36",
+  "Doi, încerc să-mi definesc eu un workflow, un UI flow, depinzând de ce e nou. Încerc eu să-l fac în mare parte 80% din cap cum aș dori să vină, ce ar trebui să intre, ce ar trebui să iasă și apoi încerc să-mi testez pe datele pe care le am, dacă am date. Dacă nu, o să mă ajut cu Claude ca să fie mai aproape de realitate."
+ ],
+ [
+  "F",
+  "03:36",
+  "Mhm."
+ ],
+ [
+  "F",
+  "04:03",
+  "Mhm."
+ ],
+ [
+  "P",
+  "04:04",
+  "Și apoi încep să testez și dacă dau de probleme între, din nou, pun niște întrebări în Claude să văd de exemplu de la ce vin erorile sau dacă sunt erori sau, mă rog, de acolo configurez mai departe."
+ ],
+ [
+  "F",
+  "04:18",
+  "Mhm. Spuneai că vrei să-ți construiești 80% din... În această parte din procesul tău nu intercalezi teste deloc sau cum?"
+ ],
+ [
+  "P",
+  "04:33",
+  "Testez pe parcurs. Dacă, de exemplu, fac un workflow și să zic că ar avea 5 noduri,"
+ ],
+ [
+  "F",
+  "04:39",
+  "Mhm."
+ ],
+ [
+  "P",
+  "04:40",
+  "Fac nodurile, le fac scripturile pentru nodurile respective..."
+ ],
+ [
+  "P",
+  "04:40",
+  "Fagurile nodurilor, respectiv"
+ ],
+ [
+  "P",
+  "04:42",
+  "Scripturile pentru nodurile respective și încep să testez fiecare script în parte și apoi cum funcționează între ele, mai bine zis."
+ ],
+ [
+  "P",
+  "04:51",
+  "Ca să pot să testez până să ajung într-un punct final, din punctul A în punctul B, ca să am un control mai mare asupra ce date scoate"
+ ],
+ [
+  "P",
+  "04:57",
+  "Fiecare nod în parte."
+ ],
+ [
+  "F",
+  "04:59",
+  "Mhm."
+ ],
+ [
+  "F",
+  "05:00",
+  "Și care-s punctele în care vezi, descoperi problemele? Pe la testare, de configurare, nu știu, ceva ce nu funcționează cum te-ai fi așteptat sau..."
+ ],
+ [
+  "P",
+  "05:13",
+  "Până acum, da, de obicei în partea de testare descopăr că nu am configurat ceva bine sau că ceva merge altcumva în log sau..."
+ ],
+ [
+  "F",
+  "05:23",
+  "Poți să-mi dai niște exemple de lucruri pe care nu le-ai..."
+ ],
+ [
+  "F",
+  "05:28",
+  "Le-ai descoperit și n-arată... încă nu funcționează?"
+ ],
+ [
+  "P",
+  "05:31",
+  "Da, de exemplu, pe ăsta acum am un proiect BPMN, mă rog, am un proiect mai... am un proces mai lung care descarcă niște fișiere și, mă rog, le parsează, face whatever."
+ ],
+ [
+  "P",
+  "05:43",
+  "Am descoperit, de exemplu, la runtime cum funcționează exact și de ce-mi dădea eroare când încercam să scot"
+ ],
+ [
+  "P",
+  "05:51",
+  "Din unul din workflow-uri"
+ ],
+ [
+  "P",
+  "05:55",
+  "Datele. Pentru un... în BPMN-ul ăsta dau apel la un workflow ca să-mi parseze ceva și apoi trebuie să le scot și nu-mi venea totul cum trebuie. Și mi-am dat după aia seama că, hey, de fapt eu nu modelasem cum trebuie data model-ul și"
+ ],
+ [
+  "P",
+  "06:08",
+  "N-avea cum să dea ce trebuie că"
+ ],
+ [
+  "P",
+  "06:09",
+  "Nu corelam ce trebuie."
+ ],
+ [
+  "F",
+  "06:11",
+  "Mhm. Nu modelaseși... În ce sens nu modelaseși corect data model-ul?"
+ ],
+ [
+  "P",
+  "06:15",
+  "Eu mă gândeam că-mi trebuie ceva."
+ ],
+ [
+  "P",
+  "06:17",
+  "Credeam că ceva-ul ăla vine cum trebuie, nu venea, practic."
+ ],
+ [
+  "P",
+  "06:23",
+  "Sună foarte dubios, dar nu știu cum să explic exact."
+ ],
+ [
+  "F",
+  "06:25",
+  "Mhm."
+ ],
+ [
+  "F",
+  "06:26",
+  "Era o problemă de mapare de date sau de cum ți-ai construit..."
+ ],
+ [
+  "F",
+  "06:31",
+  "Ok."
+ ],
+ [
+  "F",
+  "06:32",
+  "Și a trebuit să treci foarte..."
+ ],
+ [
+  "P",
+  "06:35",
+  "Mi-am dat seama foarte repede că nu merge că știam că trebuie să-mi vină ceva, nu mi-a venit și am zis: „Opa!"
+ ],
+ [
+  "P",
+  "06:40",
+  "Ceva nu e bine” și m-am dus să văd de unde vine exact."
+ ],
+ [
+  "F",
+  "06:40",
+  "Mhm."
+ ],
+ [
+  "P",
+  "06:44",
+  "Scriptul scotea bine și apoi am discutat că, hey, de fapt nu am pasat ce trebuie."
+ ],
+ [
+  "F",
+  "06:49",
+  "Ok, deci și procesul tău a fost că ai testat... când ai descoperit problema aia că nu-ți venea ce trebuie pe proiect, dacă înțeleg bine, ți-ai testat... ai luat-o pe bucățele, ai testat workflow-ul să vezi și ce iese din workflow-ul respectiv ca să-ți dai seama că unde este problema, aha."
+ ],
+ [
+  "F",
+  "07:09",
+  "Exact. Asta..."
+ ],
+ [
+  "F",
+  "07:12",
+  "Am înțeles bine, da?"
+ ],
+ [
+  "P",
+  "07:13",
+  "Da, da, da, da, da."
+ ],
+ [
+  "F",
+  "07:14",
+  "Ok."
+ ],
+ [
+  "F",
+  "07:15",
+  "Super."
+ ],
+ [
+  "F",
+  "07:17",
+  "Și ce crezi că te-ar fi ajutat,"
+ ],
+ [
+  "F",
+  "07:22",
+  "Uite, luând de exemplu la acesta, să"
+ ],
+ [
+  "F",
+  "07:28",
+  "Descoperi mai repede problema?"
+ ],
+ [
+  "P",
+  "07:31",
+  "Sincer, nu știu, aici probabil ar fi fost mai degrabă o chestie din atenția mea, să fiu eu mai degrabă mai atent. În platformă nu știu exact ce ar fi putut să mă ajute neapărat. Poate cumva să văd,"
+ ],
+ [
+  "P",
+  "07:44",
+  "Ar fi fost o idee să văd exact un"
+ ],
+ [
+  "P",
+  "07:48",
+  "La runtime un input versus output, ce scoate, ce... de fapt, un output versus input, ce scoate nodul respectiv și ce așteaptă partea cealaltă, ca să zic așa."
+ ],
+ [
+  "P",
+  "08:00",
+  "De fapt, mai degrabă ce scoate workflow-ul și ce se așteaptă nodul să primească ca input."
+ ],
+ [
+  "F",
+  "08:07",
+  "Mhm."
+ ],
+ [
+  "F",
+  "08:10",
+  "Înțeleg. Cred că"
+ ],
+ [
+  "F",
+  "08:14",
+  "Similar cu ce ai cu"
+ ],
+ [
+  "F",
+  "08:18",
+  "Pe workflow-urile de rulare a workflow-ului să fie și în zona de proces."
+ ],
+ [
+  "P",
+  "08:24",
+  "Da."
+ ],
+ [
+  "F",
+  "08:25",
+  "Aha. Cam la asta te gândești?"
+ ],
+ [
+  "P",
+  "08:26",
+  "Da, da, da, da, da."
+ ],
+ [
+  "F",
+  "08:28",
+  "Crezi că"
+ ],
+ [
+  "F",
+  "08:31",
+  "Dacă platforma te-ar..."
+ ],
+ [
+  "F",
+  "08:33",
+  "Problema aceea de mapare de date a intervenit oare din faptul că ai"
+ ],
+ [
+  "F",
+  "08:40",
+  "Făcut schimbări pe workflow pe care după aceea nu le-ai propagat pe maparea datelor?"
+ ],
+ [
+  "P",
+  "08:46",
+  "Cel mai probabil, da."
+ ],
+ [
+  "F",
+  "08:47",
+  "Ok. Nu ești foarte convins, dar..."
+ ],
+ [
+  "P",
+  "08:48",
+  "Nu, nu sunt foarte convins, dar cel mai probabil, da."
+ ],
+ [
+  "F",
+  "08:52",
+  "Ok. Și dacă"
+ ],
+ [
+  "F",
+  "08:54",
+  "Platforma ți-ar fi"
+ ],
+ [
+  "F",
+  "08:57",
+  "Scos în evidență faptul că există un disconnect"
+ ],
+ [
+  "F",
+  "09:02",
+  "Între output-ul workflow-ului și input-ul platformei de la momentul configurării..."
+ ],
+ [
+  "F",
+  "09:11",
+  "O să fie o întrebare destul de leading, n-am formulat-o foarte corect."
+ ],
+ [
+  "F",
+  "09:18",
+  "Crezi că ar fi valoros sau ai"
+ ],
+ [
+  "F",
+  "09:20",
+  "...crezi că-r fi valoros sau ai... ți-ar fi de folos la momentul configurării dacă platforma ți-ar oferi genul acesta de issue-uri? Ți-ar scoate la suprafață genul ăsta de issue-uri?"
+ ],
+ [
+  "P",
+  "09:35",
+  "Eu cel puțin da, m-aș fi dat. Adică e un safety net în plus că am mers din punctul A în punctul B cum trebuie configurat."
+ ],
+ [
+  "F",
+  "09:43",
+  "Mhm."
+ ],
+ [
+  "F",
+  "09:44",
+  "La ce moment crezi că ți-ar fi cel mai utilă genul acesta de informație?"
+ ],
+ [
+  "P",
+  "09:44",
+  "Practic."
+ ],
+ [
+  "P",
+  "09:51",
+  ".."
+ ],
+ [
+  "F",
+  "09:53",
+  "Mă refer în procesul tău: m-am dus și am modificat..."
+ ],
+ [
+  "P",
+  "09:56",
+  "Da, mie personal probabil tot undeva la runtime sau undeva unde se întâmplă un run de nod sau de workflow nod sau whatever. Adică cumva să văd ce urmează pe workflow mai departe, dacă are sens."
+ ],
+ [
+  "F",
+  "10:13",
+  "Mhm. În se- Da. Înțeleg, adică te te interesează mult mai mult să fie foarte rich, o să fie să fie foarte bogată informația de debug, de loguri la runtime."
+ ],
+ [
+  "P",
+  "10:31",
+  "Da. Da, da, da. Practic, da."
+ ],
+ [
+  "F",
+  "10:34",
+  "Rather than config. Okay. .. Gândindu-te la cum... În în platformă- Mădă, cred că-ți iau un pic întrebarea pe care i-ai pus-o anterior."
+ ],
+ [
+  "O",
+  "10:58",
+  "E foarte bine, nu-i nimic."
+ ],
+ [
+  "F",
+  "11:01",
+  "Da. În platformă în momentul acesta există anumite zone în care erori de configurare sau configurări lipsă sunt highlight-ate. Uite, îți dau un exemplu: pe UI flow-uri sau pe UI-ul dintr-un proces, în momentul în care nu ai un proces de-aici-aici, lucru care este mandatory în flow-ul respectiv pentru funcționarea corectă, ai acele mesaje de eroare pe componentă, nu știu dacă le-ai observat."
+ ],
+ [
+  "P",
+  "11:42",
+  "Da. Da, da, da."
+ ],
+ [
+  "F",
+  "11:44",
+  "Cât de mult te ghidezi și cât cât de mult te ajută în procesul de configurare genul acesta de erori afișate în context?"
+ ],
+ [
+  "P",
+  "11:58",
+  "Pe mine cel puțin foarte mult. Adică cumva, mai ales faptul că îmi spune, bă, ceva nu e complet aici,"
+ ],
+ [
+  "F",
+  "12:06",
+  "Mhm."
+ ],
+ [
+  "P",
+  "12:07",
+  "Și mă pune să mă uit încă o dată pe nod sau în nepar, cel puțin pe mine m-a ajutat pentru că pot să-mi dau seama și mai de pe mai departe cum ar veni ce folosesc, unde folosesc, de unde ar putea să crape în cazul în care testez ceva. Deci pe mine cel puțin m-a ajutat foarte mult și de obicei chiar mă ghidez după ele. Adică le țin cumva în minte că, bă, am folosit x nu știu unde, y nu știu unde, whatever."
+ ],
+ [
+  "F",
+  "12:32",
+  "Există situații în care le lași conștient neconfigurate sau nu știu, le observi și zici: ok, trec peste ele acum?"
+ ],
+ [
+  "P",
+  "12:43",
+  "Da, de obicei le las în momentul în care nu mi-am definit foarte bine tot ce trebuie din punctul A în punctul B."
+ ],
+ [
+  "F",
+  "12:52",
+  "Mhm."
+ ],
+ [
+  "P",
+  "12:53",
+  "Și cumva nu m-am, de exemplu, nu știu, pe nodul de agentic o să dau un exemplu, sunt e response-ul."
+ ],
+ [
+  "P",
+  "12:59",
+  "E unul din ele. De exemplu, nu mi-am dat seama încă foarte bine sau încă nu am decis încă foarte concret ce vreau să ajung și cum vreau să numesc variabila respectivă ca să nu mă lovesc de ea mai încolo."
+ ],
+ [
+  "P",
+  "13:12",
+  "Și atunci cumva, mă rog, în cazul ăla vine deja prepus response-key, dar dacă n-ar fi fost aș fi lăsat-o goală ca să pot să mă ghidez mai departe exact să nu am, de exemplu, agent response și agent response."
+ ],
+ [
+  "F",
+  "13:23",
+  "Mhm."
+ ],
+ [
+  "P",
+  "13:24",
+  "De exemplu."
+ ],
+ [
+  "F",
+  "13:25",
+  "Mhm. Dar în același timp ai nevoie să testezi lucruri, nu?"
+ ],
+ [
+  "P",
+  "13:29",
+  "Da, în momentul în care ajung la testare trec încă o dată peste ele și de obicei în punctul ăla deja mi-am setat foarte bine ce am de făcut și cum ar trebui să arate până la final și atunci mai trec încă o dată peste ele și le notez."
+ ],
+ [
+  "F",
+  "13:44",
+  "Mhm. Ți le-ai notat în afara...?"
+ ],
+ [
+  "P",
+  "13:48",
+  "Le-am mai ținut și în afara, de exemplu aici la <span class=\"unsure\" title=\"almost certainly the same client named elsewhere in the session; see open query\">RST</span> mai aveam nevoie de ele ținute pentru că sunt două noduri agentice care sunt în două workflow-uri separate și atunci vreau să țin minte exact că, bă, ăsta de fapt vine de acolo, ăsta vine de acolo."
+ ],
+ [
+  "P",
+  "14:00",
+  "E exact, adică ăsta de fa- vine de acolo, ăsta vine de acolo."
+ ],
+ [
+  "O",
+  "14:03",
+  "M-hm."
+ ],
+ [
+  "F",
+  "14:06",
+  "Okay. Mădă, ai... ca să știu că tu ai un hard stop și voiam să mă asigur că trecem peste ce întrebări ai și tu."
+ ],
+ [
+  "O",
+  "14:23",
+  ".. Nu neapărat. Adică aveam așa, lucruri mai punctuale, dar cred că le-ai răspuns, Horia, în alt mod. Mă gândeam la cât te ajută acum, așa cum sunt ele, warning-urile sau erorile prin locurile prin care sunt prin platformă, dacă-ți iei condecile care apar în Canvas, în UI Designer. Nu știu dacă ai observat atunci când... .. faci drop unor input-uri sau form elements, în principiu pe ele apar că nu ai process key... data process key setat, dacă le faci de la început sau le dai skip și... te uiți la funcționalitatea mare, nu știu, să se lege paginile, să ai acțiune pe un buton și revii mai apoi."
+ ],
+ [
+  "P",
+  "15:15",
+  ".. și acolo funcționează în Canvas cam similar cu Workflow, în sensul în care dacă nu am 100% imaginea făcută, o să revin probabil la ele ca să nu am mismatch-uri sau overlap-uri."
+ ],
+ [
+  "O",
+  "15:30",
+  "Ca proces de configurare, îți bați capul cu ele când le-ai făcut drop și au apărut erorile să pui process data key atunci sau îți creezi tot form-ul, îți legi, să zicem, butoanele ca să te asiguri că poți să faci tranziția dintre pagini și revii pentru fine tuning-uri mai pe final?"
+ ],
+ [
+  "P",
+  "15:36",
+  "Poți să mai repeți o dată?"
+ ],
+ [
+  "P",
+  "15:55",
+  "Depinde puțin. De obicei la colecții le las pentru mai târziu ca să am și datele, dar unde pot să pun ceva din prima, o să pun ceva din prima am o idee despre ce ar trebui să fie acolo. Adică am deja o mică idee despre cum ar vrea să-mi sune o variabilă respectivă sau process key-ul. Dacă nu-mi vine ceva din altă parte, de obicei o să încerc să-mi bat capul atunci."
+ ],
+ [
+  "O",
+  "16:21",
+  ".. și ții cont de... warning, de eroare, de error state-urile acelea pe input-uri care apar în Canvas? Nu știu dacă le-ai observat sau deja ai intrat în blind zone, când faci drop unui... form element că-i apare o bulină roșie că nu are process data key?"
+ ],
+ [
+  "P",
+  "16:44",
+  "De obicei le văd și mă ghidez după ele, adică..."
+ ],
+ [
+  "O",
+  "16:47",
+  "Da?"
+ ],
+ [
+  "P",
+  "16:48",
+  "...le rezolv, da."
+ ],
+ [
+  "O",
+  "16:50",
+  "Te întreb atâta de specific pentru că ne gândim la locurile prin care apar acum warning-uri, erori, cum se suprapune asta cu issues console care va apărea și ăsta e motivul pentru care stau așa mult pe un subiect mic."
+ ],
+ [
+  "P",
+  "17:05",
+  "Am și un exemplu bun. De exemplu acum trebuie să testez ceva și mi-am făcut un buton de upload ca să trec direct unde trebuie și... l-am testat exact înainte de meeting-ul ăsta și uitasem cum funcționează un upload button și am văzut ăla și am fost \"A! Okay\"."
+ ],
+ [
+  "O",
+  "17:22",
+  "Deci..."
+ ],
+ [
+  "P",
+  "17:24",
+  "Da, ceva... da, îți vine în ajutor."
+ ],
+ [
+  "O",
+  "17:27",
+  "M-hm."
+ ],
+ [
+  "F",
+  "17:28",
+  "Da. Noi... uite că m-am și uitat dacă am menționat în agenda... meeting-ului. Într-adevăr, ne uităm la o funcționalitate de a colecta erorile și warning-urile pe care... care pot să apară în configurarea proceselor, nu știu, un exemplu, nu am entry point... cel mai simplu exemplu, nu am entry point setat pe versiunea respectivă de proiect sau un... un node sau o acțiune de start subproces nu are procesul configurat pe ea, genul acesta de erori colectate și afișate într-un loc centralizat, într-o consolă de issues, astfel încât să ajute în momentul configurării de a scoate la suprafață aceste... probleme de configurare. De aici au venit întrebările noastre până acum. Și implicit o parte din scopul la care ne uităm este, așa cum spunea și Mădă, de a... oferi informații și în contextul configurării, dar și într-un loc centralizat. Și încercăm să găsim această balanță. .. știind așa cam unde ne dorim să ajungem, care sunt momentele... atunci când te-ai pus să lucrezi la un feature... Mădă, dacă vrei, ești... poți să ieși dacă nu mai ai... dacă trebuie să fugi și nu mai ai întrebări. Cred că e okay, o să fie ultima întrebare din partea mea."
+ ],
+ [
+  "O",
+  "19:25",
+  "Okay. Mulțumesc."
+ ],
+ [
+  "F",
+  "19:27",
+  "Pa, pa."
+ ],
+ [
+  "O",
+  "19:28",
+  "Mulțumesc, Horia."
+ ],
+ [
+  "F",
+  "19:31",
+  "Eu voiam să te întreb așa, foarte high level, gândindu-te la un feature pe care îl implementezi, okay, mai descoperi probleme pe parcurs, dar care crezi că ar fi un punct în care vrei să te asiguri că nu mai ai nicio problemă și totul funcționează corect pe... pe implementarea ta?"
+ ],
+ [
+  "P",
+  "19:55",
+  "De obicei un punct foarte bun e când nu mai am sfânta de redesenare pe proces. Ăla e un punct bun. Înseamnă că am trecut tot, am trecut prin toate... toate nodurile, cel puțin măcar o dată. Mă rog, nu doar nodurile, și componentele, că și componentele au. .. și de obicei îmi dau seama că configurarea mea e aproape de final când nu mai am nevoie de noduri noi sau componente noi sau totul depinde doar în punctul ăla de cum se manipulează datele pe care deja le am și le trimiți dintr-o parte în cealaltă. Care, mă rog, acolo de obicei sunt introduse din script-uri, whatever, acolo, da."
+ ],
+ [
+  "F",
+  "20:35",
+  "M-hm. Voi aveți și testare? Aveți și colegi care se ocupă de testare pe...?"
+ ],
+ [
+  "P",
+  "20:40",
+  "Pe proces nu. Teoretic tot noi testăm."
+ ],
+ [
+  "F",
+  "20:44",
+  "Tot voi testați. Voiam să te întreb care este punctul în care dai la testare."
+ ],
+ [
+  "P",
+  "20:50",
+  "În care-mi dau mie la testare. .. este cam ăsta, adică eu cred că e okay și mă uit cumva în stânga să văd... mă rog, stânga... whatever, unde-mi țin finalul de date, să văd: bă, s-a procesat totul cum trebuie? Am ajuns unde trebuie? N-am avut erori prin vreun proces, vreun warning, ceva? Și atunci e gata, da. Adică atunci îl testez mai puternic."
+ ],
+ [
+  "F",
+  "21:17",
+  "Lucrezi singur pe proiectul acesta sau mai este cineva care se ocupă de alte feature-uri pe...?"
+ ],
+ [
+  "P",
+  "21:22",
+  ".. a mai venit săptămâna trecută un băiat, Andrei V."
+ ],
+ [
+  "F",
+  "21:27",
+  "Ah, okay."
+ ],
+ [
+  "P",
+  "21:28",
+  "Care să ne ajute, dar până atunci eram... nu neapărat singur că a fost Andrei Z., care a plecat între timp și am rămas singur o perioadă."
+ ],
+ [
+  "F",
+  "21:36",
+  "M-hm."
+ ],
+ [
+  "P",
+  "21:37",
+  "Da."
+ ],
+ [
+  "F",
+  "21:38",
+  "Okay. Și Andrei are experiență de configurare sau e un coleg nou?"
+ ],
+ [
+  "P",
+  "21:42",
+  ".. este nou. E mai nou decât mine, dar nu știu cât de nou față de mine. Okay, adică nu-mi mai aduc aminte exact când a venit."
+ ],
+ [
+  "F",
+  "21:50",
+  "Okay, pentru că am auzit numele lui, dar nu cred că pot să pun o față peste, de asta."
+ ],
+ [
+  "P",
+  "21:55",
+  "Nu, nici eu nu prea l-am văzut la birou, adică mai mult lucrează de acasă."
+ ],
+ [
+  "F",
+  "22:00",
+  "Okay. Bun. Bine, cred că atâta a fost din partea aceasta. Nu știu dacă ai mai participat la sesiuni de user testing la noi până acum. Dar dacă te-a mai invitat vreo vreo colegă de-a mea?"
+ ],
+ [
+  "P",
+  "22:18",
+  "Nu, nu cred."
+ ],
+ [
+  "F",
+  "22:20",
+  "Okay. Noi mai facem... o să închid..."
+ ],
+ [
+  "P",
+  "22:23",
+  "Nu, e prima e prima sesiune."
+ ],
+ [
+  "F",
+  "22:25",
+  "Sesiunea aceasta a fost mai mult exploratorie, adică sunt două tipuri..."
+ ]
+
+];
+
+const IDEAS = [
+ {
+  "id": "idea-01",
+  "title": "He stopped reading the docs and started asking the knowledge base",
+  "title_ro": "A încetat să citească documentația și a început să întrebe knowledge base-ul",
+  "category": "context",
+  "topics": [
+   "Learning & tooling"
+  ],
+  "detail": "Asked how he learned to work in the platform, he described a shift. At first it was the platform open in one tab and the documentation in another. More recently he goes to the Claude knowledge base instead, asking it directly — component X, component Y, what do I need to do — and asking for examples of how to use and configure them faster.",
+  "detail_ro": "Întrebat cum a învățat să lucreze în platformă, a descris o schimbare. La început era platforma deschisă într-un tab și documentația în altul. Mai nou se duce la knowledge base-ul din Claude, întrebând direct — componenta X, componenta Y, ce am de făcut — și cerând exemple de cum să le folosească și să le configureze mai repede.",
+  "quote": "mai nou am început să mă orientez foarte mult de... cum să folosesc KB-ul din Claude",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   7,
+   6
+  ]
+ },
+ {
+  "id": "idea-02",
+  "title": "He builds roughly 80% from his head before touching data",
+  "title_ro": "Construiește cam 80% din cap înainte să atingă datele",
+  "category": "design_insight",
+  "topics": [
+   "How he builds"
+  ],
+  "detail": "His sequence starts with reading the user story two or three times until he is sure of it, asking questions where he is not. Then he defines the workflow or UI flow himself — what should go in, what should come out — and gets most of the way there before involving real data.",
+  "detail_ro": "Secvența lui începe cu citirea user story-ului de două-trei ori până e sigur, punând întrebări unde nu e. Apoi își definește singur workflow-ul sau UI flow-ul — ce ar trebui să intre, ce ar trebui să iasă — și ajunge aproape de final înainte să implice date reale.",
+  "quote": "Încerc eu să-l fac în mare parte 80% din cap cum aș dori să vină, ce ar trebui să intre, ce ar trebui să iasă",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   12,
+   11
+  ]
+ },
+ {
+  "id": "idea-03",
+  "title": "When he has no test data, he has the AI generate realistic data",
+  "title_ro": "Când n-are date de test, pune AI-ul să genereze date realiste",
+  "category": "design_insight",
+  "topics": [
+   "Learning & tooling",
+   "Testing & debugging"
+  ],
+  "detail": "He tests against whatever data he has. Where there is none, he uses Claude to produce something closer to reality rather than working with placeholders. A small detail, but it shows the AI has already moved into his build loop and not only his learning.",
+  "detail_ro": "Testează pe ce date are. Unde nu există, folosește Claude ca să producă ceva mai aproape de realitate, în loc să lucreze cu date de umplutură. Un detaliu mic, dar arată că AI-ul a intrat deja în bucla lui de construcție, nu doar în învățare.",
+  "quote": "Dacă nu, o să mă ajut cu Claude ca să fie mai aproape de realitate.",
+  "speaker": "P",
+  "confidence": "medium",
+  "needs": false,
+  "anchors": [
+   12
+  ]
+ },
+ {
+  "id": "idea-04",
+  "title": "He tests node by node as he builds, not at the end",
+  "title_ro": "Testează nod cu nod pe măsură ce construiește, nu la final",
+  "category": "design_insight",
+  "topics": [
+   "Testing & debugging",
+   "How he builds"
+  ],
+  "detail": "Asked whether he interleaves testing, the answer was yes and the method is granular. On a five-node workflow he builds the nodes, writes their scripts, tests each script on its own, then tests how they work together — so that he keeps tight control over what data each node emits before reaching the end. Worth reading against the other configurator in this round, who does not test at all while building.",
+  "detail_ro": "Întrebat dacă intercalează testarea, răspunsul a fost da, iar metoda e granulară. Pe un workflow cu cinci noduri face nodurile, le scrie scripturile, testează fiecare script în parte, apoi cum funcționează între ele — ca să păstreze control strâns asupra datelor pe care le scoate fiecare nod înainte de a ajunge la capăt. Merită citit în paralel cu celălalt configurator din runda asta, care nu testează deloc în timp ce construiește.",
+  "quote": "încep să testez fiecare script în parte și apoi cum funcționează între ele",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   21,
+   16,
+   17,
+   22
+  ]
+ },
+ {
+  "id": "idea-05",
+  "title": "His example failure was a data model that did not match what he assumed",
+  "title_ro": "Eroarea lui de referință a fost un data model care nu corespundea cu ce presupusese",
+  "category": "pain_point",
+  "topics": [
+   "Testing & debugging"
+  ],
+  "detail": "Problems still surface at testing. His worked example: a long process that downloads and parses files calls a workflow, and the data would not come back correctly. The cause was that he had not modelled the data model the way it needed to be, so the correlation could never work. He caught it quickly because he knew something should have arrived and it did not.",
+  "detail_ro": "Problemele apar tot la testare. Exemplul lui: un proces lung care descarcă și parsează fișiere apelează un workflow, iar datele nu veneau corect. Cauza era că nu modelase data model-ul cum trebuia, deci corelarea n-avea cum să funcționeze. L-a prins repede pentru că știa că trebuia să-i vină ceva și nu venise.",
+  "quote": "de obicei în partea de testare descopăr că nu am configurat ceva bine",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   26,
+   29,
+   34,
+   43
+  ]
+ },
+ {
+  "id": "idea-06",
+  "title": "What would have helped: what the workflow outputs against what the node expects",
+  "title_ro": "Ce l-ar fi ajutat: ce scoate workflow-ul față de ce așteaptă nodul",
+  "category": "feature_request",
+  "topics": [
+   "Testing & debugging",
+   "Where issues should surface"
+  ],
+  "detail": "Asked what would have let him find that failure sooner, he first put it down to his own attention — then produced a concrete ask. He wants to see, at runtime, what a workflow outputs set against what the receiving node expects as input. The facilitator read it back as extending the workflow-run view into the process area, and he agreed.",
+  "detail_ro": "Întrebat ce l-ar fi ajutat să găsească eroarea mai repede, a pus-o întâi pe seama propriei atenții — apoi a produs o cerere concretă. Vrea să vadă, la runtime, ce scoate un workflow pus față în față cu ce așteaptă ca input nodul care primește. Facilitatorul a reformulat ca extinderea vederii de rulare a workflow-ului în zona de proces, iar el a confirmat.",
+  "quote": "mai degrabă ce scoate workflow-ul și ce se așteaptă nodul să primească ca input",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   59,
+   56,
+   57
+  ]
+ },
+ {
+  "id": "idea-07",
+  "title": "Surfacing configuration issues would be a safety net",
+  "title_ro": "Afișarea problemelor de configurare ar fi o plasă de siguranță",
+  "category": "design_insight",
+  "topics": [
+   "Where issues should surface"
+  ],
+  "detail": "Put to him directly — would it be valuable if the platform surfaced a disconnect between a workflow's output and the expected input at configuration time — his answer was yes, and the word he reached for was safety net: extra confirmation that he has gone from point A to point B configured correctly.",
+  "detail_ro": "Întrebat direct — ar fi valoros ca platforma să scoată la suprafață o nepotrivire între output-ul workflow-ului și input-ul așteptat, la momentul configurării — răspunsul a fost da, iar cuvântul pe care l-a folosit a fost safety net: o confirmare în plus că a mers din punctul A în punctul B configurat corect.",
+  "quote": "e un safety net în plus că am mers din punctul A în punctul B cum trebuie configurat",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   81,
+   78
+  ]
+ },
+ {
+  "id": "idea-08",
+  "title": "…but he would rather have it at runtime than at configuration time",
+  "title_ro": "…dar l-ar vrea mai degrabă la runtime decât la configurare",
+  "category": "design_insight",
+  "topics": [
+   "Where issues should surface",
+   "Testing & debugging"
+  ],
+  "detail": "Asked when that information would help most, he did not choose configuration. He wants it where a node or workflow actually runs, so he can see what comes next in the workflow and whether it makes sense. The facilitator summarised it as caring more about rich debug and log information at runtime than at config, and he confirmed it twice. That is a meaningful steer for a feature being designed around configuration time.",
+  "detail_ro": "Întrebat când i-ar fi cel mai utilă informația, n-a ales configurarea. O vrea acolo unde rulează efectiv un nod sau un workflow, ca să vadă ce urmează în workflow și dacă are sens. Facilitatorul a rezumat că îl interesează mai mult informația bogată de debug și de log la runtime decât la configurare, iar el a confirmat de două ori. E un semnal important pentru o funcționalitate proiectată în jurul momentului de configurare.",
+  "quote": "mie personal probabil tot undeva la runtime sau undeva unde se întâmplă un run de nod",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   87,
+   83,
+   89
+  ]
+ },
+ {
+  "id": "idea-09",
+  "title": "In-context component errors guide him, and he keeps them as a mental map",
+  "title_ro": "Erorile în context de pe componente îl ghidează și le ține ca hartă mentală",
+  "category": "design_insight",
+  "topics": [
+   "In-context errors"
+  ],
+  "detail": "On the error messages already shown on incomplete UI components, he was emphatic: they help him a great deal. Being told something is not complete here makes him look at the node again, and he uses them to reason forward about what he is using and where — so he can anticipate where something might break when he tests. He said he genuinely navigates by them.",
+  "detail_ro": "Despre mesajele de eroare deja afișate pe componentele de UI incomplete a fost categoric: îl ajută foarte mult. Faptul că i se spune că ceva nu e complet aici îl face să se uite din nou pe nod, iar el le folosește ca să raționeze mai departe despre ce folosește și unde — ca să anticipeze unde ar putea crăpa ceva când testează. A spus că chiar se ghidează după ele.",
+  "quote": "mai ales faptul că îmi spune, bă, ceva nu e complet aici",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   95,
+   97,
+   94
+  ]
+ },
+ {
+  "id": "idea-10",
+  "title": "He leaves some fields unconfigured on purpose, until naming is settled",
+  "title_ro": "Lasă intenționat câmpuri neconfigurate, până se decide numirea",
+  "category": "design_insight",
+  "topics": [
+   "In-context errors",
+   "How he builds"
+  ],
+  "detail": "Asked whether he ever leaves things unconfigured knowingly, the answer was yes — and the reason is naming rather than laziness. Until he has decided what he is aiming at and what the variable should be called, he would rather leave it empty than commit, so he does not end up with two things called the same. His example is the response key on an agentic node. This is a third distinct answer to the same question across these sessions.",
+  "detail_ro": "Întrebat dacă lasă vreodată lucruri neconfigurate în mod conștient, răspunsul a fost da — iar motivul e numirea, nu comoditatea. Până nu decide unde vrea să ajungă și cum ar trebui să se numească variabila, preferă să o lase goală decât să se angajeze, ca să nu ajungă cu două lucruri numite la fel. Exemplul lui e response key de pe un nod agentic. E al treilea răspuns distinct la aceeași întrebare, în aceste sesiuni.",
+  "quote": "dacă n-ar fi fost aș fi lăsat-o goală ca să pot să mă ghidez mai departe exact să nu am, de exemplu, agent response și agent response",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   103,
+   99,
+   101,
+   102
+  ]
+ },
+ {
+  "id": "idea-11",
+  "title": "He sweeps all of them before testing, and keeps notes outside the platform",
+  "title_ro": "Le parcurge pe toate înainte de testare și ține notițe în afara platformei",
+  "category": "design_insight",
+  "topics": [
+   "In-context errors",
+   "Testing & debugging"
+  ],
+  "detail": "The deliberate gaps are not forgotten. When he reaches testing he goes over them once more, by which point he has settled what he is building, and he writes them down. He also keeps notes outside the platform: on this project two agentic nodes sit in two separate workflows, and he needs to remember which value comes from where.",
+  "detail_ro": "Golurile intenționate nu sunt uitate. Când ajunge la testare le mai parcurge o dată, moment în care a decis deja ce construiește, și le notează. Ține și notițe în afara platformei: pe proiectul ăsta două noduri agentice stau în două workflow-uri separate și trebuie să-și amintească ce valoare vine de unde.",
+  "quote": "în momentul în care ajung la testare trec încă o dată peste ele și de obicei în punctul ăla deja mi-am setat foarte bine ce am de făcut",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   107,
+   109
+  ]
+ },
+ {
+  "id": "idea-12",
+  "title": "Collections wait for data; anything he can name up front, he names",
+  "title_ro": "Colecțiile așteaptă datele; ce poate numi din prima, numește",
+  "category": "design_insight",
+  "topics": [
+   "How he builds"
+  ],
+  "detail": "Asked whether he resolves the errors as soon as an element is dropped or builds the whole form first, the answer splits by type. Collections he leaves for later, because he wants the data in hand. Anything where he already has an idea of what the variable or process key should be called, he sets immediately.",
+  "detail_ro": "Întrebat dacă rezolvă erorile imediat ce a pus un element sau construiește întâi tot formularul, răspunsul se împarte pe tipuri. Colecțiile le lasă pentru mai târziu, pentru că vrea datele în mână. Acolo unde are deja o idee despre cum ar trebui să se numească variabila sau process key-ul, le setează imediat.",
+  "quote": "De obicei la colecții le las pentru mai târziu ca să am și datele, dar unde pot să pun ceva din prima, o să pun ceva din prima",
+  "speaker": "P",
+  "confidence": "medium",
+  "needs": false,
+  "anchors": [
+   117,
+   115
+  ]
+ },
+ {
+  "id": "idea-13",
+  "title": "The red marker on a dropped element still works — with a fresh example",
+  "title_ro": "Bulina roșie de pe un element pus pe canvas încă funcționează — cu un exemplu proaspăt",
+  "category": "design_insight",
+  "topics": [
+   "In-context errors"
+  ],
+  "detail": "Asked whether the error state on a dropped form element has become a blind spot, he said no — he sees them and resolves them. He then offered an example from immediately before the session: he had built an upload button to skip ahead in a test, had forgotten how upload buttons work, and the in-context error told him. Unprompted evidence that the mechanism is still doing work for someone five months in.",
+  "detail_ro": "Întrebat dacă starea de eroare de pe un element de formular pus pe canvas a devenit un blind spot, a spus că nu — le vede și le rezolvă. A oferit apoi un exemplu de chiar înainte de sesiune: își făcuse un buton de upload ca să sară mai departe într-un test, uitase cum funcționează butoanele de upload, iar eroarea din context i-a spus. Dovadă nesolicitată că mecanismul încă lucrează pentru cineva aflat la cinci luni.",
+  "quote": "l-am testat exact înainte de meeting-ul ăsta și uitasem cum funcționează un upload button și am văzut ăla și am fost „A! Okay”",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   123,
+   119,
+   118
+  ]
+ },
+ {
+  "id": "idea-14",
+  "title": "His signal that configuration is nearly done: no more redrawing",
+  "title_ro": "Semnalul lui că configurarea e aproape gata: nu mai redesenează",
+  "category": "design_insight",
+  "topics": [
+   "How he builds",
+   "Testing & debugging"
+  ],
+  "detail": "Asked where he wants to be sure nothing is left broken, he named a marker rather than a step: the point at which he no longer has to redraw the process. It means he has been through every node and every component at least once, needs no new nodes or components, and everything left is about manipulating data he already has.",
+  "detail_ro": "Întrebat unde vrea să fie sigur că nu mai are nimic stricat, a numit un reper, nu un pas: momentul în care nu mai trebuie să redeseneze procesul. Înseamnă că a trecut prin fiecare nod și fiecare componentă măcar o dată, nu mai are nevoie de noduri sau componente noi, iar tot ce rămâne ține de manipularea datelor pe care le are deja.",
+  "quote": "un punct foarte bun e când nu mai am sfânta de redesenare pe proces",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   132,
+   131
+  ]
+ },
+ {
+  "id": "idea-15",
+  "title": "He is his own QA — nobody else tests the process",
+  "title_ro": "El e propriul QA — nimeni altcineva nu testează procesul",
+  "category": "context",
+  "topics": [
+   "Testing & debugging"
+  ],
+  "detail": "There is no separate tester on the process side: in theory they test it themselves. His hand-off to himself has a checklist he described aloud — look at where the data ends up, confirm everything processed as it should, confirm it arrived where it should, and confirm no errors or warnings anywhere in the process. Only then does he test it harder.",
+  "detail_ro": "Nu există un tester separat pe partea de proces: teoretic testează ei înșiși. Predarea către el însuși are o listă pe care a descris-o cu voce tare — se uită unde ajung datele, confirmă că totul s-a procesat cum trebuie, că a ajuns unde trebuie și că nu există erori sau warning-uri nicăieri în proces. Abia apoi îl testează mai dur.",
+  "quote": "N-am avut erori prin vreun proces, vreun warning, ceva? Și atunci e gata",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   136,
+   133,
+   134
+  ]
+ },
+ {
+  "id": "idea-16",
+  "title": "He has been working the project essentially alone",
+  "title_ro": "A lucrat pe proiect practic singur",
+  "category": "context",
+  "topics": [
+   "How he builds"
+  ],
+  "detail": "Context that frames everything above: five months into the company, on his second project, and for a stretch the only configurator on it after a colleague left. A second person joined the week before this conversation, and is newer than he is. There is no more experienced configurator beside him to ask.",
+  "detail_ro": "Context care încadrează tot ce e mai sus: la cinci luni în companie, la al doilea proiect, și o perioadă singurul configurator de pe el, după ce un coleg a plecat. O a doua persoană a venit cu o săptămână înainte de discuție și e mai nouă decât el. Nu există lângă el un configurator mai experimentat pe care să-l întrebe.",
+  "quote": "a fost Andrei Z., care a plecat între timp și am rămas singur o perioadă",
+  "speaker": "P",
+  "confidence": "high",
+  "needs": false,
+  "anchors": [
+   140,
+   138,
+   144
+  ]
+ }
+
+];
+
+// Romanian display labels for the per-session topic vocabulary (EN string = canonical
+// filter key; RO = display only). Missing keys fall back to the English label.
+const TOPICS_RO = {
+ "Learning & tooling": "Învățare & unelte",
+ "How he builds": "Cum construiește",
+ "Testing & debugging": "Testare & debugging",
+ "In-context errors": "Erori în context",
+ "Where issues should surface": "Unde ar trebui să apară issue-urile"
+
+};
+
+// Collapsed session summary shown atop the Ideas tab. A list of sections; each `kind`
+// (strengths | weaknesses | points) gets a fixed bilingual label from the template.
+// User-testing → strengths vs weaknesses; meeting → a single `points` list. Empty → hidden.
+const SUMMARY = [
+ {
+  "kind": "points",
+  "items": [
+   "An exploratory conversation, not a prototype test: no screen share, so each card points at a moment in the recording rather than at a screen.",
+   "He is five months in, on his second project, and has been the only configurator on it for a stretch — so his habits formed without a more experienced colleague beside him.",
+   "His build loop is granular: read the story until it is clear, define the flow himself, build roughly 80% from his head, then test script by script and node by node before joining them up.",
+   "He tests continuously while building, which is the opposite of the other configurator in this round — worth holding both when deciding when issues should appear.",
+   "The single clearest steer: he values a configuration-time check as a safety net, but if asked where the information would help most, he says runtime — richer debug and logs where a node actually runs.",
+   "In-context errors on components are working. He navigates by them, keeps them as a mental map of what he used where, and gave an unprompted example from minutes before the session."
+  ],
+  "items_ro": [
+   "O discuție exploratorie, nu un test pe prototip: fără screen share, deci fiecare card trimite la un moment din înregistrare, nu la un ecran.",
+   "E la cinci luni, la al doilea proiect, și o perioadă a fost singurul configurator de pe el — deci obiceiurile i s-au format fără un coleg mai experimentat alături.",
+   "Bucla lui de construcție e granulară: citește story-ul până e clar, își definește singur fluxul, construiește cam 80% din cap, apoi testează script cu script și nod cu nod înainte să le lege.",
+   "Testează continuu în timp ce construiește, exact opusul celuilalt configurator din runda asta — merită ținute amândouă când se decide când ar trebui să apară issue-urile.",
+   "Cel mai clar semnal: apreciază o verificare la momentul configurării ca plasă de siguranță, dar întrebat unde i-ar folosi cel mai mult informația, spune runtime — debug și loguri mai bogate acolo unde rulează efectiv un nod.",
+   "Erorile în context de pe componente funcționează. Se ghidează după ele, le ține ca hartă mentală a ce a folosit și unde, și a dat un exemplu nesolicitat de cu câteva minute înainte de sesiune."
+  ]
+ },
+ {
+  "kind": "strengths",
+  "items": [
+   "In-context errors on components guide him rather than annoy him: being told something is incomplete sends him back to the node, and he uses them to anticipate where a test might break.",
+   "The red marker on a dropped form element has not become a blind spot: he sees them and resolves them, and one told him how an upload button works minutes before this conversation.",
+   "A configuration-time check would be welcome as a safety net: extra confirmation that he got from point A to point B configured correctly.",
+   "He has a clear, articulable definition of nearly-done: no more redrawing the process, every node and component visited at least once, nothing left but manipulating data he already has.",
+   "He tests granularly as he builds — each script alone, then together — so he keeps control of what every node emits.",
+   "His deliberate gaps are systematically closed: he sweeps all of them again at testing and writes them down."
+  ],
+  "items_ro": [
+   "Erorile în context de pe componente îl ghidează, nu îl enervează: faptul că i se spune că ceva e incomplet îl trimite înapoi la nod, iar el le folosește ca să anticipeze unde ar putea crăpa un test.",
+   "Bulina roșie de pe un element de formular pus pe canvas n-a devenit blind spot: le vede și le rezolvă, iar una i-a spus cum funcționează un buton de upload cu câteva minute înainte de discuție.",
+   "O verificare la momentul configurării ar fi binevenită ca plasă de siguranță: o confirmare în plus că a ajuns din punctul A în punctul B configurat corect.",
+   "Are o definiție clară și exprimabilă a lui aproape-gata: nu mai redesenează procesul, fiecare nod și componentă vizitate măcar o dată, nimic rămas în afară de manipularea datelor pe care le are deja.",
+   "Testează granular în timp ce construiește — fiecare script separat, apoi împreună — ca să păstreze controlul asupra a ce scoate fiecare nod.",
+   "Golurile lui intenționate se închid sistematic: le parcurge din nou la testare și le notează."
+  ]
+ },
+ {
+  "kind": "weaknesses",
+  "items": [
+   "He would rather have the information at runtime than at configuration time: asked when a check would help most, he chose where a node actually runs, not where it is configured.",
+   "There is no way to compare a workflow's output against the input the receiving node expects: that comparison is exactly what would have caught his worked example sooner.",
+   "Data-model mismatches surface only at test: he assumed something would arrive, it did not, and the correlation could never have worked as modelled.",
+   "Naming decisions force deliberate gaps: until he has settled what a variable should be called he leaves it empty, so the platform shows errors for choices he has not made yet rather than for mistakes.",
+   "He keeps notes outside the platform: two agentic nodes in separate workflows mean tracking by hand which value comes from where.",
+   "There is no separate tester and no more experienced configurator on the project: he is his own QA, and the colleague who joined recently is newer than he is."
+  ],
+  "items_ro": [
+   "Ar prefera informația la runtime, nu la momentul configurării: întrebat când i-ar folosi cel mai mult o verificare, a ales acolo unde rulează efectiv un nod, nu unde se configurează.",
+   "Nu există nicio cale de a compara output-ul unui workflow cu input-ul pe care îl așteaptă nodul care primește: exact comparația care i-ar fi prins mai repede exemplul descris.",
+   "Nepotrivirile de data model apar abia la testare: a presupus că vine ceva, n-a venit, iar corelarea n-avea cum să funcționeze așa cum era modelată.",
+   "Deciziile de numire forțează goluri intenționate: până nu decide cum se numește o variabilă o lasă goală, deci platforma afișează erori pentru alegeri pe care încă nu le-a făcut, nu pentru greșeli.",
+   "Ține notițe în afara platformei: două noduri agentice în workflow-uri separate înseamnă urmărirea manuală a valorii care vine de unde.",
+   "Nu există tester separat și niciun configurator mai experimentat pe proiect: e propriul lui QA, iar colegul venit recent e mai nou decât el."
+  ]
+ }
+
+];
+
+const REPAIRS = {
+ "auto": [
+  [
+   "Ăă · ă · uh · mmm  (hesitation fillers)",
+   "__DROP__  (removed throughout, standalone only; sentence capitalisation restored)"
+  ],
+  [
+   "stutter repetitions — „de de”, „nu nu”, „exact exact”",
+   "collapsed"
+  ],
+  [
+   "user story · workflow · UI flow · data model · process data key · agentic node · response key · runtime · issues console",
+   "kept as spoken (platform vocabulary, correctly transcribed)"
+  ],
+  [
+   "KB-ul din Claude",
+   "kept as spoken (the internal knowledge base he queries)"
+  ]
+ ],
+ "confirm": [
+  [
+   "Recording transcribed in four parts",
+   "0–5, 5–9, 9–14 and 14–22 min, merged on absolute timestamps. Speech runs to the end of the file, with no silent tail."
+  ],
+  [
+   "Two female voices on the call",
+   "Horia is the only male voice, so every participant line — and therefore every card quote — is safely attributed. Antonia and Mădălina were separated by role: Antonia leads the questioning throughout, Mădălina asks a focused block about canvas error states between 14:23 and 17:27 and then leaves."
+  ]
+ ],
+ "query": [
+  [
+   "„RST” at 13:48",
+   "Almost certainly the same client he names at 01:41, rendered differently by the transcriber. Marked in the transcript; tell me and I will normalise it."
+  ]
+ ]
+
+};
+
+const turnToIdeas={};
+IDEAS.forEach(it=>it.anchors.forEach(a=>{(turnToIdeas[a]=turnToIdeas[a]||[]).push(it.id);}));
+const ORIG={};IDEAS.forEach(it=>{ORIG[it.id]=it;});
+const REVIEW={edits:{},notes:{},repairComments:{},repairSectionNote:"",turnComments:{},reportNote:""};
+function effective(it){return Object.assign({},it,REVIEW.edits[it.id]||{});}
+const SPK={"P": "Horia", "F": "Antonia", "O": "Mădălina", "B": "—"};
+
+// Session provenance — flattened onto every exported insight so each one is
+// self-describing in a cross-session pool. `id` (slug <feature>-<date>) is the namespace.
+const SESSION={"id": "configuration-workflow-horia-2026-09-15", "feature": "Configuration workflow — exploratory discussion", "date": "2026-09-15", "participant": "Horia"};
+
+// Screen-context frames — base64 JPEG keyed by idea id; ideas with frame:true render a
+// "⌖ view frame" toggle. Empty by default; filled per session when a recording is on disk.
+const FRAMES = {};
+
+// ---- Language (EN/RO) — switches the ANALYSIS only (card title/detail/topics,
+// category & confidence labels, masthead, note box). Quotes, speaker names, and all
+// UI chrome stay English. RO falls back to EN wherever a *_ro value is absent. ----
+const CAT_RO={pain_point:"problemă",feature_request:"cerere de funcționalitate",naming_copy:"denumire & text",design_decision:"decizie de design",design_insight:"insight de design",open_question:"întrebare deschisă",context:"context"};
+const CONF_RO={high:"ridicată",medium:"medie",low:"scăzută"};
+const TOPICS_RO_MAP=(typeof TOPICS_RO!=='undefined')?TOPICS_RO:{};
+let lang=(()=>{try{return localStorage.getItem('mi-lang')==='ro'?'ro':'en';}catch(e){return 'en';}})();
+function disp(it,key){if(lang==='ro'){const v=it[key+'_ro'];if(v!=null&&v!=='')return v;}return it[key];}
+function localizeTopic(t){return (lang==='ro'&&TOPICS_RO_MAP[t])?TOPICS_RO_MAP[t]:t;}
+function catLabel(c){return (lang==='ro'&&CAT_RO[c])?CAT_RO[c]:c.replace('_',' ');}
+function confLabel(c){return (lang==='ro'&&CONF_RO[c])?CONF_RO[c]:c;}
+function langKey(base){return lang==='ro'?base+'_ro':base;}
+function catOptLabel(c){return c==='all'?(lang==='ro'?'Toate categoriile':'All categories'):catLabel(c);}
+function topicOptLabel(t){return t==='all'?(lang==='ro'?'Toate subiectele':'All topics'):localizeTopic(t);}
+// Session-summary section labels (keyed by kind) + caption — fixed, bilingual.
+const SUM_LABELS={strengths:{en:"Strengths",ro:"Puncte forte"},weaknesses:{en:"Weak points",ro:"Puncte slabe"},points:{en:"Key points",ro:"Puncte principale"}};
+const SUM_CAP={en:"Session summary",ro:"Rezumatul sesiunii"};
+function sumLabel(kind){const l=SUM_LABELS[kind];return l?(lang==='ro'?l.ro:l.en):kind;}
+function sumItems(sec){return (lang==='ro'&&sec.items_ro&&sec.items_ro.length)?sec.items_ro:(sec.items||[]);}
+function renderSummary(){
+  const box=document.getElementById('summaryBox');if(!box)return;
+  const secs=(typeof SUMMARY!=='undefined'?SUMMARY:[]).filter(s=>s&&(s.items||[]).length);
+  if(!secs.length){box.style.display='none';return;}
+  box.style.display='';
+  document.getElementById('sum-cap').textContent=lang==='ro'?SUM_CAP.ro:SUM_CAP.en;
+  document.getElementById('sum-body').innerHTML=secs.map(s=>
+    `<div class="sum-sec ${s.kind}"><h4>${esc(sumLabel(s.kind))}</h4><ul>${sumItems(s).map(it=>`<li>${esc(it)}</li>`).join('')}</ul></div>`).join('');
+}
+function applyMastLang(){
+  document.querySelectorAll('[data-ro]').forEach(el=>{
+    if(el.dataset.en==null)el.dataset.en=el.innerHTML;
+    el.innerHTML=(lang==='ro'&&el.dataset.ro)?el.dataset.ro:el.dataset.en;});
+}
+function setLang(l){
+  lang=(l==='ro')?'ro':'en';
+  try{localStorage.setItem('mi-lang',lang);}catch(e){}
+  document.getElementById('lang-en').setAttribute('aria-pressed',lang==='en');
+  document.getElementById('lang-ro').setAttribute('aria-pressed',lang==='ro');
+  document.documentElement.lang=lang;
+  applyMastLang();
+  renderSummary();
+  // relabel filter dropdowns — values are unchanged, so the active filter is preserved
+  sel.querySelectorAll('option').forEach(o=>o.textContent=catOptLabel(o.value));
+  topicSel.querySelectorAll('option').forEach(o=>o.textContent=topicOptLabel(o.value));
+  // re-render every card not currently being edited
+  IDEAS.forEach(it=>{const card=document.getElementById('c-'+it.id);
+    if(card&&!card.classList.contains('editing'))rerenderCard(it.id);});
+  applyFilter();
+  if(document.getElementById('exportPanel').classList.contains('show'))renderOut();
+}
+
+const scriptEl=document.getElementById('script');
+TURNS.forEach((t,i)=>{
+  const d=document.createElement('div');
+  d.className='turn '+t[0]+(turnToIdeas[i]?' anchored':'');
+  d.id='t-'+i;
+  d.innerHTML=`<div class="meta-r"><span class="spk">${SPK[t[0]]}</span><span class="ts mono">${t[1]}</span></div><span class="txt">${t[2]}</span>`;
+  if(turnToIdeas[i]) d.addEventListener('click',e=>{ if(e.target.classList.contains('unsure'))return; locate(turnToIdeas[i][0],true); });
+  const btn=document.createElement('button');btn.className='rowtool';btn.textContent='💬';
+  btn.title='Comment on this line';
+  btn.addEventListener('click',e=>{e.stopPropagation();toggleTurnComment(i,d);});
+  d.appendChild(btn);
+  scriptEl.appendChild(d);
+});
+
+const kept=new Set(IDEAS.map(i=>i.id)); // all cards included by default
+const ideasEl=document.getElementById('ideas');
+function titleOf(id){const x=IDEAS.find(i=>i.id===id);return x?disp(x,'title'):id;}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cardHTML(it){
+  const q=it.needs?`<div class="query"><b>?</b><div><b>Needs confirmation — </b>${it.q}</div></div>`:'';
+  const src=TURNS[it.anchors[0]][1];
+  const nturns=it.anchors.length>1?`<span class="srcn"> · ${it.anchors.length} lines</span>`:'';
+  const topics=(it.topics&&it.topics.length)?`<div class="topics">${it.topics.map(t=>`<span class="topic">${esc(localizeTopic(t))}</span>`).join('')}</div>`:'';
+  const tension=(it.conflictsWith&&it.conflictsWith.length)?`<div class="tension"><span class="tlabel">⚡ In tension with</span>${it.conflictsWith.map(cid=>`<button class="tlink" onclick="event.stopPropagation();locate('${cid}',true)">${titleOf(cid)}</button>`).join('')}</div>`:'';
+  const frame=(it.frame&&typeof FRAMES!=='undefined'&&FRAMES[it.id])?`<div class="framewrap"><button class="framebtn" onclick="event.stopPropagation();toggleFrame('${it.id}',this)">⌖ hide frame</button><figure class="frame" id="fr-${it.id}"><img loading="lazy" src="${FRAMES[it.id]}" alt="screen at ${src}"><figcaption>Screen at ${src}</figcaption></figure></div>`:'';
+  return `<input type="checkbox" class="keep"${kept.has(it.id)?' checked':''} onchange="toggle('${it.id}',this.checked)" onclick="event.stopPropagation()" aria-label="keep">
+    <div>
+      <div class="tagrow">
+        <span class="tag ${it.category}">${esc(catLabel(it.category))}</span>
+        <span class="conf ${it.confidence}"><span class="dot"></span>${esc(confLabel(it.confidence))}</span>
+        <span class="src">⌖ ${src}${nturns}</span>
+      </div>
+      <h3>${esc(disp(it,'title'))}</h3>
+      <p class="detail">${esc(disp(it,'detail'))}</p>
+      <blockquote class="quote">“${esc(it.quote)}”</blockquote>
+      <div class="who">${SPK[it.speaker]==='Facil.'?'Facilitator':SPK[it.speaker]}</div>
+      ${q}
+      ${tension}
+      ${topics}
+      ${frame}
+    </div>`;
+}
+function toggleFrame(id,btn){const f=document.getElementById('fr-'+id);const nowHidden=f.classList.toggle('hidden');btn.textContent=nowHidden?'⌖ view frame':'⌖ hide frame';}
+// every id involved in a conflict (own links + cards others link to), for the filter
+const conflictIds=new Set();
+IDEAS.forEach(it=>(it.conflictsWith||[]).forEach(cid=>{conflictIds.add(it.id);conflictIds.add(cid);}));
+IDEAS.forEach(it=>{
+  const card=document.createElement('div');
+  card.className='card';card.id='c-'+it.id;card.dataset.cat=it.category;
+  card.dataset.topics=(it.topics||[]).join('|');
+  card.dataset.conflict=conflictIds.has(it.id)?'1':'';
+  card.addEventListener('click',()=>{if(card.classList.contains('editing'))return;locate(it.id,false);});
+  ideasEl.appendChild(card);
+  rerenderCard(it.id);
+});
+refresh(); // seed kept counters (all cards included by default)
+
+// category + topic filters (ANDed)
+const cats=['all',...new Set(IDEAS.map(i=>i.category))];
+const sel=document.getElementById('catFilter');
+cats.forEach(c=>{const o=document.createElement('option');o.value=c;
+  o.textContent=catOptLabel(c);sel.appendChild(o);});
+const topicSel=document.getElementById('topicFilter');
+const topicList=['all',...new Set(IDEAS.flatMap(i=>i.topics||[]))];
+topicList.forEach(t=>{const o=document.createElement('option');o.value=t;
+  o.textContent=topicOptLabel(t);topicSel.appendChild(o);});
+renderTaxo();
+let conflictsOnly=false;
+function toggleConflicts(){conflictsOnly=!conflictsOnly;
+  document.getElementById('conflictToggle').setAttribute('aria-pressed',conflictsOnly);applyFilter();}
+function renderTaxo(){
+  const el=document.getElementById('taxo'); if(!el) return;
+  const cc={},tc={};
+  IDEAS.forEach(i=>{cc[i.category]=(cc[i.category]||0)+1;
+    (i.topics||[]).forEach(t=>{tc[t]=(tc[t]||0)+1;});});
+  const catChips=Object.keys(cc).map(c=>
+    `<button class="chip cat c-${c}" data-k="cat" data-v="${esc(c)}">${esc(catLabel(c))}<span class="n">${cc[c]}</span></button>`).join('');
+  const topChips=Object.keys(tc).map(t=>
+    `<button class="chip" data-k="topic" data-v="${esc(t)}">${esc(localizeTopic(t))}<span class="n">${tc[t]}</span></button>`).join('');
+  el.innerHTML=
+    `<div class="taxo-row"><span class="taxo-lab">Categories</span>`+
+    `<button class="chip" data-k="cat" data-v="all">All<span class="n">${IDEAS.length}</span></button>${catChips}</div>`+
+    `<div class="taxo-row"><span class="taxo-lab">Topics</span>`+
+    `<button class="chip" data-k="topic" data-v="all">All<span class="n">${IDEAS.length}</span></button>${topChips}</div>`;
+  el.querySelectorAll('.chip').forEach(b=>{b.onclick=()=>{
+    if(b.dataset.k==='cat') sel.value=b.dataset.v; else topicSel.value=b.dataset.v;
+    applyFilter();};});
+  syncTaxo();
+}
+function syncTaxo(){
+  document.querySelectorAll('#taxo .chip').forEach(b=>{
+    const on=(b.dataset.k==='cat')?(sel.value===b.dataset.v):(topicSel.value===b.dataset.v);
+    b.classList.toggle('active',on);});
+}
+function applyFilter(){syncTaxo();const c=sel.value,t=topicSel.value;
+  document.querySelectorAll('.card').forEach(card=>{
+    const okCat=(c==='all'||card.dataset.cat===c);
+    const okTopic=(t==='all'||(card.dataset.topics||'').split('|').includes(t));
+    const okConflict=(!conflictsOnly||card.dataset.conflict==='1');
+    card.style.display=(okCat&&okTopic&&okConflict)?'':'none';});}
+
+const repEl=document.getElementById('repairs');
+function repSection(title,arr,bucket){
+  const sec=document.createElement('div');sec.className='repsec';
+  const rows=arr.map(([o,f])=>{
+    if(bucket==='query')return `<div class="rep"><span class="b query">query</span><span class="orig mono">${o}</span><span class="arrow">→</span><span class="qtext">${f}</span></div>`;
+    const fix=f==='__DROP__'?`<span class="fix drop mono">[dropped — fragments]</span>`:`<span class="fix mono">${f}</span>`;
+    return `<div class="rep"><span class="b ${bucket}">${bucket}</span><span class="orig mono">${o}</span><span class="arrow">→</span>${fix}</div>`;
+  }).join('');
+  sec.innerHTML=`<h2>${title} <button class="sectool" data-bucket="${bucket}">💬 comment on this section</button></h2>${rows}`;
+  repEl.appendChild(sec);
+  // section comment
+  sec.querySelector('.sectool').addEventListener('click',e=>toggleSectionComment(bucket,sec));
+  // per-row comment tools
+  sec.querySelectorAll('.rep').forEach((row,i)=>{
+    const orig=arr[i][0];
+    const btn=document.createElement('button');btn.className='rowtool';btn.textContent='💬';
+    btn.title='Comment on this repair';
+    btn.addEventListener('click',()=>toggleRepairComment(bucket,orig,row));
+    row.appendChild(btn);
+  });
+}
+repSection('Applied confidently',REPAIRS.auto,'auto');
+repSection('Best guess — confirm',REPAIRS.confirm,'confirm');
+repSection('Needs your input',REPAIRS.query,'query');
+
+const repCount=REPAIRS.auto.length+REPAIRS.confirm.length+REPAIRS.query.length;
+set('m-ideas',IDEAS.length);set('m-rep',repCount);
+set('m-query',REPAIRS.query.length+IDEAS.filter(i=>i.needs).length);
+function set(id,v){document.getElementById(id).textContent=v;}
+
+let activeCard=null;
+function locate(id,fromTranscript){
+  const it=IDEAS.find(x=>x.id===id);if(!it)return;
+  document.querySelectorAll('.turn.hl,.turn.hl-primary').forEach(e=>e.classList.remove('hl','hl-primary'));
+  if(activeCard)document.getElementById('c-'+activeCard)?.classList.remove('active');
+  activeCard=id;
+  const card=document.getElementById('c-'+id);card.classList.add('active');
+  it.anchors.forEach((a,idx)=>{const tn=document.getElementById('t-'+a);if(tn)tn.classList.add(idx===0?'hl-primary':'hl');});
+  const first=document.getElementById('t-'+it.anchors[0]);if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+  if(fromTranscript)card.scrollIntoView({behavior:'smooth',block:'center'});
+  updateEdgeHints();
+}
+// Off-screen edge indicators: when the active idea's source turns sit outside the
+// visible transcript, show "N above / N below" pills that jump to the nearest one.
+const EDGE_PAD=4;
+function activeAnchorEls(){if(!activeCard)return[];const it=IDEAS.find(x=>x.id===activeCard);
+  return it?it.anchors.map(a=>document.getElementById('t-'+a)).filter(Boolean):[];}
+function updateEdgeHints(){
+  const up=document.getElementById('edge-up'),dn=document.getElementById('edge-dn');
+  const sc=document.getElementById('script'),scRect=sc.getBoundingClientRect();
+  let above=0,below=0;
+  activeAnchorEls().forEach(el=>{const r=el.getBoundingClientRect();
+    if(r.bottom<scRect.top+EDGE_PAD)above++;else if(r.top>scRect.bottom-EDGE_PAD)below++;});
+  up.classList.toggle('show',above>0);document.getElementById('edge-up-n').textContent=above+(above===1?' line':' lines');
+  dn.classList.toggle('show',below>0);document.getElementById('edge-dn-n').textContent=below+(below===1?' line':' lines');
+}
+function jumpEdge(dir){
+  const sc=document.getElementById('script'),scRect=sc.getBoundingClientRect();
+  const off=activeAnchorEls().map(el=>({el,r:el.getBoundingClientRect()}))
+    .filter(o=>dir<0?o.r.bottom<scRect.top+EDGE_PAD:o.r.top>scRect.bottom-EDGE_PAD);
+  if(!off.length)return;
+  const target=dir<0?off.reduce((a,b)=>b.r.top>a.r.top?b:a):off.reduce((a,b)=>b.r.top<a.r.top?b:a);
+  target.el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+(function(){let raf=0;const sc=document.getElementById('script');
+  const tick=()=>{raf=0;updateEdgeHints();};
+  sc.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(tick);},{passive:true});
+  addEventListener('resize',()=>{if(!raf)raf=requestAnimationFrame(tick);});})();
+
+function toggle(id,on){on?kept.add(id):kept.delete(id);document.getElementById('c-'+id).classList.toggle('excluded',!on);refresh();commitReviewChange();}
+function refresh(){document.getElementById('m-kept').textContent=kept.size;
+  if(document.getElementById('exportPanel').classList.contains('show'))renderOut();}
+function selectAll(on){document.querySelectorAll('.card').forEach(card=>{ if(card.style.display==='none')return;
+  const cb=card.querySelector('.keep');cb.checked=on;const id=card.id.slice(2);on?kept.add(id):kept.delete(id);card.classList.toggle('excluded',!on);});refresh();commitReviewChange();}
+function showTab(t){['ideas','rep','how'].forEach(name=>{
+  document.getElementById('view-'+name).classList.toggle('hidden',name!==t);
+  document.getElementById('tab-'+name).setAttribute('aria-selected',name===t);});}
+
+let fmt='md';
+function openExport(){document.getElementById('exportPanel').classList.add('show');renderOut();document.getElementById('exportPanel').scrollIntoView({behavior:'smooth',block:'nearest'});}
+function closeExport(){document.getElementById('exportPanel').classList.remove('show');}
+function setFmt(f){fmt=f;document.getElementById('fmt-md').setAttribute('aria-pressed',f==='md');document.getElementById('fmt-json').setAttribute('aria-pressed',f==='json');renderOut();}
+function keptList(){return IDEAS.filter(i=>kept.has(i.id));}
+function renderOut(){document.getElementById('outBox').value=fmt==='md'?toMd():toJson();}
+function toJson(){return JSON.stringify(keptList().map(it=>{
+  const{id,title,title_ro,category,topics,detail,detail_ro,quote,speaker,confidence,needs,q,anchors}=it;
+  const row={id:SESSION.id+':'+id,session:SESSION.id,feature:SESSION.feature,date:SESSION.date,participant:SESSION.participant,
+    title,category,topics:topics||[],detail,evidence_quote:quote,speaker:SPK[speaker],confidence,
+    needs_confirmation:!!needs,question:q||null,timestamps:anchors.map(a=>TURNS[a][1])};
+  // bilingual fields (language-independent of the current view) for the downstream pool
+  if(title_ro)row.title_ro=title_ro;
+  if(detail_ro)row.detail_ro=detail_ro;
+  if(topics&&topics.length)row.topics_ro=topics.map(t=>TOPICS_RO_MAP[t]||t);
+  return row;}),null,2);}
+function toMd(){const list=keptList();if(!list.length)return "# Nothing kept yet — check some ideas.";
+  const g={};list.forEach(i=>{(g[i.category]=g[i.category]||[]).push(i);});
+  const label={pain_point:"Pain points",feature_request:"Feature requests",naming_copy:"Naming & copy",
+    design_decision:"Design decisions",design_insight:"Design insights",open_question:"Open questions",context:"Context"};
+  let out=`# ${SESSION.feature} — kept ideas (${list.length})\n_Session ${SESSION.id} · ${SESSION.date} · participant ${SESSION.participant}_\n`;
+  for(const c in g){out+=`\n## ${label[c]||c}\n`;g[c].forEach(i=>{out+=`- **${i.title}** — ${i.detail}\n  > ${i.quote}  _(${SPK[i.speaker]}, ${TURNS[i.anchors[0]][1]})_\n`;
+    if(i.topics&&i.topics.length)out+=`  > _Topics: ${i.topics.join(', ')}_\n`;
+    if(i.needs)out+=`  > _Needs confirmation: ${i.q}_\n`;});}
+  return out;}
+function copyOut(){const t=document.getElementById('outBox');t.select();navigator.clipboard.writeText(t.value).then(()=>toast('Copied'));}
+function downloadOut(){const blob=new Blob([document.getElementById('outBox').value],{type:fmt==='md'?'text/markdown':'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kept-ideas.'+(fmt==='md'?'md':'json');a.click();URL.revokeObjectURL(a.href);toast('Downloaded');}
+// ---- Review round-trip ----
+const CATS=['pain_point','feature_request','naming_copy','design_decision','design_insight','open_question','context'];
+const CONFS=['high','medium','low'];
+function nonEmpty(s){return typeof s==='string'&&s.trim().length>0;}
+function changedFields(id){
+  const e=REVIEW.edits[id];if(!e)return{};const o=ORIG[id],out={};
+  for(const k in e){const a=k==='topics'?(o.topics||[]):o[k];
+    if(JSON.stringify(a)!==JSON.stringify(e[k]))out[k]=e[k];}
+  return out;
+}
+function buildPacket(){
+  const cards=[];
+  IDEAS.forEach(it=>{
+    const ch=changedFields(it.id),note=REVIEW.notes[it.id],excluded=!kept.has(it.id);
+    const hasEdit=Object.keys(ch).length>0;
+    if(hasEdit||excluded||nonEmpty(note)){const c={id:it.id};
+      if(excluded)c.excluded=true;if(hasEdit)c.edits=ch;if(nonEmpty(note))c.note=note.trim();cards.push(c);}
+  });
+  const repairs=[];
+  Object.keys(REVIEW.repairComments).forEach(key=>{const cm=REVIEW.repairComments[key];
+    if(!nonEmpty(cm))return;const ix=key.indexOf('\t');
+    repairs.push({bucket:key.slice(0,ix),orig:key.slice(ix+1),comment:cm.trim()});});
+  const turns=[];
+  Object.keys(REVIEW.turnComments).forEach(i=>{const cm=REVIEW.turnComments[i];
+    if(nonEmpty(cm))turns.push({i:+i,comment:cm.trim()});});
+  const p={session:SESSION.id};
+  if(nonEmpty(REVIEW.reportNote))p.report_note=REVIEW.reportNote.trim();
+  if(cards.length)p.cards=cards;
+  if(repairs.length)p.repairs=repairs;
+  if(nonEmpty(REVIEW.repairSectionNote))p.repair_section_note=REVIEW.repairSectionNote.trim();
+  if(turns.length)p.turns=turns;
+  return p;
+}
+function packetCounts(){
+  let edits=0,comments=0,excluded=0;
+  IDEAS.forEach(it=>{if(Object.keys(changedFields(it.id)).length)edits++;
+    if(!kept.has(it.id))excluded++;if(nonEmpty(REVIEW.notes[it.id]))comments++;});
+  Object.values(REVIEW.repairComments).forEach(c=>{if(nonEmpty(c))comments++;});
+  Object.values(REVIEW.turnComments).forEach(c=>{if(nonEmpty(c))comments++;});
+  if(nonEmpty(REVIEW.repairSectionNote))comments++;
+  if(nonEmpty(REVIEW.reportNote))comments++;
+  return {edits,comments,excluded};
+}
+function renderTally(){
+  const {edits,comments,excluded}=packetCounts();
+  const parts=[];
+  parts.push(`<em>${edits}</em> edit${edits===1?'':'s'}`);
+  parts.push(`<em>${comments}</em> comment${comments===1?'':'s'}`);
+  parts.push(`<em>${excluded}</em> excluded`);
+  document.getElementById('review-tally').innerHTML=parts.join(' · ');
+  document.getElementById('sendReview').disabled=(edits+comments+excluded===0);
+}
+function commitReviewChange(){renderTally();
+  if(document.getElementById('reviewPanel').classList.contains('show'))renderReview();}
+let rfmt='json';
+function packetToMd(p){
+  let o=`# Review for ${p.session}\n`;
+  if(p.report_note)o+=`\n**Report note:** ${p.report_note}\n`;
+  (p.cards||[]).forEach(c=>{o+=`\n## ${c.id}${c.excluded?' — EXCLUDED':''}\n`;
+    if(c.edits)for(const k in c.edits)o+=`- edit \`${k}\` → ${JSON.stringify(c.edits[k])}\n`;
+    if(c.note)o+=`- note: ${c.note}\n`;});
+  if(p.repairs&&p.repairs.length){o+=`\n## Repairs\n`;
+    p.repairs.forEach(r=>{o+=`- [${r.bucket}] \`${r.orig}\` — ${r.comment}\n`;});}
+  if(p.repair_section_note)o+=`\n**Repair-log note:** ${p.repair_section_note}\n`;
+  if(p.turns&&p.turns.length){o+=`\n## Transcript\n`;
+    p.turns.forEach(t=>{o+=`- turn ${t.i} (${TURNS[t.i]?TURNS[t.i][1]:'?'}): ${t.comment}\n`;});}
+  return o;
+}
+function renderReview(){const p=buildPacket();
+  document.getElementById('reviewBox').value=rfmt==='json'?JSON.stringify(p,null,2):packetToMd(p);}
+function openReview(){document.getElementById('reviewPanel').classList.add('show');renderReview();
+  document.getElementById('reviewPanel').scrollIntoView({behavior:'smooth',block:'nearest'});}
+function closeReview(){document.getElementById('reviewPanel').classList.remove('show');}
+function setReviewFmt(f){rfmt=f;document.getElementById('rfmt-json').setAttribute('aria-pressed',f==='json');
+  document.getElementById('rfmt-md').setAttribute('aria-pressed',f==='md');renderReview();}
+function copyReview(){const t=document.getElementById('reviewBox');t.select();
+  navigator.clipboard.writeText(t.value).then(()=>toast('Copied'));}
+function downloadReview(){const ext=rfmt==='json'?'json':'md';
+  const blob=new Blob([document.getElementById('reviewBox').value],
+    {type:rfmt==='json'?'application/json':'text/markdown'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='review-'+SESSION.id+'.'+ext;a.click();URL.revokeObjectURL(a.href);toast('Downloaded');}
+renderTally();
+function rerenderCard(id){
+  const it=IDEAS.find(x=>x.id===id);const card=document.getElementById('c-'+id);
+  card.classList.remove('editing');
+  card.innerHTML=cardHTML(effective(it));
+  attachCardTools(card,it);applyCardState(card,id);
+}
+function applyCardState(card,id){
+  const edited=Object.keys(changedFields(id)).length>0;
+  card.classList.toggle('has-edit',edited);
+  card.classList.toggle('has-note',nonEmpty(REVIEW.notes[id]));
+  card.classList.toggle('excluded',!kept.has(id));
+  const body=card.querySelector(':scope > div:not(.cardtools)'); // the <div> from cardHTML
+  let flags=card.querySelector('.flags');if(flags)flags.remove();
+  const tags=[];
+  if(edited)tags.push({cls:'edit',label:'edited',title:'Undo edits — restore the original wording',act:()=>revertEdit(id)});
+  if(nonEmpty(REVIEW.notes[id]))tags.push({cls:'note',label:'comment',title:'Remove this comment',act:()=>removeNote(id)});
+  if(tags.length){const f=document.createElement('div');f.className='flags';
+    tags.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='flag '+t.cls;b.title=t.title;
+      b.innerHTML=`${t.label} <span class="flag-x">✕</span>`;
+      b.addEventListener('click',ev=>{ev.stopPropagation();t.act();});
+      f.appendChild(b);});
+    body.appendChild(f);}
+}
+function revertEdit(id){delete REVIEW.edits[id];rerenderCard(id);commitReviewChange();}
+function removeNote(id){delete REVIEW.notes[id];rerenderCard(id);commitReviewChange();}
+function attachCardTools(card,it){
+  const t=document.createElement('div');t.className='cardtools';
+  t.innerHTML=`<button data-t="edit">✎ Edit</button><button data-t="comment">💬 Comment</button>`;
+  t.querySelectorAll('button').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation();const k=b.dataset.t;
+    if(k==='edit')enterEdit(it.id);
+    else if(k==='comment')toggleCardComment(it.id);}));
+  card.appendChild(t);
+}
+function enterEdit(id){
+  const it=IDEAS.find(x=>x.id===id);const card=document.getElementById('c-'+id);
+  // compute effective BEFORE assigning undefined-keyed edit object (Object.assign copies undefineds)
+  const eff=effective(it);
+  // title/detail edits land on the active-language field (title_ro/detail_ro in RO);
+  // quote, category, confidence and topics are language-neutral (quote is always Romanian).
+  const tk=langKey('title'),dk=langKey('detail');
+  const e=REVIEW.edits[id]=Object.assign({[tk]:undefined,[dk]:undefined,quote:undefined,
+    category:undefined,confidence:undefined,topics:undefined},REVIEW.edits[id]||{});
+  // seed from the displayed values (an RO edit falls back to the EN text when no _ro exists yet)
+  if(e[tk]===undefined)e[tk]=disp(eff,'title');
+  if(e[dk]===undefined)e[dk]=disp(eff,'detail');
+  ['quote','category','confidence'].forEach(k=>{if(e[k]===undefined)e[k]=eff[k];});
+  if(e.topics===undefined)e.topics=(eff.topics||[]).slice();
+  card.classList.add('editing');
+  card.innerHTML=cardEditHTML(it,e);
+  // tool cluster shows Done
+  const t=document.createElement('div');t.className='cardtools';
+  t.innerHTML=`<button data-t="revert">↺ Revert</button><button data-t="done" class="on">✓ Done</button>`;
+  t.querySelectorAll('button').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();
+    b.dataset.t==='revert'?revertEdit(id):commitEdit(id);}));
+  card.appendChild(t);
+  wireEdit(card,id);
+}
+function cardEditHTML(it,e){
+  const src=TURNS[it.anchors[0]][1];
+  const tk=langKey('title'),dk=langKey('detail');
+  const catOpts=CATS.map(c=>`<option value="${c}"${c===e.category?' selected':''}>${catLabel(c)}</option>`).join('');
+  const confOpts=CONFS.map(c=>`<option value="${c}"${c===e.confidence?' selected':''}>${confLabel(c)}</option>`).join('');
+  const chips=(e.topics||[]).map((tp,i)=>`<span class="topic echip" data-i="${i}">${tp}<button data-rm="${i}">×</button></span>`).join('');
+  return `<input type="checkbox" class="keep" disabled${kept.has(it.id)?' checked':''} aria-label="keep">
+    <div>
+      <div class="tagrow">
+        <select class="esel" data-f="category">${catOpts}</select>
+        <select class="esel" data-f="confidence">${confOpts}</select>
+        <span class="src">⌖ ${src}</span>
+      </div>
+      <h3 class="efield" contenteditable="true" data-f="${tk}">${e[tk]}</h3>
+      <p class="detail efield" contenteditable="true" data-f="${dk}">${e[dk]}</p>
+      <blockquote class="quote efield" contenteditable="true" data-f="quote">${e.quote}</blockquote>
+      <div class="topics" data-topics-edit>${chips}<input class="topic-add" placeholder="+ topic" /></div>
+    </div>`;
+}
+function wireEdit(card,id){
+  const e=REVIEW.edits[id];
+  card.querySelectorAll('.efield').forEach(el=>{
+    el.addEventListener('click',ev=>ev.stopPropagation());
+    el.addEventListener('input',()=>{e[el.dataset.f]=el.textContent;commitReviewChange();});});
+  card.querySelectorAll('.esel').forEach(sel=>{
+    sel.addEventListener('click',ev=>ev.stopPropagation());
+    sel.addEventListener('change',()=>{e[sel.dataset.f]=sel.value;commitReviewChange();});});
+  const tw=card.querySelector('[data-topics-edit]');
+  tw.addEventListener('click',ev=>{ev.stopPropagation();
+    const rm=ev.target.getAttribute('data-rm');
+    if(rm!==null){e.topics.splice(+rm,1);redrawTopics(card,id);commitReviewChange();}});
+  const add=tw.querySelector('.topic-add');
+  add.addEventListener('keydown',ev=>{ev.stopPropagation();
+    if(ev.key==='Enter'&&nonEmpty(add.value)){e.topics.push(add.value.trim());add.value='';
+      redrawTopics(card,id);commitReviewChange();}});
+}
+function redrawTopics(card,id){
+  const e=REVIEW.edits[id],tw=card.querySelector('[data-topics-edit]');
+  const chips=(e.topics||[]).map((tp,i)=>`<span class="topic echip" data-i="${i}">${tp}<button data-rm="${i}">×</button></span>`).join('');
+  tw.innerHTML=chips+'<input class="topic-add" placeholder="+ topic" />';
+  const add=tw.querySelector('.topic-add');
+  add.addEventListener('keydown',ev=>{ev.stopPropagation();
+    if(ev.key==='Enter'&&nonEmpty(add.value)){e.topics.push(add.value.trim());add.value='';
+      redrawTopics(card,id);commitReviewChange();}});
+}
+function commitEdit(id){
+  // prune unchanged fields so the packet only carries real edits
+  const ch=changedFields(id);
+  if(Object.keys(ch).length===0)delete REVIEW.edits[id];else REVIEW.edits[id]=ch;
+  rerenderCard(id);commitReviewChange();
+}
+function commentField(initial,onChange,placeholder,showRemove){
+  const wrap=document.createElement('div');wrap.className='cmt';
+  const ta=document.createElement('textarea');ta.className='cmt-in';
+  ta.value=initial||'';ta.placeholder=placeholder||'Comment for Claude…';
+  ta.addEventListener('click',e=>e.stopPropagation());
+  ta.addEventListener('input',()=>onChange(ta.value));
+  wrap.appendChild(ta);
+  // showRemove defaults true; card comments pass false since their "comment ✕" chip already removes
+  if(showRemove!==false){
+    const rm=document.createElement('button');rm.type='button';rm.className='cmt-rm';rm.textContent='Remove comment';
+    rm.addEventListener('click',e=>{e.stopPropagation();onChange('');wrap.remove();});
+    wrap.appendChild(rm);
+  }
+  return wrap;
+}
+function toggleCardComment(id){
+  const card=document.getElementById('c-'+id);
+  const host=card.querySelector(':scope > div'); // the card body <div> from cardHTML
+  let box=host.querySelector(':scope > .cmt');
+  if(box){const ta=box.querySelector('.cmt-in');ta.focus();return;}
+  box=commentField(REVIEW.notes[id]||'',v=>{REVIEW.notes[id]=v;applyCardState(card,id);commitReviewChange();},'What should change about this insight? (merge, re-scope, wrong speaker…)',false);
+  host.appendChild(box);box.querySelector('.cmt-in').focus();
+}
+function toggleReportNote(btn){
+  const host=btn.parentElement;let box=host.querySelector('.cmt');
+  if(box){box.querySelector('.cmt-in').focus();return;}
+  box=commentField(REVIEW.reportNote,v=>{REVIEW.reportNote=v;
+    btn.classList.toggle('on',nonEmpty(v));commitReviewChange();},
+    'Overall direction: too many cards, wrong framing, merge these two…');
+  host.appendChild(box);box.querySelector('.cmt-in').focus();
+}
+function repairKey(bucket,orig){return bucket+'\t'+orig;}
+function toggleRepairComment(bucket,orig,row){
+  let box=row.querySelector(':scope > .cmt');
+  if(box){box.querySelector('.cmt-in').focus();return;}
+  const key=repairKey(bucket,orig);const btn=row.querySelector('.rowtool');
+  box=commentField(REVIEW.repairComments[key]||'',v=>{REVIEW.repairComments[key]=v;
+    btn.classList.toggle('on',nonEmpty(v));commitReviewChange();},'Comment on this repair (e.g. leave as-is, wrong fix)…');
+  box.classList.add('inline');row.appendChild(box);box.querySelector('.cmt-in').focus();
+  btn.classList.toggle('on',nonEmpty(REVIEW.repairComments[key]));
+}
+function toggleSectionComment(bucket,sec){
+  let box=sec.querySelector(':scope > .cmt');const btn=sec.querySelector('.sectool');
+  if(box){box.querySelector('.cmt-in').focus();return;}
+  box=commentField(REVIEW.repairSectionNote,v=>{REVIEW.repairSectionNote=v;
+    btn.classList.toggle('on',nonEmpty(v));commitReviewChange();},'Comment on the repair log as a whole…');
+  box.classList.add('inline');sec.appendChild(box);box.querySelector('.cmt-in').focus();
+}
+function toggleTurnComment(i,turn){
+  let box=turn.querySelector(':scope > .cmt');const btn=turn.querySelector('.rowtool');
+  if(box){box.querySelector('.cmt-in').focus();return;}
+  box=commentField(REVIEW.turnComments[i]||'',v=>{REVIEW.turnComments[i]=v;
+    btn.classList.toggle('on',nonEmpty(v));commitReviewChange();},'Comment on this line (e.g. wrong speaker, misattributed)…');
+  box.classList.add('inline');turn.appendChild(box);box.querySelector('.cmt-in').focus();
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);}
+setLang(lang); // apply the persisted language (no-op for EN; switches everything to RO if saved)
+</script>
+</body>
+</html>
