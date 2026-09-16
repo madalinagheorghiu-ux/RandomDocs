@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global navigation in the FlowX platform — synthesis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF8F1; --paper-2:#F3EEE2; --ink:#211F1B; --ink-soft:#5A554C;
+    --rule:#D8D1C0; --mark:#B23A2E; --amber:#9C7A1E; --green:#2E6F5E;
+    --blue:#3A5A78; --plum:#6E4A6B; --hl:#FBF1D9; --shadow:rgba(33,31,27,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:14px;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:860px;margin:0 auto;padding:0 24px 64px}
+
+  header.mast{border-bottom:1px solid var(--rule);margin-top:36px;margin-bottom:20px;padding-bottom:16px}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  h1{font-size:24px;line-height:1.2;margin:8px 0 6px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 6px;max-width:62ch}
+  .who{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-top:12px}
+  .who span{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--rule);
+    border-radius:999px;padding:4px 12px}
+  .who b{color:var(--ink);font-weight:600}
+
+  h2{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:44px 0 4px;
+     padding-top:20px;border-top:1px solid var(--rule)}
+  h2 .n{color:var(--ink-soft);font-weight:600;margin-right:8px}
+  h3{font-size:16px;font-weight:600;margin:30px 0 8px;letter-spacing:-.01em}
+  h3 .n{color:var(--ink-soft);font-weight:600;margin-right:6px}
+  .lede{color:var(--ink-soft);font-size:13.5px;margin:2px 0 6px;max-width:66ch}
+
+  .block{margin:14px 0 22px}
+  .blabel{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    display:flex;align-items:center;gap:7px;margin-bottom:9px}
+  .blabel::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+  .k .blabel{color:var(--ink-soft)}
+  .s .blabel{color:var(--green)}
+  .w .blabel{color:var(--mark)}
+
+  ul{list-style:none;margin:0;padding:0}
+  li{background:#fff;border:1px solid var(--rule);border-radius:12px;
+    padding:13px 15px;margin-bottom:8px;font-size:13.5px;line-height:1.5;color:var(--ink-soft);
+    box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  li b{color:var(--ink);font-weight:600}
+  .k li{border-left:3px solid var(--rule)}
+  .s li{border-left:3px solid var(--green)}
+  .w li{border-left:3px solid var(--mark)}
+  .src{display:block;margin-top:7px;font-size:11px;color:var(--ink-soft)}
+  .src i{font-style:normal;background:var(--paper-2);border:1px solid var(--rule);
+    border-radius:999px;padding:2px 8px;margin-right:5px;letter-spacing:.02em}
+
+  .split{background:var(--hl);border:1px solid var(--amber);border-left-width:3px;
+    border-radius:12px;padding:14px 16px;margin:10px 0 18px;font-size:13.5px;color:var(--ink)}
+  .split .tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    color:var(--amber);display:block;margin-bottom:7px}
+  .split .side{margin-top:9px;padding-left:12px;border-left:2px solid var(--rule);color:var(--ink-soft)}
+  .split .side b{color:var(--ink)}
+
+  .callout{background:#fff;border:1px solid var(--rule);border-radius:12px;
+    padding:16px 18px;margin:18px 0;box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  .callout h4{margin:0 0 9px;font-size:13px;font-weight:700;letter-spacing:.01em}
+  .callout ol{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-soft)}
+  .callout ol li{background:none;border:none;box-shadow:none;padding:3px 0;margin:0;border-left:none}
+  .callout ol li b{color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;background:#fff;
+    border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--rule);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);
+    font-weight:700;background:var(--paper-2)}
+  td.c{color:var(--ink-soft)}
+  .tablewrap{overflow-x:auto}
+
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);
+    font-size:12px;color:var(--ink-soft)}
+  footer a{color:var(--blue)}
+  @media(max-width:560px){ .wrap{padding:0 16px 48px} h1{font-size:20px} h2{font-size:17px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">Cross-session synthesis · September 2026</div>
+  <h1>Global navigation in the FlowX platform — synthesis</h1>
+  <p class="sub">Four user-testing sessions on the global navigation redesign, covering the header, the route to organisation settings, and the new bottom bar carrying versioning, branching and the issues console. 66 individual findings, consolidated.</p>
+  <div class="who">
+    <span><b>Ștefan</b> · Customer Support, 3 weeks in · 11 Sep · 47 min</span>
+    <span><b>Delia</b> · configurator · 11 Sep · 36 min</span>
+    <span><b>Cristi D</b> · delivery, merges &amp; reviews · 10 Sep · 49 min</span>
+    <span><b>Adriana</b> · configurator · 11 Sep · 31 min</span>
+  </div>
+</header>
+
+<!-- ============ 1 ============ -->
+<h2><span class="n">1</span>Global navigation</h2>
+
+<h3><span class="n">1.1</span>The global header overall</h3>
+<p class="lede">Nobody struggled with the new arrangement. The redesign's success here is that it went largely unremarked.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>It does not announce itself, and that is the point.</b> Asked directly whether anything looked different, one participant said no — then completed every task without difficulty.
+      <span class="src"><i>Delia</i><i>Adriana</i></span></li>
+    <li><b>Gathering config and runtime on the left is the most-agreed improvement of the whole redesign.</b> Raised unprompted by two participants; contested by none.
+      <span class="src"><i>Ștefan</i><i>Adriana</i></span></li>
+    <li><b>The header is filling up.</b> The open question is not this release but the next one: how many more things can the top bar hold.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>Config and runtime on the left keeps the eye in one zone.</b> No more crossing to the right and back — and no more opening a menu without realising you are in the wrong mode.
+      <span class="src"><i>Adriana</i><i>Ștefan</i></span></li>
+    <li><b>Overall more intuitive and better organised.</b> Summary verdict after the first block of tasks.
+      <span class="src"><i>Ștefan</i></span></li>
+    <li><b>The notification centre is visible and straightforward.</b> Opened unprompted in the first minutes.
+      <span class="src"><i>Adriana</i></span></li>
+    <li><b>Moving the AI entry point into the header is right.</b> A floating bubble that blocks the screen is unwanted — people who want to build with AI will go to it without being pushed.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Being able to leave comments answers an existing need.</b> The current workaround is writing notes into a script and commenting them out.
+      <span class="src"><i>Delia</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>The top bar is running out of room.</b> Archiving unused branches will help the switcher, but the trend needs another answer before long.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<h3><span class="n">1.2</span>Organisation settings — getting there, and getting back</h3>
+<p class="lede">The weakest area of the redesign, and the one where participants disagree about whether the underlying problem is real.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>Discoverability under the account avatar is the single biggest gap.</b> Two of four found it only by reasoning or searching; one says she would never have found it at all.
+      <span class="src"><i>Ștefan</i><i>Delia</i><i>Adriana</i></span></li>
+    <li><b>All four expect "back" to return them to the exact place they left</b> — which is the intended behaviour. The prototype's bug sent them to a default workspace.
+      <span class="src"><i>all four</i></span></li>
+    <li><b>The word "back" does not say where.</b> Processes, projects, or where you actually were are all plausible readings, and the tooltip contradicts the behaviour.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Whether context loss is worth fixing at all is contested</b> — see the decision box below.</li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>Back is the easiest way out once found.</b> Press it and you are straight where you need to be — the route participants reached for over every alternative.
+      <span class="src"><i>Adriana</i><i>Delia</i></span></li>
+    <li><b>A moved entry point did not block anyone.</b> One reasoned his way there — anything about users and organisations would sit under my own avatar — and another found it by searching.
+      <span class="src"><i>Ștefan</i><i>Delia</i></span></li>
+    <li><b>Expectations match the design intent.</b> Return to the workspace you were in, not a default one; only one narrow exception was offered, and it was self-identified.
+      <span class="src"><i>Adriana</i><i>Delia</i><i>Ștefan</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>"I would never have looked there."</b> The account icon holds what belongs to <em>you</em> — your password, your email — not what belongs to the organisation. A cog beside the profile, not settings inside it.
+      <span class="src"><i>Adriana</i></span></li>
+    <li><b>Organisation has left the hierarchy.</b> The mental model is organisation above workspace above projects; reaching it from the account menu makes it feel like it sits on a different scale entirely.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>"Go back" is ambiguous, and the label contradicts the behaviour.</b> The tooltip reads <em>go back to workspace</em> while the behaviour returns you to the exact spot you left.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Without a back control, one participant did not know how to return at all.</b>
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>The real navigation frustration may be elsewhere entirely.</b> Asked whether leaving organisation settings creates friction, the answer was no — followed immediately by what does: being logged out mid-work and having to walk the whole path again.
+      <span class="src"><i>Adriana</i></span></li>
+  </ul>
+</div>
+
+<div class="callout">
+  <h4>On the table: organisation as a third tab</h4>
+  <p style="margin:0;font-size:.93rem;color:var(--ink-soft)">If organisation settings is simply another context — as switching between config and runtime already is — then give it a tab. Press <em>organization</em> and you go there; press <em>config</em> and you come back. One move that answers both the placement question and the go-back ambiguity. <span style="color:var(--ink-faint)">— proposed by Cristi D, who flagged himself that product may object.</span></p>
+</div>
+
+<!-- ============ 2 ============ -->
+<h2><span class="n">2</span>The bottom bar</h2>
+
+<h3><span class="n">2.1</span>Versioning &amp; branching — usage and expectations</h3>
+<p class="lede">The move to the bottom is accepted by everyone who commented on it. The disagreement is about ordering, not placement.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>The placement is settled: nobody objected.</b> One called it intuitive and easy; another saw no downside beyond it not being where you expect.
+      <span class="src"><i>Adriana</i><i>Cristi D</i></span></li>
+    <li><b>Discoverability rests on colour, not on position.</b> One participant found the controls because they are coloured and said she would not have spotted them as quickly otherwise; another never realised the bar was clickable at all.
+      <span class="src"><i>Adriana</i><i>Delia</i></span></li>
+    <li><b>Quick access and the full console are wanted as complements, not alternatives.</b> The compact one for switching, the console when you need to see what changed.
+      <span class="src"><i>Ștefan</i><i>Adriana</i></span></li>
+    <li><b>Landing on the latest version after a branch switch is confirmed correct</b> by everyone asked.
+      <span class="src"><i>Adriana</i><i>Delia</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>Intuitive and easy to navigate.</b> A warm, repeated verdict on the bottom bar as a whole.
+      <span class="src"><i>Adriana</i></span></li>
+    <li><b>The move frees the header.</b> Room for the run button — so you no longer go back to run — and somewhere to put notifications.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Two routes to switch version is the right call.</b> Compact by default because there is less to get lost in; the console when you also want the changed resources.
+      <span class="src"><i>Ștefan</i></span></li>
+    <li><b>The console closing on switch is a feature, not a flaw.</b> The close is the signal that the switch happened — no separate confirmation needed.
+      <span class="src"><i>Adriana</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>Branch rows show the creator, not the last editor.</b> The person who touched it last is the person you go to — a colleague lost time that same day double-checking a build for exactly this reason.
+      <span class="src"><i>Ștefan</i></span></li>
+    <li><b>The bar does not look clickable.</b> One participant went in through the branching icon every time, never considering the bar was a control.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Select-then-switch is a step more than expected.</b> Selecting, switching, then closing is three actions where there are two today.
+      <span class="src"><i>Adriana</i></span></li>
+    <li><b>No current-version indicator on the page.</b> Asked to change version, she first had to work out where she already was.
+      <span class="src"><i>Adriana</i></span></li>
+    <li><b>Export from the version console gives a version, not a build.</b> The filename changed to a date, which read as a new naming convention rather than a warning.
+      <span class="src"><i>Ștefan</i></span></li>
+    <li><b>A personalised branch list would cost more than it gives.</b> Shared order is what lets you sit next to a colleague and look at the same thing.
+      <span class="src"><i>Adriana</i></span></li>
+  </ul>
+</div>
+
+<div class="split">
+  <span class="tag">⚡ Unresolved — branch ordering</span>
+  <b>What should the quick-access list be ordered by?</b>
+  <div class="side"><b>Most recently changed, everywhere.</b> Knowing the first entry is always the most recent means navigating without reading. <span style="color:var(--ink-faint)">— Ștefan</span></div>
+  <div class="side"><b>Creation date, because it does not move.</b> With eleven branches on one project, ordering by modification makes the list a constant ping-pong; creation date is stable and the eye can learn it. <span style="color:var(--ink-faint)">— Adriana</span></div>
+</div>
+
+<h3><span class="n">2.2</span>Issues console — usage and expectations</h3>
+<p class="lede">The most strongly validated part of the release. The open questions are <em>when</em> and <em>where</em> issues appear, not whether the console is wanted.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>The floating console beat what participants predicted.</b> Two independently expected something else — a new tab, a classic dialog — and preferred what they got.
+      <span class="src"><i>Ștefan</i><i>Delia</i></span></li>
+    <li><b>It is strong enough to become a team standard.</b> One participant would write zero warnings and zero errors into his team's definition of done.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Everyone wants to control how much screen it takes.</b> Dock it, split it, shrink it to a strip — rather than the platform deciding half or full.
+      <span class="src"><i>Cristi D</i><i>Delia</i><i>Ștefan</i></span></li>
+    <li><b>"In context" is the weakest label in the release.</b> One could not form any guess at what it does; two others reached the right reading only after several passes.
+      <span class="src"><i>Ștefan</i><i>Delia</i><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>It surfaces what is only discoverable at runtime today.</b> A swimlane with no role assigned currently shows up when you reach it and it fails.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>A floating, movable panel beats both alternatives participants imagined.</b> It survives moving between menus and keeps the surrounding information visible.
+      <span class="src"><i>Ștefan</i><i>Delia</i><i>Cristi D</i></span></li>
+    <li><b>Clicking an issue navigates to the node, as predicted.</b> The highlight-in-place versus navigate-on-link split matched expectations.
+      <span class="src"><i>Cristi D</i><i>Ștefan</i></span></li>
+    <li><b>Both groupings read correctly without prompting</b> — by resource type and by severity, with what each is useful for.
+      <span class="src"><i>Cristi D</i><i>Delia</i></span></li>
+    <li><b>Click-to-toggle severity chips beat a dropdown.</b>
+      <span class="src"><i>Ștefan</i></span></li>
+    <li><b>Almost-real-time refresh is good enough.</b> Thirty seconds to a minute of delay is not a problem — a constraint removed rather than added.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>Clicking an issue hides the result behind the panel.</b> The navigation works, but you cannot see it happen. Wanted: the panel drops into a bottom tab like a chat window, and the affected node blinks.
+      <span class="src"><i>Ștefan</i></span></li>
+    <li><b>No way to search by process or workflow.</b> With thirty workflows in a project, scrolling to the one you care about is slow.
+      <span class="src"><i>Ștefan</i><i>Delia</i></span></li>
+    <li><b>Severity cannot be set by the user.</b> Deliberate choices keep presenting as errors, taking up visual space and dulling attention to the ones that matter.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Scope is too narrow.</b> Misconfiguration should cover data sources too — a REST source that fails to return 200 when tested is equally a misconfiguration.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Grouping by resource is unclear</b>, where grouping by severity is understood immediately.
+      <span class="src"><i>Ștefan</i></span></li>
+    <li><b>The issue list inside a node panel sits awkwardly</b>, pushed to the bottom.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<div class="split">
+  <span class="tag">⚡ Unresolved — should issue markers be on by default?</span>
+  <b>Three positions, each sound from its own premise.</b>
+  <div class="side"><b>On.</b> Anything you have to switch on may never be discovered — you do not know it exists and were never curious. <span style="color:var(--ink-faint)">— Ștefan, who triages failures</span></div>
+  <div class="side"><b>Off.</b> A process that is only just started always carries issues — a missing end node, leftover nodes producing unreachable-node errors. Worse, dead nodes are often left <em>deliberately</em>, like commented-out code, to compare old behaviour against new. The platform would be flagging her own decisions. <span style="color:var(--ink-faint)">— Delia, who configures solutions</span></div>
+  <div class="side"><b>Split the surfaces.</b> Populate the console from the very start — a beginner benefits from being told what is missing, and it deflects questions from the support team. But markers spread across every resource only once you signal you are done: a whole flow turning red is discouraging and pushes people into fixing node by node, generating work that later proves unnecessary. <span style="color:var(--ink-faint)">— Cristi D</span></div>
+</div>
+
+<!-- ============ 3 ============ -->
+<h2><span class="n">3</span>Decisions to make</h2>
+<div class="callout">
+  <ol>
+    <li><b>Issue marker default</b> — on, off, or after a milestone. Cristi's split (console from the start, markers after) reconciles the other two and is the only proposal that accounts for both premises.</li>
+    <li><b>Branch ordering</b> — creation date or last modified. Genuinely contested; both reason from real projects. Worth deciding deliberately rather than by whoever was asked last.</li>
+    <li><b>Organisation settings placement</b> — keep it under the account avatar, add a cog beside the profile, or make it a third tab. Two of four participants object to the current placement on mental-model grounds, not on discoverability alone.</li>
+    <li><b>Whether to invest in context preservation</b> — one participant has never hit the problem, solves it by duplicating a browser tab, and would not prioritise it. Another's real frustration is session expiry, which this work does not touch.</li>
+    <li><b>"In context" naming</b> — the weakest label tested. It is decipherable but not self-evident to anyone.</li>
+  </ol>
+</div>
+
+<h2><span class="n">4</span>Coverage &amp; caveats</h2>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Session</th><th>Covered</th><th>Caveat worth carrying</th></tr></thead>
+  <tbody>
+    <tr><td><b>Ștefan</b></td><td class="c">Header, org settings, versions, issues console</td><td class="c">Three weeks into the role; caveats his own feedback repeatedly. His two sharpest points — losing scroll position, and the opt-out principle — are not novice-specific.</td></tr>
+    <tr><td><b>Delia</b></td><td class="c">Header, org settings, versions, issues console</td><td class="c">Version export and builds not covered.</td></tr>
+    <tr><td><b>Cristi D</b></td><td class="c">Header, org settings, versions, issues console</td><td class="c">Judges against a team workflow — merges and reviewing colleagues' branches — rather than his own screen alone.</td></tr>
+    <tr><td><b>Adriana</b></td><td class="c">Header, org settings, versions</td><td class="c"><b>Issues console not tested</b> — session ended early; a fifteen-minute follow-up was agreed.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout" style="margin-top:1.5rem">
+  <h4>One finding that belongs to no section</h4>
+  <p style="margin:0;font-size:.93rem;color:var(--ink-soft)">Going back from a process instance throws away your scroll position. Ștefan scrolls back hours to find a failure, opens one, returns — and starts again. Workflow instances does not do this, because it opens a dialog he can leave from. He called fixing it the single largest quality-of-life gain available, and it has nothing to do with the redesign.</p>
+</div>
+
+<footer>
+  Built from four session reports: Ștefan (11 Sep), Delia (11 Sep), Cristi D (10 Sep), Adriana (11 Sep).
+  Individual reports, with transcripts and screen frames, are in
+  <a href="https://madalinagheorghiu-ux.github.io/RandomDocs/userTestingSessions/">userTestingSessions</a>.
+</footer>
+
+</div>
+</body>
+</html>
