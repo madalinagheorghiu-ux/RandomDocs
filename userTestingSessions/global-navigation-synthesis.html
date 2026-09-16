@@ -82,6 +82,23 @@
     font-size:12px;color:var(--ink-soft)}
   footer a{color:var(--blue)}
   @media(max-width:560px){ .wrap{padding:0 16px 48px} h1{font-size:20px} h2{font-size:17px} }
+  .proto{margin:14px 0 0}
+  .proto a{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    color:var(--blue);text-decoration:none;background:#fff;border:1px solid var(--rule);
+    border-radius:999px;padding:6px 14px;box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  .proto a:hover{border-color:var(--blue)}
+
+  nav.toc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+    background:var(--paper-2);border:1px solid var(--rule);border-radius:12px;
+    padding:11px 13px;margin:0 0 8px}
+  .toclabel{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    color:var(--ink-soft);margin-right:4px}
+  nav.toc a{font-size:12.5px;color:var(--ink-soft);text-decoration:none;
+    background:#fff;border:1px solid var(--rule);border-radius:999px;padding:4px 11px;white-space:nowrap}
+  nav.toc a:hover{border-color:var(--ink-soft);color:var(--ink)}
+  nav.toc a b{color:var(--ink);font-weight:700;margin-right:3px}
+  h2[id],h3[id]{scroll-margin-top:16px}
+  @media(max-width:560px){ nav.toc a{font-size:12px;padding:3px 9px} }
 </style>
 </head>
 <body>
@@ -97,12 +114,25 @@
     <span><b>Cristi D</b> · delivery, merges &amp; reviews · 10 Sep · 49 min</span>
     <span><b>Adriana</b> · configurator · 11 Sep · 31 min</span>
   </div>
+  <p class="proto"><a href="https://claude.ai/design/p/8ff19484-1a07-423e-95af-ee696a3a1fec?file=Proposal+A+v3+-+Horizontal+Nav.dc.html&amp;via=share" target="_blank" rel="noopener">Open the prototype — Proposal A v3, Horizontal Nav ↗</a></p>
 </header>
 
-<!-- ============ 1 ============ -->
-<h2><span class="n">1</span>Global navigation</h2>
+<nav class="toc" aria-label="Contents">
+  <span class="toclabel">Contents</span>
+  <a href="#s1"><b>1</b> Global navigation</a>
+  <a href="#s11"><b>1.1</b> Global header</a>
+  <a href="#s12"><b>1.2</b> Org settings &amp; back</a>
+  <a href="#s2"><b>2</b> Bottom bar</a>
+  <a href="#s21"><b>2.1</b> Versioning &amp; branching</a>
+  <a href="#s22"><b>2.2</b> Issues console</a>
+  <a href="#s3"><b>3</b> Decisions to make</a>
+  <a href="#s4"><b>4</b> Coverage &amp; caveats</a>
+</nav>
 
-<h3><span class="n">1.1</span>The global header overall</h3>
+<!-- ============ 1 ============ -->
+<h2 id="s1"><span class="n">1</span>Global navigation</h2>
+
+<h3 id="s11"><span class="n">1.1</span>The global header overall</h3>
 <p class="lede">Nobody struggled with the new arrangement. The redesign's success here is that it went largely unremarked.</p>
 
 <div class="block k">
@@ -141,7 +171,7 @@
   </ul>
 </div>
 
-<h3><span class="n">1.2</span>Organisation settings — getting there, and getting back</h3>
+<h3 id="s12"><span class="n">1.2</span>Organisation settings — getting there, and getting back</h3>
 <p class="lede">The weakest area of the redesign, and the one where participants disagree about whether the underlying problem is real.</p>
 
 <div class="block k">
@@ -191,9 +221,9 @@
 </div>
 
 <!-- ============ 2 ============ -->
-<h2><span class="n">2</span>The bottom bar</h2>
+<h2 id="s2"><span class="n">2</span>The bottom bar</h2>
 
-<h3><span class="n">2.1</span>Versioning &amp; branching — usage and expectations</h3>
+<h3 id="s21"><span class="n">2.1</span>Versioning &amp; branching — usage and expectations</h3>
 <p class="lede">The move to the bottom is accepted by everyone who commented on it. The disagreement is about ordering, not placement.</p>
 
 <div class="block k">
@@ -249,7 +279,7 @@
   <div class="side"><b>Creation date, because it does not move.</b> With eleven branches on one project, ordering by modification makes the list a constant ping-pong; creation date is stable and the eye can learn it. <span style="color:var(--ink-faint)">— Adriana</span></div>
 </div>
 
-<h3><span class="n">2.2</span>Issues console — usage and expectations</h3>
+<h3 id="s22"><span class="n">2.2</span>Issues console — usage and expectations</h3>
 <p class="lede">The most strongly validated part of the release. The open questions are <em>when</em> and <em>where</em> issues appear, not whether the console is wanted.</p>
 
 <div class="block k">
@@ -311,7 +341,7 @@
 </div>
 
 <!-- ============ 3 ============ -->
-<h2><span class="n">3</span>Decisions to make</h2>
+<h2 id="s3"><span class="n">3</span>Decisions to make</h2>
 <div class="callout">
   <ol>
     <li><b>Issue marker default</b> — on, off, or after a milestone. Cristi's split (console from the start, markers after) reconciles the other two and is the only proposal that accounts for both premises.</li>
@@ -322,7 +352,7 @@
   </ol>
 </div>
 
-<h2><span class="n">4</span>Coverage &amp; caveats</h2>
+<h2 id="s4"><span class="n">4</span>Coverage &amp; caveats</h2>
 <div class="tablewrap">
 <table>
   <thead><tr><th>Session</th><th>Covered</th><th>Caveat worth carrying</th></tr></thead>
