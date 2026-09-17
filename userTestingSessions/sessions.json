@@ -180,5 +180,15 @@
     "insights": 64,
     "file": "self-enrolment-synthesis.html",
     "pin": true
+  },
+  {
+    "id": "configuration-workflow-synthesis",
+    "title": "Configuration workflow in FlowX.AI — synthesis",
+    "date": "2026-09-16",
+    "participant": "Cristi D · Horia · Carina · Luca · Delia",
+    "feature": "Configuration workflow",
+    "insights": 80,
+    "file": "configuration-workflow-synthesis.html",
+    "pin": true
   }
 ]

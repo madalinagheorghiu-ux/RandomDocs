@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configuration workflow in FlowX.AI — synthesis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF8F1; --paper-2:#F3EEE2; --ink:#211F1B; --ink-soft:#5A554C;
+    --rule:#D8D1C0; --mark:#B23A2E; --amber:#9C7A1E; --green:#2E6F5E;
+    --blue:#3A5A78; --plum:#6E4A6B; --hl:#FBF1D9; --shadow:rgba(33,31,27,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:14px;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:860px;margin:0 auto;padding:0 24px 64px}
+
+  header.mast{border-bottom:1px solid var(--rule);margin-top:36px;margin-bottom:20px;padding-bottom:16px}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  h1{font-size:24px;line-height:1.2;margin:8px 0 6px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 6px;max-width:62ch}
+  .who{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-top:12px}
+  .who span{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--rule);
+    border-radius:999px;padding:4px 12px}
+  .who b{color:var(--ink);font-weight:600}
+
+  h2{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:44px 0 4px;
+     padding-top:20px;border-top:1px solid var(--rule)}
+  h2 .n{color:var(--ink-soft);font-weight:600;margin-right:8px}
+  h3{font-size:16px;font-weight:600;margin:30px 0 8px;letter-spacing:-.01em}
+  h3 .n{color:var(--ink-soft);font-weight:600;margin-right:6px}
+  .lede{color:var(--ink-soft);font-size:13.5px;margin:2px 0 6px;max-width:66ch}
+
+  .block{margin:14px 0 22px}
+  .blabel{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    display:flex;align-items:center;gap:7px;margin-bottom:9px}
+  .blabel::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+  .k .blabel{color:var(--ink-soft)}
+  .s .blabel{color:var(--green)}
+  .w .blabel{color:var(--mark)}
+
+  ul{list-style:none;margin:0;padding:0}
+  li{background:#fff;border:1px solid var(--rule);border-radius:12px;
+    padding:13px 15px;margin-bottom:8px;font-size:13.5px;line-height:1.5;color:var(--ink-soft);
+    box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  li b{color:var(--ink);font-weight:600}
+  .k li{border-left:3px solid var(--rule)}
+  .s li{border-left:3px solid var(--green)}
+  .w li{border-left:3px solid var(--mark)}
+  .src{display:block;margin-top:7px;font-size:11px;color:var(--ink-soft)}
+  .src i{font-style:normal;background:var(--paper-2);border:1px solid var(--rule);
+    border-radius:999px;padding:2px 8px;margin-right:5px;letter-spacing:.02em}
+
+  .split{background:var(--hl);border:1px solid var(--amber);border-left-width:3px;
+    border-radius:12px;padding:14px 16px;margin:10px 0 18px;font-size:13.5px;color:var(--ink)}
+  .split .tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    color:var(--amber);display:block;margin-bottom:7px}
+  .split .side{margin-top:9px;padding-left:12px;border-left:2px solid var(--rule);color:var(--ink-soft)}
+  .split .side b{color:var(--ink)}
+
+  .callout{background:#fff;border:1px solid var(--rule);border-radius:12px;
+    padding:16px 18px;margin:18px 0;box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  .callout h4{margin:0 0 9px;font-size:13px;font-weight:700;letter-spacing:.01em}
+  .callout ol{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-soft)}
+  .callout ol li{background:none;border:none;box-shadow:none;padding:3px 0;margin:0;border-left:none}
+  .callout ol li b{color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;background:#fff;
+    border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--rule);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);
+    font-weight:700;background:var(--paper-2)}
+  td.c{color:var(--ink-soft)}
+  .tablewrap{overflow-x:auto}
+
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);
+    font-size:12px;color:var(--ink-soft)}
+  footer a{color:var(--blue)}
+  @media(max-width:560px){ .wrap{padding:0 16px 48px} h1{font-size:20px} h2{font-size:17px} }
+  .proto{margin:14px 0 0}
+  .proto a{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    color:var(--blue);text-decoration:none;background:#fff;border:1px solid var(--rule);
+    border-radius:999px;padding:6px 14px;box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  .proto a:hover{border-color:var(--blue)}
+
+  nav.toc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+    background:var(--paper-2);border:1px solid var(--rule);border-radius:12px;
+    padding:11px 13px;margin:0 0 8px}
+  .toclabel{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    color:var(--ink-soft);margin-right:4px}
+  nav.toc a{font-size:12.5px;color:var(--ink-soft);text-decoration:none;
+    background:#fff;border:1px solid var(--rule);border-radius:999px;padding:4px 11px;white-space:nowrap}
+  nav.toc a:hover{border-color:var(--ink-soft);color:var(--ink)}
+  nav.toc a b{color:var(--ink);font-weight:700;margin-right:3px}
+  h2[id],h3[id]{scroll-margin-top:16px}
+  @media(max-width:560px){ nav.toc a{font-size:12px;padding:3px 9px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">Cross-session synthesis · September 2026</div>
+  <h1>Configuration workflow in FlowX.AI — synthesis</h1>
+  <p class="sub">Five exploratory conversations with configurators about how they actually build: where they start, when they test, what they knowingly leave unfinished, and where configuration problems should surface. No prototype and no screen share — these were discovery discussions, not usability tests. 89 individual findings, consolidated.</p>
+  <div class="who">
+    <span><b>Cristi D</b> · delivery, senior · 14 Sep · 24 min</span>
+    <span><b>Horia</b> · 5 months in · 15 Sep · 22 min</span>
+    <span><b>Carina</b> · 9 months in · 15 Sep · 25 min</span>
+    <span><b>Luca</b> · configurator · 16 Sep · 27 min</span>
+    <span><b>Delia</b> · configurator · 16 Sep · 27 min</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <span class="toclabel">Contents</span>
+  <a href="#s1"><b>1</b> How people build</a>
+  <a href="#s11"><b>1.1</b> Where they start</a>
+  <a href="#s12"><b>1.2</b> When they test</a>
+  <a href="#s2"><b>2</b> Unfinished on purpose</a>
+  <a href="#s3"><b>3</b> Surfacing issues</a>
+  <a href="#s31"><b>3.1</b> Does the panel reach anyone?</a>
+  <a href="#s32"><b>3.2</b> When &amp; where they want it</a>
+  <a href="#s4"><b>4</b> Adjacent findings</a>
+  <a href="#s5"><b>5</b> Decisions to make</a>
+  <a href="#s6"><b>6</b> Coverage &amp; caveats</a>
+</nav>
+
+<div class="split" style="margin-top:18px">
+  <span class="tag">The headline</span>
+  <b>Three of five do not engage with the issues panel — and each has a different reason.</b>
+  <div class="side">One <b>avoids that part of the screen by trained habit</b>, and can describe the map his attention has learned. <span style="color:var(--ink-faint)">— Cristi D</span></div>
+  <div class="side">One <b>read it and ignored it, because he already knew every item in it.</b> Not wrong, just no signal. <span style="color:var(--ink-faint)">— Luca</span></div>
+  <div class="side">One <b>filters by severity</b>: warnings never move her, errors would — and everything in the panel today is a warning. <span style="color:var(--ink-faint)">— Carina</span></div>
+  <div class="side">Of the two who would use it, one <b>would rather have the information at runtime</b> than at configuration time. <span style="color:var(--ink-faint)">— Horia</span></div>
+</div>
+
+<!-- ============ 1 ============ -->
+<h2 id="s1"><span class="n">1</span>How people build</h2>
+
+<h3 id="s11"><span class="n">1.1</span>Where they start, and in what order</h3>
+<p class="lede">More agreement here than anywhere else in the round. The order is stable enough to design around.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>Structure before detail, in every session.</b> Three named the data model as the genuine first step; the fourth builds the UI skeleton first; the fifth sketches the whole process end to end before filling it in.
+      <span class="src"><i>Luca</i><i>Delia</i><i>Horia</i><i>Carina</i><i>Cristi D</i></span></li>
+    <li><b>Two independently used the same figure</b> — they get the thing to roughly eighty per cent from their own head, then adjust against reality.
+      <span class="src"><i>Horia</i><i>Delia</i></span></li>
+    <li><b>Functional rules and validations come last, deliberately.</b> Get the happy path working, then add the conditions that keep you on it.
+      <span class="src"><i>Luca</i><i>Cristi D</i></span></li>
+    <li><b>One team has codified the order</b> — skeleton first, then refine — as an agreed working method rather than a personal habit, which makes it safer to build tooling around.
+      <span class="src"><i>Carina</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>The sequence is consistent and articulable.</b> Everyone could describe their own order without prompting, and the orders broadly agree: structure, then integrations or data, then UI detail, then rules.</li>
+    <li><b>Reuse comes before construction.</b> Before creating a screen, one checks whether it exists elsewhere and copies it — grids, shared images, breadcrumbs.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>Intake is disciplined:</b> talk to the analyst, read the design file, then the technical documentation, and go back for clarification after.
+      <span class="src"><i>Carina</i></span></li>
+    <li><b>Database integrations have moved to the front</b> for one participant, because that is where you see exactly what you are working with.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>Mock data early, real data later:</b> mocks purely to confirm the page renders, then swapped out once integrations exist.
+      <span class="src"><i>Carina</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>Changing the data model does not propagate.</b> The platform prompts on a type change, but you click through and it does not hold all of it, so every reference gets found by hand.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Nodes cannot be copied, so whole workflows get duplicated</b> and trimmed down — stated plainly as the cause of much of the leftover clutter.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Adding integrations to a finished process crowds the canvas badly</b>, and subprocesses do not relieve it: a subprocess for two nodes creates a mountain of processes and still has to be mapped in and back out.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>Analysts sometimes make resource-shape decisions that get undone later</b>, and newer colleagues are more likely to implement them as written.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Requirements move under people:</b> development now starts early, sometimes from discovery, so what a thing should do changes before it settles.
+      <span class="src"><i>Delia</i></span></li>
+  </ul>
+</div>
+
+<h3 id="s12"><span class="n">1.2</span>When they test</h3>
+<p class="lede">The widest spread in the round. Same role, same platform, and the answers run from "not at all while building" to "after every node".</p>
+
+<div class="split">
+  <span class="tag">⚡ A spectrum, not a disagreement</span>
+  <b>When does testing start?</b>
+  <div class="side"><b>Not while building.</b> Early on it is save-data-and-move-on, just to see the UI; real testing begins only once workflows need mapping or actions touch the database. <span style="color:var(--ink-faint)">— Luca</span></div>
+  <div class="side"><b>On failure, in isolation.</b> Wire it in and expect it to work; when it does not, build a throwaway workflow to test a smaller piece, then return. <span style="color:var(--ink-faint)">— Delia</span></div>
+  <div class="side"><b>A four-rung ladder.</b> Designer test flow for small pieces, workflows alone, then integrated and retested, then end-to-end from the container app. <span style="color:var(--ink-faint)">— Carina</span></div>
+  <div class="side"><b>Node by node as he builds.</b> Write the scripts, test each alone, then test how they work together, keeping control of what every node emits. <span style="color:var(--ink-faint)">— Horia</span></div>
+  <div class="side"><b>Continuous, and sceptical.</b> Even when the tool says a script works, often it will not — so test with varied inputs throughout. <span style="color:var(--ink-faint)">— Cristi D</span></div>
+  <div class="side" style="border-left-color:var(--amber)"><b>Why it matters:</b> Luca's stretch of building without running is exactly where static detection would earn its place; Horia and Cristi D would hit problems at their own next node anyway.</div>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>Methods are concrete and repeatable, not vague.</b> Every boolean checked in three states — true, false, undefined — is a rule you could teach.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Real data comes from the running system:</b> pull an input from one of your own recent instances and run the workflow with it, rather than inventing fixtures.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Where there is no data, AI fills the gap</b> with something closer to reality than placeholders.
+      <span class="src"><i>Horia</i></span></li>
+    <li><b>The process-instance error view is the most valued debugging surface</b> — which node stopped, what failed there, including inside subprocesses.
+      <span class="src"><i>Carina</i></span></li>
+    <li><b>People have a clear signal for "nearly done":</b> no more redrawing the process, every node and component visited at least once.
+      <span class="src"><i>Horia</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>You cannot test one step in isolation — and two people worked around it independently.</b> One asked for it directly; the other disconnects the start node and physically moves it into the middle of the workflow so the run begins where she wants.
+      <span class="src"><i>Luca</i><i>Delia</i></span></li>
+    <li><b>Long tests that write to the database make iteration expensive:</b> change something upstream and the whole set-up has to be repeated.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>The integrated run usually fails on the condition you set</b>, sending you back to individual testing — routine rather than exceptional.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>A workflow can pass its own tests and still fail once integrated:</b> parameters and returned data only reveal the mismatch when the whole thing runs.
+      <span class="src"><i>Carina</i><i>Horia</i></span></li>
+    <li><b>A process that will not start says nothing useful.</b> A blank page and "something went wrong", leaving you to reconstruct what changed since the last successful test.
+      <span class="src"><i>Carina</i></span></li>
+    <li><b>Paths that can never be reached stay invisible until you run them</b> — a user path that cannot advance, a field that never displays.
+      <span class="src"><i>Luca</i></span></li>
+  </ul>
+</div>
+
+<!-- ============ 2 ============ -->
+<h2 id="s2"><span class="n">2</span>Unfinished on purpose</h2>
+<p class="lede">Four of five knowingly leave configuration incomplete while working — for four different reasons. Any detection feature will be reporting these choices back to them.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>Incomplete configuration is the normal working state, not an error state.</b> It is temporary, intentional, and differently motivated in every session.</li>
+    <li><b>The reasons do not generalise:</b> comparison, naming, scope, and focus. A single "you have unfinished items" message speaks to none of them precisely.</li>
+    <li><b>Only one participant leaves nothing on purpose</b> — and the two stray nodes on his canvas survived because a bug prevented deleting them, which the platform then flags as issues.
+      <span class="src"><i>Luca</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>Comparison.</b> Old prompts and agents kept disconnected beside new ones so results can be compared — two agents in parallel, cleared only when the project reaches production.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Naming.</b> A field left blank until he has decided what the variable should be called, so he does not end up with two things named the same.
+      <span class="src"><i>Horia</i></span></li>
+    <li><b>Focus.</b> Build only the field and the button you need to test, and do not care about errors elsewhere on the screen at that moment.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Scope.</b> Left unconfigured only for small isolated checks that do not affect an end-to-end flow; otherwise she tries to start a process with nothing left behind.
+      <span class="src"><i>Carina</i></span></li>
+    <li><b>The gaps do get closed.</b> One sweeps all of them again at testing and writes them down; another says nothing is ever left permanently undone while the capability exists.
+      <span class="src"><i>Horia</i><i>Cristi D</i></span></li>
+    <li><b>One participant has inverted the error state entirely</b>, leaving an unfinished input showing its error on purpose, as a bookmark for something to return to.
+      <span class="src"><i>Delia</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>The platform reports deliberate choices as mistakes.</b> Dead nodes kept for comparison, fields left blank pending a naming decision — all read as errors.
+      <span class="src"><i>Delia</i><i>Horia</i></span></li>
+    <li><b>Severity cannot be set by the user</b>, so intentional items keep occupying visual space and dulling attention to the ones that matter.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>There is no defined moment when gaps get cleaned up</b> for some people — they are postponed until something makes them urgent.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Experiments must survive many commits</b> because sandbox and staging carry different data sets, so the old approach stays reachable while the client tests.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>A deletion bug leaves nodes behind that the platform then flags</b> — the tool reporting a mess the tool created.
+      <span class="src"><i>Luca</i></span></li>
+  </ul>
+</div>
+
+<!-- ============ 3 ============ -->
+<h2 id="s3"><span class="n">3</span>Surfacing issues</h2>
+
+<h3 id="s31"><span class="n">3.1</span>Does the current panel reach anyone?</h3>
+<p class="lede">Largely not — and usefully, for reasons that are diagnosable rather than mysterious.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>Nobody said the panel was wrong.</b> The failures are of attention, signal and severity, not of correctness.</li>
+    <li><b>The most diagnostic account:</b> after a month with the platform, attention has a learned map — left margin yes, bottom no, top right where the run button is. Prominence in the wrong region will not recover it; only a different location will.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>The severity problem is close to fatal as configured:</b> one participant acts on errors and lets warnings accumulate, and today every item in the panel is a warning.
+      <span class="src"><i>Carina</i></span></li>
+    <li><b>The signal problem is the other half:</b> one read the panel and found every finding was something he already knew, including a workflow he uses himself to add test data.
+      <span class="src"><i>Luca</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>In-context errors on components are the thing that already works.</b> Four sessions endorsed them independently — they guide, they trigger a concrete routine, and one participant navigates by them as a map of what he used where.
+      <span class="src"><i>Horia</i><i>Luca</i><i>Carina</i><i>Delia</i></span></li>
+    <li><b>An unprompted fresh example:</b> minutes before one session, an inline error explained how an upload button works to someone who had forgotten.
+      <span class="src"><i>Horia</i></span></li>
+    <li><b>The most self-aware contribution of the round:</b> asked whether he skips the hints because he is experienced enough not to need them, he declined the flattering explanation — it is habit — and argued it would be wrong to build only for people already used to the platform, because the team wants to grow.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Scripting syntax messages earn a narrow, specific endorsement</b> — missing brackets and semicolons are things people genuinely mix up.
+      <span class="src"><i>Carina</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>Habit beats prominence.</b> One participant avoids the region entirely — "evitate cu grație" — even when the panel reports five problems.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Warnings are filtered out by policy, not by accident</b>, and the panel currently contains nothing else.
+      <span class="src"><i>Carina</i></span></li>
+    <li><b>Findings people already know produce no value</b>, however correct they are.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>He suspects juniors behave the same way</b>, so this is not an expert-user exemption but a general discoverability problem.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Scope is too narrow:</b> misconfiguration should cover data sources too — a REST source that fails to return 200 when tested is equally a misconfiguration.
+      <span class="src"><i>Luca</i></span></li>
+  </ul>
+</div>
+
+<h3 id="s32"><span class="n">3.2</span>When and where they would want it</h3>
+<p class="lede">Convergent, and it is not where the panel currently sits: the moment of running.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>Three of five named the run as the moment</b> — just before pressing it, at the point of pressing it, or where the node actually executes.
+      <span class="src"><i>Cristi D</i><i>Carina</i><i>Horia</i></span></li>
+    <li><b>Nobody wants the run blocked.</b> The one narrow exception offered was a case where the solution genuinely would not start.
+      <span class="src"><i>Cristi D</i><i>Carina</i></span></li>
+    <li><b>The shape people want is a count and a route, not a list.</b> Twenty-seven findings inline would be a bad experience; the build-pipeline pattern — every error at once, then five more commits — was named as the thing to avoid.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>The most requested single detection is the same failure in three sessions:</b> a workflow that passes alone but does not line up with what the receiving node expects.
+      <span class="src"><i>Horia</i><i>Luca</i><i>Carina</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>A concrete, bounded proposal exists:</b> on pressing run, show "you have seven issues" with a link through to the detail. A heads-up, not a wall.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Both scopes are wanted, and the team already has that model:</b> issues globally, and scoped to the process you are in.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>It is strong enough to become a team standard:</b> one participant would write zero warnings and zero errors into his team's definition of done.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>Almost-real-time refresh is sufficient</b> — thirty seconds to a minute of delay is not a problem, which removes a constraint rather than adding one.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>A configuration-time check is welcome as a safety net</b>, even from the participant who would rather have it at runtime.
+      <span class="src"><i>Horia</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>Configuration time may be the wrong moment for the richest information.</b> Asked where it would help most, one chose runtime — where a node actually runs, with fuller debug and logs.
+      <span class="src"><i>Horia</i></span></li>
+    <li><b>There is no way to compare a workflow's output against the receiving node's expected input</b>, which is precisely the comparison that would have caught the worked failures.
+      <span class="src"><i>Horia</i><i>Carina</i></span></li>
+    <li><b>Start-up failure messages are opaque:</b> a blank page, "something went wrong", and no indication of what — heard from others too, not just her.
+      <span class="src"><i>Carina</i></span></li>
+    <li><b>No search by process or workflow inside the console</b>, with projects carrying thirty workflows.
+      <span class="src"><i>Luca</i></span></li>
+    <li><b>Unreachable paths and never-displayed fields are undetected</b>, and only surface when you run them.
+      <span class="src"><i>Luca</i></span></li>
+  </ul>
+</div>
+
+<!-- ============ 4 ============ -->
+<h2 id="s4"><span class="n">4</span>Adjacent findings</h2>
+<p class="lede">Not about issue surfacing, but raised unprompted and worth not losing.</p>
+
+<div class="block s">
+  <span class="blabel">Working well</span>
+  <ul>
+    <li><b>Learning has shifted from documentation to asking the knowledge base</b> — component X, component Y, what do I do — including asking for examples to configure faster.
+      <span class="src"><i>Horia</i></span></li>
+    <li><b>Reviewing what changed per resource before committing</b> is habitual, precisely because people do not work alone on every project.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Commit cadence is sound where it exists:</b> at a stable point, at the end of a day, never mid-task.
+      <span class="src"><i>Delia</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Friction</span>
+  <ul>
+    <li><b>Commit messages became harder to find than they were</b> — small and off to the side, and they matter most late in a project where each commit carries one change.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Build number and commit message answer different questions</b>, and she wants both rather than one replacing the other.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>One participant has no commit habit at all:</b> without branches forcing it, he says he would still be at the initial commit — and would accept a nudge that a commit is getting large.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>The keyboard-shortcut reference is undiscovered</b>, and going to each item by hand feels faster — so the shortcuts save nothing today.
+      <span class="src"><i>Delia</i></span></li>
+    <li><b>Notes are kept outside the platform</b> to track which value comes from which of two agentic nodes in separate workflows.
+      <span class="src"><i>Horia</i></span></li>
+  </ul>
+</div>
+
+<!-- ============ 5 ============ -->
+<h2 id="s5"><span class="n">5</span>Decisions to make</h2>
+<div class="callout">
+  <ol>
+    <li><b>Where the surface lives.</b> The panel as positioned reaches two of five. The convergent answer is the run moment — a count and a route at the point of pressing run, never blocking it. That is a placement decision, not a content one.</li>
+    <li><b>What counts as an error versus a warning.</b> Everything in the panel today is a warning, and at least one participant acts only on errors. Until severity means something, the panel is invisible to her by design.</li>
+    <li><b>Whether detection belongs at configuration time or runtime.</b> Two want it before they run; one would rather have richer information where the node actually executes. These are not incompatible, but they are different builds.</li>
+    <li><b>Testing one step in isolation.</b> Asked for directly by one participant and worked around physically by another. It is the largest non-detection ask in the round, and it would reduce the cost of every failure discussed here.</li>
+    <li><b>Copying nodes.</b> Whole workflows get duplicated because individual nodes cannot be copied, and that duplication generates much of the clutter the issues feature then reports.</li>
+    <li><b>Letting people mark severity themselves.</b> Deliberate incompleteness is universal; without a way to downgrade a known choice, the signal stays diluted.</li>
+  </ol>
+</div>
+
+<h2 id="s6"><span class="n">6</span>Coverage &amp; caveats</h2>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Session</th><th>Vantage point</th><th>Caveat worth carrying</th></tr></thead>
+  <tbody>
+    <tr><td><b>Cristi D</b><br><span style="color:var(--ink-soft)">14 Sep</span></td><td class="c">Senior delivery; enterprise and fast-moving projects</td>
+      <td class="c">The most self-aware account of his own blind spots, and he argued explicitly against designing for people like him. The last 90 seconds of his recording were personal and are not included.</td></tr>
+    <tr><td><b>Horia</b><br><span style="color:var(--ink-soft)">15 Sep</span></td><td class="c">Five months in, second project</td>
+      <td class="c">Has been the only configurator on his project for a stretch — no more experienced colleague to ask, and no separate QA.</td></tr>
+    <tr><td><b>Carina</b><br><span style="color:var(--ink-soft)">15 Sep</span></td><td class="c">Nine months in, one project</td>
+      <td class="c">Her project is not on SaaS, so she has not seen the newer issues panel at all — her answers concern the process-area warnings and component error markers.</td></tr>
+    <tr><td><b>Luca</b><br><span style="color:var(--ink-soft)">16 Sep</span></td><td class="c">Configurator; enrolment wizards and a backend-heavy SaaS project</td>
+      <td class="c">The only participant who had opened the issues panel and formed a view of its contents.</td></tr>
+    <tr><td><b>Delia</b><br><span style="color:var(--ink-soft)">16 Sep</span></td><td class="c">Configurator; agent-heavy and web-crawling work</td>
+      <td class="c">Also took part in the navigation round, where she argued canvas markers should be off by default — this session explains why.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout" style="margin-top:1.5rem">
+  <h4>The finding that should survive this document</h4>
+  <p style="margin:0;font-size:13.5px;color:var(--ink-soft)">Attention is trained, and it trains against you. After a month with the platform one participant's eye had learned a map of where to look and where not to — and the bottom of the screen had fallen off it. He suspects juniors do the same. That single observation explains why a correct, well-built panel can be read by almost nobody, and it points at placement rather than content as the thing to change.</p>
+</div>
+
+<footer>
+  Built from five session reports: Cristi D (14 Sep), Horia (15 Sep), Carina (15 Sep), Luca (16 Sep), Delia (16 Sep).
+  Individual reports, with transcripts and timestamps, are in
+  <a href="https://madalinagheorghiu-ux.github.io/RandomDocs/userTestingSessions/">userTestingSessions</a>.
+</footer>
+
+</div>
+
+</body>
+</html>
