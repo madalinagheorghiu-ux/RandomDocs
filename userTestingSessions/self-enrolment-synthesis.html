@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Self-enrolment links &amp; solution access — synthesis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF8F1; --paper-2:#F3EEE2; --ink:#211F1B; --ink-soft:#5A554C;
+    --rule:#D8D1C0; --mark:#B23A2E; --amber:#9C7A1E; --green:#2E6F5E;
+    --blue:#3A5A78; --plum:#6E4A6B; --hl:#FBF1D9; --shadow:rgba(33,31,27,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:14px;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:860px;margin:0 auto;padding:0 24px 64px}
+
+  header.mast{border-bottom:1px solid var(--rule);margin-top:36px;margin-bottom:20px;padding-bottom:16px}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  h1{font-size:24px;line-height:1.2;margin:8px 0 6px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 6px;max-width:62ch}
+  .who{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-top:12px}
+  .who span{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--rule);
+    border-radius:999px;padding:4px 12px}
+  .who b{color:var(--ink);font-weight:600}
+
+  h2{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:44px 0 4px;
+     padding-top:20px;border-top:1px solid var(--rule)}
+  h2 .n{color:var(--ink-soft);font-weight:600;margin-right:8px}
+  h3{font-size:16px;font-weight:600;margin:30px 0 8px;letter-spacing:-.01em}
+  h3 .n{color:var(--ink-soft);font-weight:600;margin-right:6px}
+  .lede{color:var(--ink-soft);font-size:13.5px;margin:2px 0 6px;max-width:66ch}
+
+  .block{margin:14px 0 22px}
+  .blabel{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    display:flex;align-items:center;gap:7px;margin-bottom:9px}
+  .blabel::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+  .k .blabel{color:var(--ink-soft)}
+  .s .blabel{color:var(--green)}
+  .w .blabel{color:var(--mark)}
+
+  ul{list-style:none;margin:0;padding:0}
+  li{background:#fff;border:1px solid var(--rule);border-radius:12px;
+    padding:13px 15px;margin-bottom:8px;font-size:13.5px;line-height:1.5;color:var(--ink-soft);
+    box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  li b{color:var(--ink);font-weight:600}
+  .k li{border-left:3px solid var(--rule)}
+  .s li{border-left:3px solid var(--green)}
+  .w li{border-left:3px solid var(--mark)}
+  .src{display:block;margin-top:7px;font-size:11px;color:var(--ink-soft)}
+  .src i{font-style:normal;background:var(--paper-2);border:1px solid var(--rule);
+    border-radius:999px;padding:2px 8px;margin-right:5px;letter-spacing:.02em}
+
+  .split{background:var(--hl);border:1px solid var(--amber);border-left-width:3px;
+    border-radius:12px;padding:14px 16px;margin:10px 0 18px;font-size:13.5px;color:var(--ink)}
+  .split .tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    color:var(--amber);display:block;margin-bottom:7px}
+  .split .side{margin-top:9px;padding-left:12px;border-left:2px solid var(--rule);color:var(--ink-soft)}
+  .split .side b{color:var(--ink)}
+
+  .callout{background:#fff;border:1px solid var(--rule);border-radius:12px;
+    padding:16px 18px;margin:18px 0;box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  .callout h4{margin:0 0 9px;font-size:13px;font-weight:700;letter-spacing:.01em}
+  .callout ol{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-soft)}
+  .callout ol li{background:none;border:none;box-shadow:none;padding:3px 0;margin:0;border-left:none}
+  .callout ol li b{color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;background:#fff;
+    border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--rule);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);
+    font-weight:700;background:var(--paper-2)}
+  td.c{color:var(--ink-soft)}
+  .tablewrap{overflow-x:auto}
+
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);
+    font-size:12px;color:var(--ink-soft)}
+  footer a{color:var(--blue)}
+  @media(max-width:560px){ .wrap{padding:0 16px 48px} h1{font-size:20px} h2{font-size:17px} }
+  .proto{margin:14px 0 0}
+  .proto a{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    color:var(--blue);text-decoration:none;background:#fff;border:1px solid var(--rule);
+    border-radius:999px;padding:6px 14px;box-shadow:0 1px 2px rgba(33,31,27,.05)}
+  .proto a:hover{border-color:var(--blue)}
+
+  nav.toc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+    background:var(--paper-2);border:1px solid var(--rule);border-radius:12px;
+    padding:11px 13px;margin:0 0 8px}
+  .toclabel{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    color:var(--ink-soft);margin-right:4px}
+  nav.toc a{font-size:12.5px;color:var(--ink-soft);text-decoration:none;
+    background:#fff;border:1px solid var(--rule);border-radius:999px;padding:4px 11px;white-space:nowrap}
+  nav.toc a:hover{border-color:var(--ink-soft);color:var(--ink)}
+  nav.toc a b{color:var(--ink);font-weight:700;margin-right:3px}
+  h2[id],h3[id]{scroll-margin-top:16px}
+  @media(max-width:560px){ nav.toc a{font-size:12px;padding:3px 9px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">Cross-session synthesis · August–September 2026</div>
+  <h1>Self-enrolment links &amp; solution access — synthesis</h1>
+  <p class="sub">Three usability sessions on the solution access page and self-enrolment links: how access is described, how links are created and managed, whether people should arrive as individuals or in groups, and — in one session — the end-user journey after clicking a link. 54 individual findings, consolidated.</p>
+  <div class="who">
+    <span><b>Cristi D</b> · delivery, merges &amp; reviews · 27 Aug · 29 min</span>
+    <span><b>Cătălin Barabaș</b> · delivery · 28 Aug · 43 min</span>
+    <span><b>Alex Goj</b> · delivery, works at scale · 3 Sep · 19 min</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <span class="toclabel">Contents</span>
+  <a href="#s1"><b>1</b> Describing access</a>
+  <a href="#s11"><b>1.1</b> The labels</a>
+  <a href="#s12"><b>1.2</b> The page &amp; getting around it</a>
+  <a href="#s2"><b>2</b> Self-enrolment links</a>
+  <a href="#s21"><b>2.1</b> Creating &amp; managing</a>
+  <a href="#s22"><b>2.2</b> Groups vs individuals</a>
+  <a href="#s3"><b>3</b> The end-user journey</a>
+  <a href="#s4"><b>4</b> Decisions to make</a>
+  <a href="#s5"><b>5</b> Coverage &amp; caveats</a>
+</nav>
+
+<!-- ============ 1 ============ -->
+<h2 id="s1"><span class="n">1</span>Describing access</h2>
+
+<h3 id="s11"><span class="n">1.1</span>The access labels</h3>
+<p class="lede">Two of three read them correctly. The third did not — and the session proved that renaming will not fix it.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>Two of three understood the access states immediately</b>, at solution level and on the access page.
+      <span class="src"><i>Alex Goj</i><i>Cristi D</i></span></li>
+    <li><b>The third read them as how end users get into the platform</b>, not as how the solution is configured — the confusion the team had already seen.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>Renaming was tested live, and failed.</b> Offered "who can access" with "everyone" in place of "public", he landed in exactly the same place. The word is not the problem.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>One genuine ambiguity survives in all readings:</b> the label does not say what signing in actually <em>does</em> — whether the account is created at that moment, or an existing account is assigned to a group.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>Solution-level access read correctly at first glance</b>, and the reading held when it was challenged.
+      <span class="src"><i>Alex Goj</i></span></li>
+    <li><b>The labels confused nobody who already knows the domain</b> — not on a first visit to the solution, and not now.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>The page explains its own purpose from the title alone:</b> who has access, and whether they got it directly or through a group.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Even the participant who misread it produced two usable alternatives</b> — "Public / Private", or "no authentication / with authentication" — offered for people less familiar with access, not for himself.
+      <span class="src"><i>Cătălin</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>The Access column can read as container-app entry:</b> public meaning you get in without logging in, Requires Sign In meaning you are redirected to a login and then checked by group.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>Relabelling is not the fix.</b> A live rewording test moved his reading not at all — so the problem sits in placement, or in the concept the column is trying to express.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>What happens at sign-in is undefined:</b> is the user created then, or assigned to a group then?
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>The difficulty may be intrinsic rather than fixable by copy.</b> Offering that much granularity necessarily means whoever grants access has to know a lot about the application — which makes it an audience question.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<h3 id="s12"><span class="n">1.2</span>The access page, and getting around it</h3>
+<p class="lede">The core design decision — a dedicated page rather than stacked dialogs — was endorsed. The controls inside it were not.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>The dedicated page is the right call, explicitly.</b> It removes the dialog-over-dialog stack, and leaves one dialog with the page as context behind it.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Two of three found the page without being told</b> — one by clicking the row unprompted, one by muscle memory from where Share used to be.
+      <span class="src"><i>Cătălin</i><i>Alex Goj</i></span></li>
+    <li><b>Every complaint here is about a control, not the layout:</b> the arrow that opens each row, the missing way back out of a nested dialog, and the policy details in the header.
+      <span class="src"><i>all three</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>Clicking the row felt natural.</b> The cursor changing was enough of a cue — he did not expect a button and did not need one.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>The whole page was read correctly on a first pass:</b> the links, the group, the role controls, and what each row would open.
+      <span class="src"><i>Cătălin</i><i>Cristi D</i></span></li>
+    <li><b>Asking for confirmation in place beats opening a dialog for it.</b> A confirmation step is needed, and keeping the surrounding information visible is better than covering it.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Regenerating needs no extra feedback:</b> the updated date is enough, because it is an action you take and walk away from.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>The copy throughout was judged direct and the right length</b>, neither too long nor too short.
+      <span class="src"><i>Cătălin</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>The arrow at the end of each configuration row promises to expand it in place.</b> On both rows it opens a separate window instead, and it caught the same person out twice.
+      <span class="src"><i>Alex Goj</i></span></li>
+    <li><b>There is no way back out of a nested window.</b> Opening one link's list of joiners leaves only a close control, which reads as closing everything and returning to the start.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>The policy and build details above the access list are noise</b> — and worse, they can mislead, because individual people get put on builds other than the one displayed.
+      <span class="src"><i>Alex Goj</i></span></li>
+    <li><b>Access has no named owner at the client.</b> The product supports a dedicated administrator for roles and access, but in practice user management gets handed back to the FlowX team.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<!-- ============ 2 ============ -->
+<h2 id="s2"><span class="n">2</span>Self-enrolment links</h2>
+
+<h3 id="s21"><span class="n">2.1</span>Creating and managing links</h3>
+<p class="lede">Creating a link is the most consistently praised thing in the round. What happens to links afterwards is where the disagreements are.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>All three liked creating a link.</b> One could not picture a simpler version; another called the experience genuinely enjoyable, unprompted.
+      <span class="src"><i>Cătălin</i><i>Alex Goj</i><i>Cristi D</i></span></li>
+    <li><b>The first question anyone asked was about forwarding</b> — what stops the link spreading beyond its intended audience. These are public sign-up links by design, but this release has no cap and no expiry.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>Revoking a link stops new joins but leaves everyone already in.</b> That second half is missing and was asked for directly.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>What to do with spent links is genuinely contested</b> — see the box below.</li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>The full lifecycle works:</b> create, copy, refresh, revoke and delete were walked end to end with no friction.
+      <span class="src"><i>Alex Goj</i></span></li>
+    <li><b>Not being able to edit an issued link needs no fixing:</b> a wrong role means deleting it and making another, accepted without persuading.
+      <span class="src"><i>Alex Goj</i></span></li>
+    <li><b>Dropping the approval step for the first release was accepted</b> the moment it was explained.
+      <span class="src"><i>Alex Goj</i></span></li>
+    <li><b>Approval is also seen as the right answer to the forwarding worry</b> — better than a domain restriction, because it puts the organisation in control of who gets in.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>Both gaps one participant found came with his own fix attached:</b> a way to hide links that are switched off, and not opening anything at all when a solution has none.
+      <span class="src"><i>Alex Goj</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>Revoking a link does not remove the people who joined through it.</b> The campaign shape offered: a seven-day joining window, a thirty-day trial, then whoever did not convert is removed.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Regenerate versus delete is not distinguishable:</b> one participant could not tell them apart and had to ask what the difference is.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>The list of joined users is not useful without a sign-up date.</b> The total is already visible, so exporting the names alone tells you nothing; with dates you can match sign-ups to a campaign.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Dead links still offer actions that cannot work</b>, Copy among them.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Nothing bounds the openness of a link:</b> no cap on sign-ups and no expiry in this release, both planned for later.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>Per-user enrolment has no stated limit:</b> what happens at very large numbers, and at what point managing by group stops being optional.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<div class="split">
+  <span class="tag">⚡ Unresolved — what happens to spent links?</span>
+  <b>Hide them, or keep them?</b>
+  <div class="side"><b>Hide them behind a toggle.</b> Revoked links stay in the list permanently and cannot be reactivated; ten of them means scrolling inside a dialog. <span style="color:var(--ink-faint)">— Alex Goj</span></div>
+  <div class="side"><b>Keep them, they are the campaign history.</b> Someone will want to look back and see how many joined through each — comparing a campus flyer QR against a website call-to-action to see which performed better. <span style="color:var(--ink-faint)">— Cătălin</span></div>
+  <div class="side"><b>Keep them, for audit and marketing.</b> He first questioned the dead Copy button, then accepted the case for the list itself and named both purposes. So the objection is to the inert actions on the row, not to the row. <span style="color:var(--ink-faint)">— Cristi D</span></div>
+</div>
+
+<h3 id="s22"><span class="n">2.2</span>Groups versus individual users</h3>
+<p class="lede">The deepest finding of the round. All three want a group option; they differ entirely on how badly.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>All three want the ability to put joiners into a group.</b> Nobody defended per-user-only enrolment.
+      <span class="src"><i>all three</i></span></li>
+    <li><b>They sit on a spectrum, not a line.</b> For one it is the only mechanism he has; for another it is what he would choose because it is cleaner; for the third it should be an option but never required.
+      <span class="src"><i>Alex Goj</i><i>Cristi D</i><i>Cătălin</i></span></li>
+    <li><b>Group-on-link-creation was in the original design and deferred</b> for reasons the team already knows — the empty system group, and the checks needed when adding to an existing group already bound to the solution with a different role.</li>
+    <li><b>The strongest single contribution is a cleanup rule</b> keyed on provenance, arrived at unprompted — see strengths.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>A precise cleanup rule, reached unprompted:</b> a group created automatically by an enrolment link should disappear when the link and its users are gone — but a group that already existed and was merely pointed at must survive, because it can hold people from elsewhere. The deciding factor is who created it.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>The group preference is grounded in production, not tidiness:</b> one Keycloak setup had five hundred users, and adding them to a list one at a time was unworkable by the ninth.
+      <span class="src"><i>Cristi D</i></span></li>
+    <li><b>Even the least group-oriented participant found a real use for them</b> minutes after saying he would not necessarily want one: students sharing a role but split by year, where one group gets something extra and fourth-years lose access on graduation.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>Self-enrolment correctly has no place for designer accounts:</b> designers are invited from the designer users area, and the client should not reach that side at all.
+      <span class="src"><i>Cătălin</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>For one participant groups are the only mechanism, full stop.</b> He does not grant access person by person at all — so an enrolment link with no group setting drops everyone who joins outside the only structure he manages access with, at accounts running to hundreds of users.
+      <span class="src"><i>Alex Goj</i></span></li>
+    <li><b>There is no organisation-level group to point a link at.</b> Groups are built per business case and not reused across solutions, so a reusable target does not exist today.
+      <span class="src"><i>Alex Goj</i></span></li>
+    <li><b>Role versus group is still conceptually unclear to someone who has never configured one</b> — he could not say when he would use which.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>Revoking a link and revoking access need to stay separate actions</b>, with the group question deciding what each one means.
+      <span class="src"><i>Cristi D</i></span></li>
+  </ul>
+</div>
+
+<!-- ============ 3 ============ -->
+<h2 id="s3"><span class="n">3</span>The end-user journey</h2>
+<p class="lede">Only one session covered what happens after someone clicks a link. Treat this section as one person's view, not the round's.</p>
+
+<div class="block k">
+  <span class="blabel">Key points</span>
+  <ul>
+    <li><b>The registration flow produced the strongest single request of the round</b>, raised three separate times.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>He talked himself out of two objections</b> — entering an email twice, and self-enrolment for designers — which is worth recording as evidence those decisions hold.
+      <span class="src"><i>Cătălin</i></span></li>
+  </ul>
+</div>
+
+<div class="block s">
+  <span class="blabel">Strengths</span>
+  <ul>
+    <li><b>One generic message for any dead link is right:</b> the person clicking does not need to know why it died, and per-case wording would add little.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>Entering the email twice is acceptable</b> on security grounds — he raised it, then reasoned it through himself.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>The approval and rejection screens read as fine</b>, with simpler judged better.
+      <span class="src"><i>Cătălin</i></span></li>
+  </ul>
+</div>
+
+<div class="block w">
+  <span class="blabel">Weak points</span>
+  <ul>
+    <li><b>Registration gives no sense of how far along you are.</b> Raised three times. Merging the password step with the name step would remove the need for a progress indicator entirely — which makes combining them the better fix, if the underlying limitation allows.
+      <span class="src"><i>Cătălin</i></span></li>
+    <li><b>The login screen for existing users looks unrelated to the rest of the flow.</b> He wanted the same split-page shape kept throughout, and described the current experience as jumping from design to design to design.
+      <span class="src"><i>Cătălin</i></span></li>
+  </ul>
+</div>
+
+<!-- ============ 4 ============ -->
+<h2 id="s4"><span class="n">4</span>Decisions to make</h2>
+<div class="callout">
+  <ol>
+    <li><b>Spent links — hide or keep.</b> Genuinely contested, and the two positions come from different jobs: one manages a crowded dialog, the other wants campaign history. A hide-by-default toggle satisfies both; removing the dead actions on a revoked row satisfies the third objection separately.</li>
+    <li><b>Group on the link.</b> Deferred, and all three want it. The open question is whether it is optional or required — the answer has to be optional, since one participant has never configured a group at all.</li>
+    <li><b>What "Requires Sign In" means at the moment of signing in.</b> Nobody could tell whether the account is created then or assigned to a group then. This is a copy question with a real answer behind it.</li>
+    <li><b>Whether relabelling the access column is worth doing at all.</b> A live rewording test moved nobody. If the confusion is worth fixing, the fix is placement or concept, not words.</li>
+    <li><b>Bounding a link's openness.</b> No cap and no expiry today; approval is the mechanism two participants reached for independently, and it was cut from the first release.</li>
+    <li><b>Revoking joiners as well as links.</b> Currently one action exists where two are wanted, and the group decision changes what each one would mean.</li>
+  </ol>
+</div>
+
+<h2 id="s5"><span class="n">5</span>Coverage &amp; caveats</h2>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Session</th><th>Covered</th><th>Caveat worth carrying</th></tr></thead>
+  <tbody>
+    <tr><td><b>Cristi D</b><br><span style="color:var(--ink-soft)">27 Aug</span></td><td class="c">Access page, link lifecycle, revoke &amp; regenerate, groups</td>
+      <td class="c">He already knew the feature from an earlier session, so this ran closer to a design review than a first-encounter test. End-user flow not covered.</td></tr>
+    <tr><td><b>Cătălin</b><br><span style="color:var(--ink-soft)">28 Aug</span></td><td class="c">Admin side <em>and</em> the end-user login and registration flow</td>
+      <td class="c">The only session covering the end-user journey — section 3 rests entirely on it.</td></tr>
+    <tr><td><b>Alex Goj</b><br><span style="color:var(--ink-soft)">3 Sep</span></td><td class="c">Solution-level access, the access page, link lifecycle</td>
+      <td class="c">He grants access from the End Users groups area and rarely works on this page, so his approval is sincere but comes from someone who would seldom be there. Shortest session at 19 minutes.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout" style="margin-top:1.5rem">
+  <h4>One thing worth not losing</h4>
+  <p style="margin:0;font-size:13.5px;color:var(--ink-soft)">The rename test is the most useful negative result in the round. Rewording the access column was tried on the one participant who had misread it, live, mid-session — and it moved him not at all. That is a cheap experiment that saved an expensive one, and it is the kind of thing that disappears from a report unless it is written down as a finding rather than as a moment in a transcript.</p>
+</div>
+
+<footer>
+  Built from three session reports: Cristi D (27 Aug), Cătălin Barabaș (28 Aug), Alex Goj (3 Sep).
+  Individual reports, with transcripts and screen frames, are in
+  <a href="https://madalinagheorghiu-ux.github.io/RandomDocs/userTestingSessions/">userTestingSessions</a>.
+</footer>
+
+</div>
+
+</body>
+</html>

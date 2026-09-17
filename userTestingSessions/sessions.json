@@ -170,5 +170,15 @@
     "feature": "Configuration workflow — exploratory discussion",
     "insights": 18,
     "file": "configuration-workflow-carina-2026-09-15.html"
+  },
+  {
+    "id": "self-enrolment-synthesis",
+    "title": "Self-enrolment links & solution access — synthesis",
+    "date": "2026-09-03",
+    "participant": "Cristi D · Cătălin · Alex Goj",
+    "feature": "Self-enrolment links & solution access",
+    "insights": 64,
+    "file": "self-enrolment-synthesis.html",
+    "pin": true
   }
 ]
